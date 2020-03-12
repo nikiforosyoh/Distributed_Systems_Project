@@ -6,21 +6,19 @@ public class Publisher implements Publisher_Interface
 
     }
 
+    @Override
+    public Broker hashTopic(ArtistName artistname) {
+        return null;
+    }
 
-    public Broker hashTopic()
-    {
+    @Override
+    public void push(ArtistName artistname, Value value) {
 
     }
 
-
-    public void push()
-    {
-
-    }
-
-
-    public void notifyFailure()
-    {
+    @Override
+    public void notifyFailure(Broker broker) {
 
     }
+
 }
