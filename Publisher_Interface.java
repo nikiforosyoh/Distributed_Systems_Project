@@ -1,4 +1,4 @@
-public interface Publisher_Interface
+public interface Publisher_Interface extends Node
 {
     public void getBrokerList();
 
