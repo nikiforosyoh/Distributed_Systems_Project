@@ -1,4 +1,4 @@
-public class Publisher
+public class Publisher extends Node
 {
 
     public void getBrokerList()
@@ -21,4 +21,5 @@ public class Publisher
 
     }
 
+  
 }
