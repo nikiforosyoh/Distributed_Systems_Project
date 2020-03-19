@@ -1,4 +1,4 @@
-public class Publisher implements Publisher_Interface
+public class Publisher
 {
 
     public void getBrokerList()
