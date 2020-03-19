@@ -4,7 +4,7 @@ import com.sun.corba.se.pept.broker.Broker;
 import java.util.ArrayList;
 import java.util.List;
 //or import java.util.*;
-public Node {
+public class Node {
     //fields
     List<Broker> brokers=new ArrayList<Broker>();
 
