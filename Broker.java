@@ -1,7 +1,14 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.net.*;
 
 public class Broker extends Node{
+
+    private Socket socket;
 
     List<Consumer> registerdUsers = new ArrayList<Consumer>();
     List<Publisher> registerdPublishers = new ArrayList<Publisher>();
