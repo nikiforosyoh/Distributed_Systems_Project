@@ -10,7 +10,10 @@ public Node {
 
     //methods
     public void init(int x){}
-    public List<Broker> getBrokers(){}
+    public List<Broker> getBrokers(){
+       return null;   
+    
+    }
     public void connect(){}
     public void discconnect(){}
     public void updateNodes(){}
