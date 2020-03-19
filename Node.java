@@ -9,10 +9,10 @@ public Node {
     List<Broker> brokers=new ArrayList<Broker>();
 
     //methods
-    public void init(int x);
-    public List<Broker> getBrokers();
-    public void connect();
-    public void discconnect();
-    public void updateNodes();
+    public void init(int x){}
+    public List<Broker> getBrokers(){}
+    public void connect(){}
+    public void discconnect(){}
+    public void updateNodes(){}
 
 }
