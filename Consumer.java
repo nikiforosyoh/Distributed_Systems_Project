@@ -30,14 +30,15 @@ public class Consumer extends Node {
 
                     while (true){
                          message = (String) in.readObject();
-                    System.out.println("Broker> " + message);
+                         System.out.println("Broker> " + message);
 
-                    out.writeObject("Testing Consumer..");
-                    out.flush();
+                         out.writeObject("Testing Consumer..");
+                         out.flush();
 
-                    // out.writeObject("Byee!!!!");
-                    //out.flush();
-               }
+                         // out.writeObject("Byee!!!!");
+                         //out.flush();
+                    }
+                    
                } catch (ClassNotFoundException classNot){
                     System.err.println("Data received in unknown format");
                }
