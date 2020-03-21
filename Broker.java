@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.*;
 
-public class Broker extends Node{
+public class Broker extends Node implements Runnable, Serializable{
     List<Consumer> registerdUsers = new ArrayList<Consumer>(){};
     List<Publisher> registerdPublishers = new ArrayList<Publisher>();
     ServerSocket providerSocket = null;
@@ -18,15 +18,24 @@ public class Broker extends Node{
         new Broker().openServer();
     }
 
+    @Override
+    public void run() {
+
+    }
 
     public void openServer() {
 
         try {
 
             providerSocket = new ServerSocket(4321);
+            System.out.println("Server is open!");
 
-            while (true) {
+           while (true) {
                 connection = providerSocket.accept();
+                //thread
+                System.out.println("s1");
+
+
                 ObjectOutputStream out = new ObjectOutputStream(connection.getOutputStream());
                 ObjectInputStream in = new ObjectInputStream(connection.getInputStream());
 
@@ -45,21 +54,25 @@ public class Broker extends Node{
                     }
                 } while (!message.equals("Byee!!!!"));
 
-
                 in.close();
                 out.close();
-                //connection.close();
 
             }//while
+
 
         } //try
         catch (IOException ioException) {
             ioException.printStackTrace();
         }
 
-
-
     }//openServer
+
+
+    public Broker(String BrokerIp, int brokerPort){
+
+    }
+
+    public Broker() {}
 
     public void calculateKeys(){}
     public Publisher acceptConection(Publisher p){
@@ -70,5 +83,5 @@ public class Broker extends Node{
     }
     public void notifyPublisher(String s){}
     public void pull(ArtistName a){}
-    
+
 }
