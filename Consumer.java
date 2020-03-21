@@ -35,10 +35,10 @@ public class Consumer extends Node {
                          out.writeObject("Testing Consumer..");
                          out.flush();
 
-                         // out.writeObject("Byee!!!!");
+                         // out.writeObject("bb");
                          //out.flush();
                     }
-                    
+
                } catch (ClassNotFoundException classNot){
                     System.err.println("Data received in unknown format");
                }

@@ -52,7 +52,7 @@ public class Broker extends Node implements Runnable, Serializable{
                     catch (ClassNotFoundException classnot) {
                         System.err.println("Data received in unknown format");
                     }
-                } while (!message.equals("Byee!!!!"));
+                } while (!message.equals("bb"));
 
                 in.close();
                 out.close();
