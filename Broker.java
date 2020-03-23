@@ -12,6 +12,8 @@ public class Broker extends Node implements Runnable, Serializable{
     ServerSocket providerSocket = null;
     Socket connection = null;
     String message = null;
+    String brokerIp;
+    int brokerPort;
 
     public static void main(String[] args) {
 
@@ -21,6 +23,29 @@ public class Broker extends Node implements Runnable, Serializable{
     @Override
     public void run() {
 
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(connection.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(connection.getInputStream());
+
+            out.writeObject("Connection successful!");
+            out.flush();
+
+            do {
+                try {
+
+                    message = (String) in.readObject();
+                    System.out.println(connection.getInetAddress().getHostAddress() + ">" + message);
+
+                } catch (ClassNotFoundException classnot) {
+                    System.err.println("Data received in unknown format");
+                }
+            } while (!message.equals("bb"));
+
+            in.close();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void openServer() {
@@ -32,31 +57,13 @@ public class Broker extends Node implements Runnable, Serializable{
 
            while (true) {
                 connection = providerSocket.accept();
-                //thread
-                System.out.println("s1");
-
-
-                ObjectOutputStream out = new ObjectOutputStream(connection.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream(connection.getInputStream());
-
-                out.writeObject("Connection successful!");
-                out.flush();
-
-                do {
-                    try {
-
-                        message = (String) in.readObject();
-                        System.out.println(connection.getInetAddress().getHostAddress() + ">" + message);
-
-                    }
-                    catch (ClassNotFoundException classnot) {
-                        System.err.println("Data received in unknown format");
-                    }
-                } while (!message.equals("bb"));
-
-                in.close();
-                out.close();
-
+                System.out.println("accept connection");
+                Thread thread= new Thread(new Broker(connection));
+                System.out.println("after thread");
+                thread.start();
+                System.out.println("after start");
+                //thread.join();
+               //System.out.println("after join");
             }//while
 
 
@@ -67,10 +74,15 @@ public class Broker extends Node implements Runnable, Serializable{
 
     }//openServer
 
-
-    public Broker(String BrokerIp, int brokerPort){
-
+    public Broker(Socket connection){
+        this.connection=connection;
     }
+
+    public Broker(String brokerIp, int brokerPort){
+        this.brokerIp=brokerIp;
+        this.brokerPort=brokerPort;
+    }
+
 
     public Broker() {}
 
@@ -84,4 +96,5 @@ public class Broker extends Node implements Runnable, Serializable{
     public void notifyPublisher(String s){}
     public void pull(ArtistName a){}
 
+    public void setBr(){}
 }

@@ -26,14 +26,19 @@ public class Publisher extends Node {
             in = new ObjectInputStream(requestSocket.getInputStream());
 
             try {
-                message = (String) in.readObject();
-                System.out.println("Broker> " + message);
 
-                out.writeObject("Testing Publisher..");
-                out.flush();
+                while (true) {
 
-                //out.writeObject("bb");
-                //out.flush();
+                    message = (String) in.readObject();
+                    System.out.println("Broker> " + message);
+
+                    out.writeObject("Testing Publisher..");
+                    out.flush();
+
+                    //out.writeObject("bb");
+                    //out.flush();
+
+                }
 
             } catch (ClassNotFoundException classNot){
                 System.err.println("Data received in unknown format");
