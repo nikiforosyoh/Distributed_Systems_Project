@@ -1,100 +1,73 @@
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.*;
 
-public class Broker extends Node implements Runnable, Serializable{
-    List<Consumer> registerdUsers = new ArrayList<Consumer>(){};
+public class Broker extends Node{
+    ServerSocket ConsumerServer = null;
+    ServerSocket PublisherServer=null;
+    Socket connect = null;
+    private DataInputStream in = null;
+    List<Consumer> registerdUsers = new ArrayList<Consumer>();
     List<Publisher> registerdPublishers = new ArrayList<Publisher>();
-    ServerSocket providerSocket = null;
-    Socket connection = null;
-    String message = null;
-    String brokerIp;
-    int brokerPort;
 
-    public static void main(String[] args) {
-
-        new Broker().openServer();
+    public Broker(){}
+    public Broker(Socket socket){
+        this.connect=socket;
     }
 
-    @Override
-    public void run() {
 
+    public void openServer(){
         try {
-            ObjectOutputStream out = new ObjectOutputStream(connection.getOutputStream());
-            ObjectInputStream in = new ObjectInputStream(connection.getInputStream());
+            ConsumerServer=new ServerSocket(5000);
+            System.out.println("Server:waiting for client connection....");
+            Thread t1= new Thread() {
+                public void run() {
+                    try {
+                        try {
+                            PublisherServer = new ServerSocket(5001);
 
-            out.writeObject("Connection successful!");
-            out.flush();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        while(true){
+                            Socket socket2= PublisherServer.accept();
+                            System.out.println("Publisher accepted");
+                            PublisherThread pt=new PublisherThread(socket2);
+                            pt.start();
+                        }
 
-            do {
-                try {
-
-                    message = (String) in.readObject();
-                    System.out.println(connection.getInetAddress().getHostAddress() + ">" + message);
-
-                } catch (ClassNotFoundException classnot) {
-                    System.err.println("Data received in unknown format");
+                    }
+                     catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            } while (!message.equals("bb"));
+            };
+            t1.start();
 
-            in.close();
-            out.close();
+            while(true) {
+                connect = ConsumerServer.accept();
+                System.out.println("Consumer accepted!!");
+                ConsumerThread ct=new ConsumerThread(connect);
+                ct.start();
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    public void openServer() {
-
-        try {
-
-            providerSocket = new ServerSocket(4321);
-            System.out.println("Server is open!");
-
-           while (true) {
-                connection = providerSocket.accept();
-                System.out.println("accept connection");
-                Thread thread= new Thread(new Broker(connection));
-                System.out.println("after thread");
-                thread.start();
-                System.out.println("after start");
-                //thread.join();
-               //System.out.println("after join");
-            }//while
-
-
-        } //try
-        catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-
-    }//openServer
-
-    public Broker(Socket connection){
-        this.connection=connection;
-    }
-
-    public Broker(String brokerIp, int brokerPort){
-        this.brokerIp=brokerIp;
-        this.brokerPort=brokerPort;
-    }
-
-
-    public Broker() {}
-
     public void calculateKeys(){}
-    public Publisher acceptConection(Publisher p){
-        return null;
-    }
-    public Consumer acceptConection(Consumer c){
-        return null;
-    }
+    public Publisher acceptConection(Publisher p){ return null; }
+    public Consumer acceptConection(Consumer c){return null; }
     public void notifyPublisher(String s){}
     public void pull(ArtistName a){}
 
-    public void setBr(){}
+
+    public static void main(String[] args) throws IOException {
+        Broker broker=new Broker();
+        broker.openServer();
+
+    }
+
 }
