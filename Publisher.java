@@ -1,77 +1,67 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.net.*;
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
-public class Publisher extends Node {
-    Socket requestSocket = null;
-    ObjectOutputStream out = null;
-    ObjectInputStream in = null;
-    String message;
-    public String brokerIP="127.0.0.1";
-    public int brokerPort = 4321;
+public class Publisher extends Node
+{
+    public void getBrokerList(){}
 
-    public static void main(String[] args) {
-        new Publisher().startPublisher();
-    }
+    public Broker hashTopic(ArtistName artistname){return null; }
 
-    private void startPublisher() {
-        try {
-            requestSocket = new Socket(brokerIP, brokerPort);
+    public void push(ArtistName artistname, Value value){}
 
-            out = new ObjectOutputStream(requestSocket.getOutputStream());
-            in = new ObjectInputStream(requestSocket.getInputStream());
+    public void notifyFailure(Broker broker){}
 
-            try {
+    public static void main(String[] args){
+        Socket socket = null;
+        ObjectInputStream input=null;
+        ObjectOutputStream out =null;
+        DataInputStream input2=null;
 
-                while (true) {
 
-                    message = (String) in.readObject();
-                    System.out.println("Broker> " + message);
+        try{
+            socket = new Socket("127.0.0.1",5001);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            input = new ObjectInputStream(socket.getInputStream());
 
-                    out.writeObject("Testing Publisher..");
-                    out.flush();
-
-                    //out.writeObject("bb");
-                    //out.flush();
+            System.out.println("Connected");
+            //takes input from terminal
+            input2 = new DataInputStream(System.in);
+            String line = "";
+            while(!line.equals("Over")){
+                try{
+                    line = input2.readLine();
+                    out.writeObject(line);
 
                 }
-
-            } catch (ClassNotFoundException classNot){
-                System.err.println("Data received in unknown format");
+                catch(IOException i){
+                    System.out.println(i);
+                }
             }
 
-            in.close();
-            out.close();
-
-        } catch (UnknownHostException unknownHost) {
-            System.err.println("You are trying to connect to an unknown host!");
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }finally {
-            disconnect(requestSocket);
         }
+        catch(UnknownHostException u)
+        {
+            System.out.println(u);
+        }
+        catch(IOException i)
+        {
+            System.out.println(i);
+        }
+        //String to read message from input tab
+        String line = "";
+        //keep reading until "Over" is displayed on the screen
+        while(!line.equals("Over")){
+            try{
+                line = input.readLine();
+                out.writeUTF(line);
+
+            }
+            catch(IOException i){
+                System.out.println(i);
+            }
+        }
+
+
     }
-
-    public void getBrokerList()
-    {
-
-    }
-
-    public Broker hashTopic(ArtistName artistname) {
-        return null;
-    }
-
-    public void push(ArtistName artistname, Value value) {
-
-    }
-
-    public void notifyFailure(Broker broker) {
-
-    }
-
-  
 }
