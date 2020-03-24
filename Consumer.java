@@ -1,73 +1,64 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.net.*;
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import javax.swing.JOptionPane;
 
 public class Consumer extends Node {
-     Socket requestSocket = null;
-     ObjectOutputStream out = null;
-     ObjectInputStream in = null;
-     String message;
-     public String brokerIP="127.0.0.1";
-     public int brokerPort = 4321;
 
-     public static void main(String[] args) {
-          new Consumer().startConsumer();
-     }
+    public void register(Broker broker, ArtistName artistName){
+    }
 
-     public void startConsumer() {
+    public void disconnect(Broker broker, ArtistName artistName){
 
-          try {
-               requestSocket = new Socket(brokerIP, brokerPort);
+    }
+    public void playData(ArtistName artistName, Value value){
 
-               out = new ObjectOutputStream(requestSocket.getOutputStream());
-               in = new ObjectInputStream(requestSocket.getInputStream());
+    }
 
-               try {
-
-                         message = (String) in.readObject();
-                         System.out.println("Broker> " + message);
-
-                         out.writeObject("Testing Consumer..");
-                         out.flush();
-
-                         out.writeObject("bb");
-                         out.flush();
+    public static void main(String[] args) throws IOException {
+       Socket socket = null;
+       ObjectInputStream input=null;
+       ObjectOutputStream out =null;
+       DataInputStream input2=null;
 
 
-               } catch (ClassNotFoundException classNot){
-                    System.err.println("Data received in unknown format");
-               }
+        try{
+            socket = new Socket("127.0.0.1",5000);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            input = new ObjectInputStream(socket.getInputStream());
 
-               in.close();
-               out.close();
+            System.out.println("Connected");
+            //takes input from terminal
+            input2 = new DataInputStream(System.in);
 
-          } catch (UnknownHostException unknownHost) {
-               System.err.println("You are trying to connect to an unknown host!");
-          } catch (IOException ioException) {
-               ioException.printStackTrace();
-          }finally {
+            String line = "";
+            while(!line.equals("Over")){
+                try{
+                    line = input2.readLine();
+                    out.writeObject(line);
 
-               super.disconnect(requestSocket);
-          }
-     }
+                }
+                catch(IOException i){
+                    System.out.println(i);
+                }
+            }
 
-     public void register(Broker broker, ArtistName artistName){}
+        }
+        catch(UnknownHostException u)
+        {
+            System.out.println(u);
+        }
+        catch(IOException i)
+        {
+            System.out.println(i);
+        }
+        //String to read message from input tab
+        //keep reading until "Over" is displayed on the screen
 
-     /*
-     public void disconnect(Broker broker, ArtistName artistName){
-          try {
-               in.close();
-               out.close();
-               requestSocket.close();
-          } catch (IOException ioException) {
-               ioException.printStackTrace();
-          }
-     }
-     */
 
-     public void playData(ArtistName artistName, Value value){}
+
+    }
+
+
 }
