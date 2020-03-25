@@ -7,8 +7,8 @@ import java.net.*;
 public class Broker extends Node{
 
     String ipBroker="127.0.0.1";
-    int brokerPort1=5001;
-    int brokerPort2=5002;
+    int ConsumersPort=5004;
+    int PublishersPort=5005;
 
 
     ServerSocket ConsumerServer = null;
@@ -18,13 +18,13 @@ public class Broker extends Node{
     List<Consumer> registerdUsers = new ArrayList<Consumer>();
     List<Publisher> registerdPublishers = new ArrayList<Publisher>();
 
-    public void createTxt(int port1,int port2)
+    public void createTxt(int ConsumersPort,int PublishersPort)
     {
         try {
             BufferedWriter output = new BufferedWriter(new FileWriter("src\\Broker.txt", true));
 
             output.write("Broker IP: "+ipBroker+
-                    " Broker ports : "+Integer.toString(port1)+" , "+Integer.toString(port2)+"\n");
+                    "\tBroker Port: "+Integer.toString(PublishersPort)+"\n");
             output.close();
 
         } catch (FileNotFoundException e) {
@@ -42,22 +42,22 @@ public class Broker extends Node{
 
 
     public void openServer(){
-        createTxt(brokerPort1,brokerPort2);
+        createTxt(ConsumersPort,PublishersPort);
         try {
-            ConsumerServer=new ServerSocket(brokerPort1);
-            System.out.println("Server:waiting for client connection....");
+            ConsumerServer=new ServerSocket(ConsumersPort);
+            System.out.println("Broker> waiting for connection...");
+            System.out.println("Available Consumer Port: "+ConsumersPort);
+            System.out.println("Available Publisher Port: "+PublishersPort);
+
             Thread t1= new Thread() {
                 public void run() {
                     try {
-                        try {
-                            PublisherServer = new ServerSocket(brokerPort2);
 
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        PublisherServer = new ServerSocket(PublishersPort);
+
                         while(true){
                             Socket socket2= PublisherServer.accept();
-                            System.out.println("Publisher accepted");
+                            System.out.println("Publisher accepted! --> " + socket2.getInetAddress().getHostAddress());
                             PublisherThread pt=new PublisherThread(socket2);
                             pt.start();
                         }
@@ -72,7 +72,7 @@ public class Broker extends Node{
 
             while(true) {
                 connect = ConsumerServer.accept();
-                System.out.println("Consumer accepted!!");
+                System.out.println("Consumer accepted! --> " + connect.getInetAddress().getHostAddress());
                 ConsumerThread ct=new ConsumerThread(connect);
                 ct.start();
             }

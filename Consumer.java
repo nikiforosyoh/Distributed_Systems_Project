@@ -17,10 +17,10 @@ public class Consumer extends Node {
     }
 
     public static void main(String[] args) throws IOException {
-       Socket socket = null;
-       ObjectInputStream input=null;
-       ObjectOutputStream out =null;
-       DataInputStream input2=null;
+        Socket socket = null;
+        ObjectInputStream input=null;
+        ObjectOutputStream out =null;
+        DataInputStream input2=null;
 
 
         try{
@@ -28,7 +28,7 @@ public class Consumer extends Node {
             out = new ObjectOutputStream(socket.getOutputStream());
             input = new ObjectInputStream(socket.getInputStream());
 
-            System.out.println("Connected");
+            System.out.println("Consumer Connected: " + socket);
             //takes input from terminal
             input2 = new DataInputStream(System.in);
 
@@ -53,10 +53,6 @@ public class Consumer extends Node {
         {
             System.out.println(i);
         }
-        //String to read message from input tab
-        //keep reading until "Over" is displayed on the screen
-
-
 
     }
 

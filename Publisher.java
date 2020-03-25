@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 
 public class Publisher extends Node
 {
+
     public void getBrokerList(){}
 
     public Broker hashTopic(ArtistName artistname){return null; }
@@ -18,13 +19,13 @@ public class Publisher extends Node
         ObjectOutputStream out =null;
         DataInputStream input2=null;
 
-
         try{
-            socket = new Socket("127.0.0.1",5001);
+            socket = new Socket("127.0.0.1",5005);
             out = new ObjectOutputStream(socket.getOutputStream());
             input = new ObjectInputStream(socket.getInputStream());
 
-            System.out.println("Connected");
+            System.out.println("Publisher Connected: " + socket);
+
             //takes input from terminal
             input2 = new DataInputStream(System.in);
             String line = "";
@@ -33,9 +34,21 @@ public class Publisher extends Node
                     line = input2.readLine();
                     out.writeObject(line);
 
+                    if(line.equalsIgnoreCase("brokers")) {
+                        System.out.println("Broker> ");
+                        String data = "";
+                        for (int i=0; i<3; i++){
+                            data = (String) input.readObject();
+                            System.out.println("\t" + data);
+
+                        }
+                    }
+
                 }
                 catch(IOException i){
                     System.out.println(i);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -47,19 +60,6 @@ public class Publisher extends Node
         catch(IOException i)
         {
             System.out.println(i);
-        }
-        //String to read message from input tab
-        String line = "";
-        //keep reading until "Over" is displayed on the screen
-        while(!line.equals("Over")){
-            try{
-                line = input.readLine();
-                out.writeUTF(line);
-
-            }
-            catch(IOException i){
-                System.out.println(i);
-            }
         }
 
 
