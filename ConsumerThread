@@ -20,8 +20,7 @@ public class ConsumerThread extends Thread{
 
             while (true){
                 String data=(String) in.readObject();
-                System.out.println(data);
-            }
+                System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
