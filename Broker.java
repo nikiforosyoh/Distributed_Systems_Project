@@ -5,12 +5,35 @@ import java.util.List;
 import java.net.*;
 
 public class Broker extends Node{
+
+    String ipBroker="127.0.0.1";
+    int brokerPort1=5001;
+    int brokerPort2=5002;
+
+
     ServerSocket ConsumerServer = null;
     ServerSocket PublisherServer=null;
     Socket connect = null;
     private DataInputStream in = null;
     List<Consumer> registerdUsers = new ArrayList<Consumer>();
     List<Publisher> registerdPublishers = new ArrayList<Publisher>();
+
+    public void createTxt(int port1,int port2)
+    {
+        try {
+            BufferedWriter output = new BufferedWriter(new FileWriter("src\\Broker.txt", true));
+
+            output.write("Broker IP: "+ipBroker+
+                    " Broker ports : "+Integer.toString(port1)+" , "+Integer.toString(port2)+"\n");
+            output.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public Broker(){}
     public Broker(Socket socket){
@@ -19,14 +42,15 @@ public class Broker extends Node{
 
 
     public void openServer(){
+        createTxt(brokerPort1,brokerPort2);
         try {
-            ConsumerServer=new ServerSocket(5000);
+            ConsumerServer=new ServerSocket(brokerPort1);
             System.out.println("Server:waiting for client connection....");
             Thread t1= new Thread() {
                 public void run() {
                     try {
                         try {
-                            PublisherServer = new ServerSocket(5001);
+                            PublisherServer = new ServerSocket(brokerPort2);
 
                         } catch (IOException e) {
                             e.printStackTrace();
