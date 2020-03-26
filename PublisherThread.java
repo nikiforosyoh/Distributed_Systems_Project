@@ -23,12 +23,9 @@ public class PublisherThread extends Thread{
                 System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
 
                 if(data.equalsIgnoreCase("brokers")){
-                    String[] brokers= ReadBrokerTxt();
-                    for (int i=0; i<3; i++){
-                        out.writeObject(brokers[i]);
-                    }
-
+                    sendBrokerInfo(out);
                 }
+
 
             }
         } catch (IOException e) {
@@ -39,15 +36,11 @@ public class PublisherThread extends Thread{
     }
 
     //load file
-    private static String[] ReadBrokerTxt() {
+    private static void sendBrokerInfo(ObjectOutputStream out) {
         File f = null;
         BufferedReader reader = null;
         String line;
         String[] brokers = new String[3];
-
-        String broker1 = "";
-        String broker2 = "";
-        String broker3 = "";
 
         try {
             f = new File("src\\Broker.txt");
@@ -64,15 +57,15 @@ public class PublisherThread extends Thread{
         try {
             line = reader.readLine();
 
-            broker1 = line;
+            brokers[0] = line;
             line = reader.readLine();
-            broker2 = line;
+            brokers[1] = line;
             line = reader.readLine();
-            broker3 = line;
+            brokers[2] = line;
 
-            brokers[0] = broker1;
-            brokers[1] = broker2;
-            brokers[2] = broker3;
+            for (int i=0; i<3; i++){
+                out.writeObject(brokers[i]);
+            }
 
         }catch (IOException e) {
             System.out.println	("Error reading line ...");
@@ -84,7 +77,6 @@ public class PublisherThread extends Thread{
         catch (IOException e) {
             System.err.println("Error closing file.");
         }
-        return brokers;
     }
 
 }

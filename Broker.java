@@ -7,8 +7,8 @@ import java.net.*;
 public class Broker extends Node{
 
     String ipBroker="127.0.0.1";
-    int ConsumersPort=5004;
-    int PublishersPort=5005;
+    int ConsumersPort=5000;
+    int PublishersPort=5001;
 
 
     ServerSocket ConsumerServer = null;
@@ -24,7 +24,7 @@ public class Broker extends Node{
             BufferedWriter output = new BufferedWriter(new FileWriter("src\\Broker.txt", true));
 
             output.write("Broker IP: "+ipBroker+
-                    "\tBroker Port: "+Integer.toString(PublishersPort)+"\n");
+                    "\t,Broker Port: "+Integer.toString(PublishersPort)+"\n");
             output.close();
 
         } catch (FileNotFoundException e) {

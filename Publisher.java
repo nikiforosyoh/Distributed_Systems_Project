@@ -1,9 +1,13 @@
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Publisher extends Node
 {
+
+    private static String[][] availableBrokers = new String[3][2]; //broker1: brokerIP, brokerPort -> Integer.parseInt();
 
     public void getBrokerList(){}
 
@@ -20,7 +24,7 @@ public class Publisher extends Node
         DataInputStream input2=null;
 
         try{
-            socket = new Socket("127.0.0.1",5005);
+            socket = new Socket("127.0.0.1",5001);
             out = new ObjectOutputStream(socket.getOutputStream());
             input = new ObjectInputStream(socket.getInputStream());
 
@@ -35,19 +39,20 @@ public class Publisher extends Node
                     out.writeObject(line);
 
                     if(line.equalsIgnoreCase("brokers")) {
-                        System.out.println("Broker> ");
-                        String data = "";
-                        for (int i=0; i<3; i++){
-                            data = (String) input.readObject();
-                            System.out.println("\t" + data);
+                        availableBrokers = getBrokerInfo(input, availableBrokers );
+                        System.out.println("Brokers' information received");
 
+                        //Printing availableBrokers Array
+                        /*
+                        for(int i=0; i<3; i++){
+                            System.out.println(availableBrokers[i][0]);
+                            System.out.println(availableBrokers[i][1]);
                         }
+                        */
                     }
 
                 }
-                catch(IOException i){
-                    System.out.println(i);
-                } catch (ClassNotFoundException e) {
+                catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }
@@ -63,5 +68,19 @@ public class Publisher extends Node
         }
 
 
+    }
+
+    public static String[][] getBrokerInfo(ObjectInputStream input, String[][] availableBrokers) throws IOException, ClassNotFoundException {
+        String info = "";
+        for (int i=0; i<3; i++){
+            info = (String) input.readObject();
+
+            availableBrokers[i][0] = info.trim().substring(info.indexOf(":")+1,info.indexOf(",")).trim();
+            info = info.trim().substring(info.indexOf(",")+1);
+            availableBrokers[i][1] = info.trim().substring(info.indexOf(":")+1).trim();
+
+        }
+
+        return availableBrokers;
     }
 }
