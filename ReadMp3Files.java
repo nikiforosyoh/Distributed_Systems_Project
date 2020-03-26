@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class readMp3Files
+public class ReadMp3Files
 {
     public static void main(String args[]) throws UnsupportedTagException, InvalidDataException, IOException
     {
