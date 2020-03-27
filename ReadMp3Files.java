@@ -17,7 +17,9 @@ import java.util.stream.Stream;
 
 public class ReadMp3Files
 {
-    public static void main(String args[]) throws UnsupportedTagException, InvalidDataException, IOException
+    ArrayList<String> artistsname=new ArrayList<>();
+    ArrayList<String> ca=new ArrayList<>();
+    public ArrayList<String> Read() throws UnsupportedTagException, InvalidDataException, IOException
     {
         String path = "C:\\Users\\DELL\\Desktop\\Distributed Systems\\Songs";
 
@@ -45,6 +47,7 @@ public class ReadMp3Files
         int ca = CountArtists(path);
         System.out.println("Artist count: " + ca);
         System.out.println("Song count: " + sc);
+        return ca;
     }
 
     public static int CountArtists(String pathToMp3Files)
@@ -90,7 +93,7 @@ public class ReadMp3Files
             e.printStackTrace();
         }
 
-        return ArtistCount;
+        return Artists;
     }
 
 }
