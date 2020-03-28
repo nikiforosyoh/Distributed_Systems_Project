@@ -5,10 +5,12 @@ public class ConsumerThread extends Thread{
     Socket connection;
     ObjectInputStream in;
     ObjectOutputStream out;
+    int key;
 
 
-    public ConsumerThread(Socket socket){
+    public ConsumerThread(Socket socket, int key){
         connection=socket;
+        this.key=key;
     }
 
     public void run(){

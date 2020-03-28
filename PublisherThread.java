@@ -6,7 +6,8 @@ public class PublisherThread extends Thread{
     ObjectInputStream in;
     ObjectOutputStream out;
     int key;
-    public PublisherThread(Socket socket,int key){
+
+    public PublisherThread(Socket socket, int key){
         connection=socket;
         this.key=key;
     }
@@ -17,17 +18,20 @@ public class PublisherThread extends Thread{
         try {
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
-            out.writeObject(key);
+
 
             while (true){
-
                 String data=(String) in.readObject();
                 System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
 
                 if(data.equalsIgnoreCase("brokers")){
                     sendBrokerInfo(out);
                 }
+                if (data.equalsIgnoreCase("key")){
+                    System.out.println("broker key: " + key );
+                    out.writeObject(Integer.toString(key));
 
+                }
 
             }
         } catch (IOException e) {
