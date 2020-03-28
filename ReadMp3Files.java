@@ -21,7 +21,7 @@ public class ReadMp3Files
     ArrayList<String> ca=new ArrayList<>();
     public ArrayList<String> Read() throws UnsupportedTagException, InvalidDataException, IOException
     {
-        String path = "C:\\Users\\DELL\\Desktop\\Distributed Systems\\Songs";
+        String path = "Songs";
 
         Stream<Path> walk = Files.walk(Paths.get(path));
         List<String> result = walk.filter(Files::isRegularFile).map(Path::toString).collect(Collectors.toList());
