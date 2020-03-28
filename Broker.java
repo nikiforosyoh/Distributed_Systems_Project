@@ -8,17 +8,17 @@ import java.net.*;
 public class Broker extends Node{
 
     String ipBroker="127.0.0.1";
-    int ConsumersPort=5002;
-    int PublishersPort=5003;
-    int key=0;
+    int ConsumersPort=5000;
+    int PublishersPort=5001;
+    int key=1;
 
 
     ServerSocket ConsumerServer = null;
     ServerSocket PublisherServer=null;
-    Socket connect = null;
+    Socket connectCon = null;
     private DataInputStream in = null;
-    List<Consumer> registerdUsers = new ArrayList<Consumer>();
-    List<Publisher> registerdPublishers = new ArrayList<Publisher>();
+    List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
+    List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
 
     public void createTxt(int ConsumersPort,int PublishersPort)
     {
@@ -39,14 +39,14 @@ public class Broker extends Node{
 
     public Broker(){}
     public Broker(Socket socket){
-        this.connect=socket;
+        this.connectCon=socket;
     }
 
 
     public void openServer(){
 
 
-        createTxt(ConsumersPort,PublishersPort);
+       // createTxt(ConsumersPort,PublishersPort);
         try {
             ConsumerServer=new ServerSocket(ConsumersPort);
             System.out.println("Broker> waiting for connection...");
@@ -60,15 +60,16 @@ public class Broker extends Node{
                         PublisherServer = new ServerSocket(PublishersPort);
 
                         while(true){
-                            Socket socket2= PublisherServer.accept();
+                            Socket connectPub= PublisherServer.accept();
                             calculateKeys();
-                            System.out.println("Publisher accepted! --> " + socket2.getInetAddress().getHostAddress());
-                            PublisherThread pt=new PublisherThread(socket2, key);
+                            System.out.println("Publisher accepted! --> " + connectPub.getInetAddress().getHostAddress());
+                            PublisherThread pt=new PublisherThread(connectPub, key);
+                            registeredPublishers.add(pt);
                             pt.start();
                         }
 
                     }
-                     catch (IOException | NoSuchAlgorithmException e) {
+                    catch (IOException | NoSuchAlgorithmException e) {
                         e.printStackTrace();
                     }
                 }
@@ -76,9 +77,10 @@ public class Broker extends Node{
             t1.start();
 
             while(true) {
-                connect = ConsumerServer.accept();
-                System.out.println("Consumer accepted! --> " + connect.getInetAddress().getHostAddress());
-                ConsumerThread ct=new ConsumerThread(connect, key);
+                connectCon = ConsumerServer.accept();
+                System.out.println("Consumer accepted! --> " + connectCon.getInetAddress().getHostAddress());
+                ConsumerThread ct=new ConsumerThread(connectCon,key);
+                registeredUsers.add(ct);
                 ct.start();
             }
 
