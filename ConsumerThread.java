@@ -7,8 +7,7 @@ public class ConsumerThread extends Thread{
     ObjectOutputStream out;
     int key;
 
-
-    public ConsumerThread(Socket socket, int key){
+    public ConsumerThread(Socket socket,int key){
         connection=socket;
         this.key=key;
     }
@@ -25,9 +24,9 @@ public class ConsumerThread extends Thread{
                 System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
             }
 
-
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (IOException | ClassNotFoundException  e) {
+            //e.printStackTrace();
+            System.out.println("Consumer disconnected! --> "+connection.getInetAddress().getHostAddress());
         }
     }
 
