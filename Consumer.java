@@ -43,6 +43,7 @@ public class Consumer extends Node {
                     System.out.println(i);
                 }
             }
+            socket.close();
 
         }
         catch(UnknownHostException u)
