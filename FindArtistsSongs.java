@@ -13,7 +13,7 @@ public class FindArtistsSongs
 {
     public static void main(String args[])
     {
-        String path  = "C:\\Users\\DELL\\Desktop\\Distributed Systems\\Songs";
+        String path  = "Songs";
         int removablePart = path.length()+1;
 
         ArrayList<String> SongNames = new ArrayList<String>();
