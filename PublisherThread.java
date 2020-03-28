@@ -5,9 +5,10 @@ public class PublisherThread extends Thread{
     Socket connection;
     ObjectInputStream in;
     ObjectOutputStream out;
-
-    public PublisherThread(Socket socket){
+    int key;
+    public PublisherThread(Socket socket,int key){
         connection=socket;
+        this.key=key;
     }
 
     public void run(){
@@ -16,9 +17,10 @@ public class PublisherThread extends Thread{
         try {
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
-
+            out.writeObject(key);
 
             while (true){
+
                 String data=(String) in.readObject();
                 System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
 
