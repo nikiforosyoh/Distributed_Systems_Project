@@ -31,8 +31,8 @@ public class Hash {
      //0.
      public ArrayList<String> readArtists(){
          ReadMp3Files readMp3Files=new ReadMp3Files();
-         System.out.println("The size of array artistsName is :"+readMp3Files.CountArtists("C:\\Hellag\\AUEB\\2019_2020(final)\\spring\\distributed_systems\\projects\\dataset1\\dataset1\\Test"));
-         artistnames=readMp3Files.CountArtists("C:\\Hellag\\AUEB\\2019_2020(final)\\spring\\distributed_systems\\projects\\dataset1\\dataset1\\Test");
+         System.out.println("The size of array artistsName is :"+readMp3Files.CountArtists("Songs"));
+         artistnames=readMp3Files.CountArtists("Songs");
          return artistnames;
      }
      //1.
