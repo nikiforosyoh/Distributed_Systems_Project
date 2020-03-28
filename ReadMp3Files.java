@@ -44,13 +44,13 @@ public class ReadMp3Files
             sc++;
         }
 
-        int ca = CountArtists(path);
+        ca = CountArtists(path);
         System.out.println("Artist count: " + ca);
         System.out.println("Song count: " + sc);
         return ca;
     }
 
-    public static int CountArtists(String pathToMp3Files)
+    public static ArrayList<String> CountArtists(String pathToMp3Files)
     {
         int ArtistCount = 0;
         ArrayList<String> Artists = new ArrayList<String>();
