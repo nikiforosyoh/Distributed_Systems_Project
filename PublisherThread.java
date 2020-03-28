@@ -26,10 +26,13 @@ public class PublisherThread extends Thread{
 
                 if(data.equalsIgnoreCase("brokers")){
                     sendBrokerInfo(out);
+                    connection.close();
+                    return;
                 }
                 if (data.equalsIgnoreCase("key")){
                     System.out.println("broker key: " + key );
                     out.writeObject(Integer.toString(key));
+                    out.flush();
 
                 }
 
@@ -40,7 +43,6 @@ public class PublisherThread extends Thread{
             e.printStackTrace();
         }
     }
-
     //load file
     private static void sendBrokerInfo(ObjectOutputStream out) {
         File f = null;
@@ -71,6 +73,7 @@ public class PublisherThread extends Thread{
 
             for (int i=0; i<3; i++){
                 out.writeObject(brokers[i]);
+                out.flush();
             }
 
         }catch (IOException e) {
