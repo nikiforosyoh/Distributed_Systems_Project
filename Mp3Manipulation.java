@@ -17,9 +17,9 @@ public class Mp3Manipulation
 
         ArrayList<byte[]> ChunkList = new ArrayList<>();
 
-        File file = new File("C://Users//DELL//Desktop//Distributed Systems//Songs//Apex.mp3");
+        File file = new File("Songs\\Assassin.mp3");
 
-        Path path = Paths.get("C://Users//DELL//Desktop//Distributed Systems//Songs//Apex.mp3");
+        Path path = Paths.get("Songs\\Assassin.mp3");
 
         long file_size = size(path);
 
@@ -71,7 +71,7 @@ public class Mp3Manipulation
 
         System.out.println(Arrays.equals(newMp3ByteArray,Mp3ByteArray));
 
-        FileOutputStream stream = new FileOutputStream("C://Users//DELL//Desktop//Distributed Systems//Distributed_Systems_Project//src//MP3ARRAYFILE.mp3");
+        FileOutputStream stream = new FileOutputStream("src//MP3ARRAYFILE.mp3");
         stream.write(newMp3ByteArray);
 
     }
