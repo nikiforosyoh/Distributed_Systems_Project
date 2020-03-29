@@ -17,16 +17,15 @@ public class ConsumerThread extends Thread{
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
 
-
-
             while (true){
-                String data=(String) in.readObject();
-                System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
+                String request=(String) in.readObject();
+                System.out.println(connection.getInetAddress().getHostAddress() + "> "  + request);
+
             }
 
         } catch (IOException | ClassNotFoundException  e) {
             //e.printStackTrace();
-            System.out.println("Consumer disconnected! --> "+connection.getInetAddress().getHostAddress());
+            System.out.println("Consumer disconnected! --> " + connection.getInetAddress().getHostAddress());
         }
     }
 

@@ -1,24 +1,29 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 public class PublisherThread extends Thread{
     Socket connection;
     ObjectInputStream in;
     ObjectOutputStream out;
     int key;
+    List<PublisherThread> registeredPublishers;
 
-    public PublisherThread(Socket socket, int key){
+    public PublisherThread(Socket socket, int key, List<PublisherThread> registeredPublishers){
         connection=socket;
         this.key=key;
+        for (PublisherThread publisherThread : this.registeredPublishers = registeredPublishers) {
+            
+        }
+        ;
+
     }
 
     public void run(){
 
-
         try {
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
-
 
             while (true){
                 String data=(String) in.readObject();
@@ -27,15 +32,17 @@ public class PublisherThread extends Thread{
                 if(data.equalsIgnoreCase("brokers")){
                     sendBrokerInfo(out);
                     connection.close();
+
+                    synchronized(registeredPublishers) {
+                        //remove this thread from publisher threads list
+                        registeredPublishers.remove(this);
+                    }
                     return;
                 }
                 if (data.equalsIgnoreCase("key")){
-                    System.out.println("broker key: " + key );
                     out.writeObject(Integer.toString(key));
                     out.flush();
-
                 }
-
             }
         } catch (IOException e) {
             e.printStackTrace();

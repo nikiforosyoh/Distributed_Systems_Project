@@ -18,7 +18,7 @@ public class Consumer extends Node {
 
     public static void main(String[] args) throws IOException {
         Socket socket = null;
-        ObjectInputStream input=null;
+        ObjectInputStream in=null;
         ObjectOutputStream out =null;
         DataInputStream input2=null;
 
@@ -26,17 +26,17 @@ public class Consumer extends Node {
         try{
             socket = new Socket("127.0.0.1",5000);
             out = new ObjectOutputStream(socket.getOutputStream());
-            input = new ObjectInputStream(socket.getInputStream());
+            in= new ObjectInputStream(socket.getInputStream());
 
             System.out.println("Consumer Connected: " + socket);
             //takes input from terminal
             input2 = new DataInputStream(System.in);
 
-            String line = "";
-            while(!line.equals("Over")){
+            String request = "";
+            while(!request.equalsIgnoreCase("over")){
                 try{
-                    line = input2.readLine();
-                    out.writeObject(line);
+                    request = input2.readLine();
+                    out.writeObject(request);
 
                 }
                 catch(IOException i){

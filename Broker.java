@@ -8,8 +8,8 @@ import java.net.*;
 public class Broker extends Node{
 
     String ipBroker="127.0.0.1";
-    int ConsumersPort=5000;
-    int PublishersPort=5001;
+    int ConsumersPort=5004;
+    int PublishersPort=5005;
     int key=1;
 
 
@@ -46,7 +46,7 @@ public class Broker extends Node{
     public void openServer(){
 
 
-       // createTxt(ConsumersPort,PublishersPort);
+       createTxt(ConsumersPort,PublishersPort);
         try {
             ConsumerServer=new ServerSocket(ConsumersPort);
             System.out.println("Broker> waiting for connection...");
@@ -62,8 +62,8 @@ public class Broker extends Node{
                         while(true){
                             Socket connectPub= PublisherServer.accept();
                             calculateKeys();
-                            System.out.println("Publisher accepted! --> " + connectPub.getInetAddress().getHostAddress());
-                            PublisherThread pt=new PublisherThread(connectPub, key);
+                            System.out.println("Publisher connected! --> " + connectPub.getInetAddress().getHostAddress());
+                            PublisherThread pt=new PublisherThread(connectPub, key, registeredPublishers);
                             registeredPublishers.add(pt);
                             pt.start();
                         }
@@ -78,7 +78,7 @@ public class Broker extends Node{
 
             while(true) {
                 connectCon = ConsumerServer.accept();
-                System.out.println("Consumer accepted! --> " + connectCon.getInetAddress().getHostAddress());
+                System.out.println("Consumer connected! --> " + connectCon.getInetAddress().getHostAddress());
                 ConsumerThread ct=new ConsumerThread(connectCon,key);
                 registeredUsers.add(ct);
                 ct.start();

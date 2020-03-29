@@ -8,13 +8,10 @@ public class Publisher extends Node
 {
     private static String[][] availableBrokers = new String[3][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
 
-    public String artists = "A-N";
-
     public static void main(String args[]){
         Publisher pub=new Publisher();
         pub.initialization();
         pub.openPublisher();
-
     }
 
     public void initialization(){
@@ -34,7 +31,10 @@ public class Publisher extends Node
 
             availableBrokers = getBrokerInfo(in, availableBrokers );
             System.out.println("Brokers' information received");
+            in.close();
+            out.close();
             socket.close();
+
 
         }
         catch(UnknownHostException u) {
@@ -50,6 +50,7 @@ public class Publisher extends Node
 
     public void openPublisher(){
 
+        //three threads for connections with all three brokers
         for(int i=0;i<3;i++) {
 
             final int j=i;
@@ -72,28 +73,34 @@ public class Publisher extends Node
                         String line="key";
                         out.writeObject(line);
                         out.flush();
-                        // Thread.sleep(1000);
+
                         if (line.equalsIgnoreCase("key")) {
                             String key = (String) in.readObject();
                             availableBrokers[j][2]=key;
-                            System.out.println("broker key: " + key);
-
                         }
+
+                        //print stored info for brokers
+                        /*
+                        if(j==2){
+                            System.out.println("BrokersIp \tPorts \tkeys ");
+                            for (int k=0; k<3; k++){
+                                for (int l=0; l<3; l++){
+                                    System.out.print(availableBrokers[k][l]);
+                                    System.out.print("\t");
+                                }
+                                System.out.print("\n");
+                            }
+                        }
+                        */
 
                         while (true) {
                             try {
                                 line = new String(input2.readLine());
-                                //String line= "kamilopardaleis";
-                                if(line.equals("Over")){break;}
+                                if(line.equalsIgnoreCase("over")){break;}
                                 out.writeObject(line);
                                 out.flush();
-                               // Thread.sleep(1000);
-                                if (line.equalsIgnoreCase("key")) {
-                                    String key = (String) in.readObject();
-                                    availableBrokers[j][2]=key;
-                                    System.out.println("broker key: " + key);
 
-                                }
+                                String request = (String) in.readObject();
 
                             } catch (ClassNotFoundException e) {
                                 e.printStackTrace();
