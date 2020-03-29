@@ -1,21 +1,44 @@
 import java.util.ArrayList;
 
-public class MusicFile {
-    //fields
+public class MusicFile
+{
     protected String trackName;
-    //protected String artistName;
-    protected ArtistName artistName;
+    protected String artistName;
     protected String albumInfo;
-    protected String genre;
-    protected byte[] musicFileExtract;//byte [] ???
+    protected byte[] musicFileExtract;
+    protected int chunkNumber;
 
-    public MusicFile(String trackName, ArtistName artistName, String albumInfo, String genre, byte[] musicFileExtract){
-        this.trackName=trackName;
-        this.artistName=artistName;//??
-        this.albumInfo=albumInfo;
-        this.genre=genre;
-        for(int i=0;i<musicFileExtract.length;i++){
-            this.musicFileExtract[i]=musicFileExtract[i];
-        }
+    public MusicFile(String trackName, String artistName, String albumInfo, byte[] musicFileExtract, int chunkNumber)
+    {
+        this.trackName = trackName;
+        this.artistName = artistName;
+        this.albumInfo = albumInfo;
+        this.musicFileExtract = musicFileExtract;
+        this.chunkNumber = chunkNumber;
+    }
+
+    public String getTrackName()
+    {
+        return this.trackName;
+    }
+
+    public String getArtistName()
+    {
+        return this.artistName;
+    }
+
+    public String getAlbumInfo()
+    {
+        return this.albumInfo;
+    }
+
+    public byte[] getMusicFileExtract()
+    {
+        return this.musicFileExtract;
+    }
+
+    public int getChunkNumber()
+    {
+        return this.chunkNumber;
     }
 }
