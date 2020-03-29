@@ -8,16 +8,18 @@ public class PublisherThread extends Thread{
     ObjectOutputStream out;
     int key;
     List<PublisherThread> registeredPublishers;
+    Broker broker;
 
-    public PublisherThread(Socket socket, int key, List<PublisherThread> registeredPublishers){
+    public PublisherThread(Socket socket, int key, List<PublisherThread> registeredPublishers, Broker broker){
         connection=socket;
         this.key=key;
         for (PublisherThread publisherThread : this.registeredPublishers = registeredPublishers) {
             
         }
         ;
-
+        this.broker=broker;
     }
+
 
     public void run(){
 
@@ -38,14 +40,29 @@ public class PublisherThread extends Thread{
                         registeredPublishers.remove(this);
                     }
                     return;
+
                 }
                 if (data.equalsIgnoreCase("key")){
                     out.writeObject(Integer.toString(key));
                     out.flush();
                 }
+
+                if (data.equalsIgnoreCase("next")) {
+                    while(true) {
+                        System.out.println("FUCK");
+                        if (broker.getNewRequest()) {
+                            out.writeObject(broker.getRequest());
+                            out.flush();
+                            broker.setNewRequest(false);
+                            break;
+                        }
+                    }
+                }
+
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("Publisher disconnected! --> " + connection.getInetAddress().getHostAddress());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

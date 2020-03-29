@@ -6,10 +6,14 @@ public class ConsumerThread extends Thread{
     ObjectInputStream in;
     ObjectOutputStream out;
     int key;
+    String request= "";
+    Broker broker;
 
-    public ConsumerThread(Socket socket,int key){
+    public ConsumerThread(Socket socket,int key, Broker broker){
         connection=socket;
         this.key=key;
+        this.broker=broker;
+
     }
 
     public void run(){
@@ -18,9 +22,11 @@ public class ConsumerThread extends Thread{
             in = new ObjectInputStream(connection.getInputStream());
 
             while (true){
-                String request=(String) in.readObject();
-                System.out.println(connection.getInetAddress().getHostAddress() + "> "  + request);
-
+                this.request = (String) in.readObject();
+                broker.setRequest(this.request);
+                broker.setNewRequest(true);
+                System.out.println(broker.getNewRequest());
+                System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);
             }
 
         } catch (IOException | ClassNotFoundException  e) {
@@ -28,6 +34,5 @@ public class ConsumerThread extends Thread{
             System.out.println("Consumer disconnected! --> " + connection.getInetAddress().getHostAddress());
         }
     }
-
 
 }

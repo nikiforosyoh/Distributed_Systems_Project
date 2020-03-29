@@ -70,6 +70,7 @@ public class Publisher extends Node
 
                         //takes input from terminal
                         input2 = new DataInputStream(System.in);
+
                         String line="key";
                         out.writeObject(line);
                         out.flush();
@@ -95,12 +96,12 @@ public class Publisher extends Node
 
                         while (true) {
                             try {
-                                line = new String(input2.readLine());
-                                if(line.equalsIgnoreCase("over")){break;}
-                                out.writeObject(line);
+
+                                out.writeObject("next");
                                 out.flush();
 
                                 String request = (String) in.readObject();
+                                System.out.println("Consumer's request: " + request);
 
                             } catch (ClassNotFoundException e) {
                                 e.printStackTrace();
