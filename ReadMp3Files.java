@@ -231,9 +231,10 @@ public class ReadMp3Files
 
     public static void main(String args[]) throws InvalidDataException, IOException, UnsupportedTagException
     {
+        ReadMp3Files mp3Methods = new ReadMp3Files();
         /*
         String path = "Songs";
-        ReadMp3Files mp3Methods = new ReadMp3Files();
+
 
         ArrayList<ArrayList<String>> listOfArtistSongs = mp3Methods.getListOfArtistSongs(path);
         ArrayList <String> listOfArtists = getArtistsList(path);
@@ -251,24 +252,69 @@ public class ReadMp3Files
 
         */
 
-        ReadMp3Files mp3Methods = new ReadMp3Files();
+        /*
+
         ArrayList<byte[]> ChunkList = mp3Methods.splitToChunk("A Waltz For Naseem");
         byte[] mp3File = mp3Methods.recreateFile(ChunkList);
 
         FileOutputStream stream = new FileOutputStream("src//Mitsos.mp3");
         stream.write(mp3File);
+         */
+
+        /*
+        String[] MusicFileInfo = mp3Methods.getMusicFileAttributes("Ambush in Rattlesnake Gulch");
+        for(String info : MusicFileInfo)
+        {
+            System.out.println(info);
+        }
+
+         */
+
 
     }
 
-    public String[] getMusicFileAttributes(String songName) throws InvalidDataException, IOException, UnsupportedTagException {
+    public String[] getMusicFileAttributes(String songName) throws InvalidDataException, IOException, UnsupportedTagException
+    {
         String pathOfSong = "Songs\\"+songName+".mp3";
 
         String[] MusicFileAttributes = new String[3];
 
         File file = new File(pathOfSong);
         Mp3File mp3file = new Mp3File(file);
-        ID3v2 fileTag = 
+        ID3v2 fileTag = mp3file.getId3v2Tag();
 
+        MusicFileAttributes[0] = file.getName().substring(0, file.getName().length()-4);
+
+        MusicFileAttributes[1] = fileTag.getArtist();
+
+        if(!fileTag.getAlbum().equals(""))
+        {
+            MusicFileAttributes[2] = fileTag.getAlbum();
+        }
+        else
+        {
+            MusicFileAttributes[2] = "no album info";
+        }
+
+        return MusicFileAttributes;
+    }
+
+    public ArrayList<MusicFile> getMusicFiles(String SongName) throws InvalidDataException, IOException, UnsupportedTagException
+    {
+        ArrayList<MusicFile> MusicFileArray = new ArrayList<>();
+
+        String[] MusicFileInfo = getMusicFileAttributes(SongName);
+        ArrayList<byte[]> SongChunks = splitToChunk(SongName);
+
+        int numOfChunks = SongChunks.size();
+
+        for(int i = 0 ; i < numOfChunks ; i++)
+        {
+            MusicFile musicFile = new MusicFile(MusicFileInfo[0], MusicFileInfo[1], MusicFileInfo[2], SongChunks.get(i), i+1);
+            MusicFileArray.add(musicFile);
+        }
+
+        return MusicFileArray;
     }
 
 
