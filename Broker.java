@@ -21,6 +21,7 @@ public class Broker extends Node{
     private DataInputStream in = null;
     List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
     List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
+    private static ArrayList<ArtistName> publisher0Astists = new ArrayList<ArtistName>();
 
     public static void main(String[] args) throws IOException {
         Broker broker=new Broker("127.0.0.1",5004,5005 );

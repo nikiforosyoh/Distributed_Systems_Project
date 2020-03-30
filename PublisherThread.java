@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PublisherThread extends Thread{
@@ -9,6 +10,7 @@ public class PublisherThread extends Thread{
     int key;
     List<PublisherThread> registeredPublishers;
     Broker broker;
+    private static ArrayList<ArtistName> brokerAstists = new ArrayList<ArtistName>();
 
     public PublisherThread(Socket socket, int key, List<PublisherThread> registeredPublishers, Broker broker){
         connection=socket;
@@ -47,6 +49,16 @@ public class PublisherThread extends Thread{
                     out.flush();
                 }
 
+                if (data.equalsIgnoreCase("artist names")){
+                    brokerAstists = (ArrayList<ArtistName>) in.readObject();
+                    for (ArtistName a : brokerAstists){
+                        System.out.println(a.getArtistName());
+
+                        System.out.println(a.getKey());
+                    }
+                }
+
+
                 if (data.equalsIgnoreCase("next")) {
                     while(true) {
                         System.out.print("");
@@ -61,7 +73,7 @@ public class PublisherThread extends Thread{
 
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             System.out.println("Publisher disconnected! --> " + connection.getInetAddress().getHostAddress());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

@@ -1,6 +1,9 @@
+import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 
-public class ArtistName {
+public class ArtistName implements Serializable {
+    //what is that?!
+    private static final long serialVersionUID = -2374023814140121509L;
     protected String artistName;
     protected int key;
 
