@@ -7,9 +7,9 @@ import java.net.*;
 
 public class Broker extends Node{
 
-    String ipBroker="127.0.0.1";
-    int ConsumersPort=5004;
-    int PublishersPort=5005;
+    String BrokerIP;
+    int ConsumersPort;
+    int PublishersPort;
     int key; //Hash(IP+port)
     String request; //input from Consumer
     boolean newRequest = false; //notify for new Consumer request
@@ -22,24 +22,16 @@ public class Broker extends Node{
     List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
     List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
 
-    public void createTxt(int ConsumersPort,int PublishersPort) {
-        try {
-            BufferedWriter output = new BufferedWriter(new FileWriter("src\\Broker.txt", true));
-
-            output.write("Broker IP: "+ipBroker+
-                    "\t,Broker Port: "+PublishersPort+"\n");
-            output.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void main(String[] args) throws IOException {
+        Broker broker=new Broker("127.0.0.1",5004,5005 );
+        broker.openServer();
     }
 
     public Broker(){}
-    public Broker(Socket socket){
-        this.connectCon=socket;
+    public Broker(String BrokerIP, int ConsumersPort, int PublishersPort ){
+        this.BrokerIP=BrokerIP;
+        this.ConsumersPort= ConsumersPort;
+        this.PublishersPort=PublishersPort;
     }
 
     public void openServer(){
@@ -94,7 +86,7 @@ public class Broker extends Node{
     //Hash(IP+port) to calculate broker's key
     public void calculateKeys() throws NoSuchAlgorithmException {
         TestHashing hash = new TestHashing();
-        key = Integer.parseInt( hash.getMd5(ipBroker + Integer.toString(PublishersPort)) );
+        key = Integer.parseInt( hash.getMd5(BrokerIP + Integer.toString(PublishersPort)) );
     }
 
     public void setRequest(String request){
@@ -126,11 +118,19 @@ public class Broker extends Node{
 
     public void pull(ArtistName a){}
 
+    public void createTxt(int ConsumersPort,int PublishersPort) {
+        try {
+            BufferedWriter output = new BufferedWriter(new FileWriter("src\\Broker.txt", true));
 
-    public static void main(String[] args) throws IOException {
-        Broker broker=new Broker();
-        broker.openServer();
+            output.write("Broker IP: "+BrokerIP+
+                    "\t,Broker Port: "+PublishersPort+"\n");
+            output.close();
 
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

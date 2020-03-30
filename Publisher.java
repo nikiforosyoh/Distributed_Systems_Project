@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 public class Publisher extends Node
@@ -8,35 +9,54 @@ public class Publisher extends Node
 
     private static ArrayList<ArtistName> artists = new ArrayList<ArtistName>();
     private int keysCount=0;
-    boolean sorted=false;
     private static String[][] availableBrokers = new String[3][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
     char start; //to split artists to publishers
     char end;
+    int BrokerPort;
+    String BrokerIp;
+    private static ArrayList<ArtistName> broker0Astists = new ArrayList<ArtistName>();
     private static ArrayList<ArtistName> broker1Astists = new ArrayList<ArtistName>();
     private static ArrayList<ArtistName> broker2Astists = new ArrayList<ArtistName>();
-    private static ArrayList<ArtistName> broker3Astists = new ArrayList<ArtistName>();
 
 
-    public static void main(String args[]){
-        Publisher pub=new Publisher('A', 'N');
+    public static void main(String args[]) throws NoSuchAlgorithmException {
+        Publisher pub=new Publisher('a', 'z', "127.0.0.1", 5001);
         pub.initialization();
         pub.openPublisher();
 
     }
 
-    public Publisher(char start, char end){
+    public Publisher(char start, char end, String BrokerIp, int BrokerPort){
         this.start=Character.toLowerCase(start);
         this.end=Character.toLowerCase(end);
+        this.BrokerIp=BrokerIp;
+        this.BrokerPort=BrokerPort;
     }
 
+    //fill artists ArrayList
+    //receive broker's information
+    public void initialization() throws NoSuchAlgorithmException {
 
-    public void initialization(){
+
+        ReadMp3Files readMp3Files = new ReadMp3Files();
+
+        for ( String a : readMp3Files.getPublisherArtistList(start, end)){
+            ArtistName newArtist = new ArtistName(a);
+            artists.add(newArtist);
+        }
+
+        //print all artists of this Publisher
+        /*for (ArtistName a : artists){
+            System.out.println(a.getArtistName());
+        }
+        */
+
         Socket socket = null;
         ObjectInputStream in=null;
         ObjectOutputStream out =null;
 
         try{
-            socket = new Socket("127.0.0.1",5001);
+            socket = new Socket(BrokerIp, BrokerPort);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
@@ -96,16 +116,6 @@ public class Publisher extends Node
                             keysCount++;
                         }
 
-                        //distribute artists to brokers depending on hash(artistName) and hash(IP+port)
-                        while(true){
-                            System.out.print("");
-                            if(sorted){
-                                distributeArtists();
-                                break;
-                            }
-                        }
-
-
                         while (true) {
                             try {
 
@@ -136,8 +146,9 @@ public class Publisher extends Node
         while(true){
             System.out.print("");
             if(keysCount==3){
-                availableBrokers=sorting(availableBrokers);
-                sorted=true;
+                availableBrokers=sortKeys(availableBrokers);
+                //distribute artists to brokers depending on hash(artistName) and hash(IP+port)
+                distributeArtists();
                 break;
             }
         }
@@ -155,24 +166,39 @@ public class Publisher extends Node
 
     }
 
+    //distribute artists to brokers depending on hash(artistName) and hash(IP+port)s
     private void distributeArtists() {
 
         for ( ArtistName artist : artists) {
 
             if (artist.getKey() < Integer.parseInt(availableBrokers[0][2]) | artist.getKey() >= Integer.parseInt(availableBrokers[2][2]) ) {
-                //to pairnei o 1os
-                broker1Astists.add(artist);
+                // o 1os
+                broker0Astists.add(artist);
             } else if (artist.getKey() < Integer.parseInt(availableBrokers[1][2])) {
-                //to pairnei o 2os
-                broker2Astists.add(artist);
+                // o 2os
+                broker1Astists.add(artist);
             } else if (artist.getKey() < Integer.parseInt(availableBrokers[2][2])) {
-                //to pairnei o 3os
-                broker3Astists.add(artist);
+                // o 3os
+                broker2Astists.add(artist);
             }
         }
 
-    }
 
+        System.out.println("\n 1st broker:");
+        for (ArtistName a : broker0Astists){
+            System.out.println(a.getArtistName());
+        }
+        System.out.println("\n 2nd broker:");
+        for (ArtistName a : broker1Astists){
+            System.out.println(a.getArtistName());
+        }
+        System.out.println("\n 3rd broker:");
+        for (ArtistName a : broker2Astists){
+            System.out.println(a.getArtistName());
+        }
+
+
+    }
 
     public void getBrokerList(){}
 
@@ -196,7 +222,7 @@ public class Publisher extends Node
     }
 
     //sort keys in availableBrokers array
-    public String[][] sorting(String[][] a) {
+    public String[][] sortKeys(String[][] a) {
         String temp;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3 - i - 1; j++)
@@ -210,4 +236,5 @@ public class Publisher extends Node
         }
         return a;
     }
+
 }
