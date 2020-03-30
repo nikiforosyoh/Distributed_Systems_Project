@@ -24,8 +24,7 @@ public class ReadMp3Files
     ArrayList<String> artistsname = new ArrayList<>();
     ArrayList<String> ca = new ArrayList<>();
 
-    public ArrayList<String> Read() throws UnsupportedTagException, InvalidDataException, IOException
-    {
+    public ArrayList<String> Read() throws UnsupportedTagException, InvalidDataException, IOException {
         String path = "Songs";
 
         Stream<Path> walk = Files.walk(Paths.get(path));
@@ -70,8 +69,7 @@ public class ReadMp3Files
         return ListOfPaths;
     }
 
-    public static ArrayList<String> getArtistsList(String pathToMp3Files)
-    {
+    public static ArrayList<String> getArtistsList(String pathToMp3Files) {
         int ArtistCount = 0;
         ArrayList<String> Artists = new ArrayList<String>();
 
@@ -100,15 +98,7 @@ public class ReadMp3Files
                 }
             }
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        catch (InvalidDataException e)
-        {
-            e.printStackTrace();
-        }
-        catch (UnsupportedTagException e)
+        catch (IOException | InvalidDataException | UnsupportedTagException e )
         {
             e.printStackTrace();
         }
@@ -116,8 +106,7 @@ public class ReadMp3Files
         return Artists;
     }
 
-    public ArrayList<ArrayList<String>> getListOfArtistSongs(String path) throws IOException, InvalidDataException, UnsupportedTagException
-    {
+    public ArrayList<ArrayList<String>> getListOfArtistSongs(String path) throws IOException, InvalidDataException, UnsupportedTagException {
         ArrayList <ArrayList <String>> listOfArtistSongs = new ArrayList<>();
 
         ArrayList <String> listOfArtists = getArtistsList(path);
@@ -151,8 +140,7 @@ public class ReadMp3Files
         return listOfArtistSongs;
     }
 
-    public static byte[] recreateFile(ArrayList<byte[]> ChunkList)
-    {
+    public static byte[] recreateFile(ArrayList<byte[]> ChunkList) {
         int chunkSize = 524288;
         int lastChunkSize = ChunkList.get(ChunkList.size()-1).length;
         int numOfBytes = (ChunkList.size()-1)*chunkSize + ChunkList.get(ChunkList.size()-1).length;
@@ -161,18 +149,15 @@ public class ReadMp3Files
 
         int indexOfChunk = 1;
         int indexOfByte = 0;
-        for (byte[] chunk : ChunkList)
-        {
-            if(indexOfChunk < ChunkList.size())
-            {
+        for (byte[] chunk : ChunkList) {
+            if(indexOfChunk < ChunkList.size()){
                 for(int i = 0 ; i < chunkSize ; i++)
                 {
                     Mp3ByteArray[indexOfByte] = chunk[i];
                     indexOfByte++;
                 }
             }
-            else
-            {
+            else{
                 for(int i = 0 ; i < lastChunkSize ; i++)
                 {
                     Mp3ByteArray[indexOfByte] = chunk[i];
@@ -185,8 +170,7 @@ public class ReadMp3Files
         return Mp3ByteArray;
     }
 
-    public ArrayList<byte[]> splitToChunk(String songName) throws IOException
-    {
+    public ArrayList<byte[]> splitToChunk(String songName) throws IOException {
         int chunkSize = 524288;
         String pathOfSong = "Songs\\"+songName+".mp3";
 
@@ -199,11 +183,9 @@ public class ReadMp3Files
         int numOfChunks = Mp3ByteArray.length/(chunkSize);
 
         int index = 0;
-        for (int i = 0 ; i <= numOfChunks ; i++)
-        {
+        for (int i = 0 ; i <= numOfChunks ; i++) {
 
-            if( i < numOfChunks)
-            {
+            if( i < numOfChunks) {
                 byte[] chunk = new byte[chunkSize];
                 for(int j = 0 ; j < chunkSize ; j++)
                 {
@@ -212,11 +194,9 @@ public class ReadMp3Files
                 }
                 ChunkList.add(chunk);
             }
-            else
-            {
+            else {
                 byte[] chunk = new byte[lastChunkSize];
-                for(int j = 0 ; j < lastChunkSize ; j++)
-                {
+                for (int j = 0; j < lastChunkSize; j++) {
                     chunk[j] = Mp3ByteArray[index];
                     index++;
                 }
@@ -230,8 +210,8 @@ public class ReadMp3Files
 
 
 
-    public String[] getMusicFileAttributes(String songName) throws InvalidDataException, IOException, UnsupportedTagException
-    {
+    public String[] getMusicFileAttributes(String songName) throws InvalidDataException, IOException, UnsupportedTagException {
+
         String pathOfSong = "Songs\\"+songName+".mp3";
 
         String[] MusicFileAttributes = new String[3];
@@ -244,20 +224,17 @@ public class ReadMp3Files
 
         MusicFileAttributes[1] = fileTag.getArtist();
 
-        if(!fileTag.getAlbum().equals(""))
-        {
+        if(!fileTag.getAlbum().equals("")) {
             MusicFileAttributes[2] = fileTag.getAlbum();
-        }
-        else
-        {
+        } else {
             MusicFileAttributes[2] = "no album info";
         }
 
         return MusicFileAttributes;
     }
 
-    public ArrayList<MusicFile> getMusicFiles(String SongName) throws InvalidDataException, IOException, UnsupportedTagException
-    {
+    public ArrayList<MusicFile> getMusicFiles(String SongName) throws InvalidDataException, IOException, UnsupportedTagException {
+
         ArrayList<MusicFile> MusicFileArray = new ArrayList<>();
 
         String[] MusicFileInfo = getMusicFileAttributes(SongName);
@@ -265,8 +242,7 @@ public class ReadMp3Files
 
         int numOfChunks = SongChunks.size();
 
-        for(int i = 0 ; i < numOfChunks ; i++)
-        {
+        for(int i = 0 ; i < numOfChunks ; i++) {
             MusicFile musicFile = new MusicFile(MusicFileInfo[0], MusicFileInfo[1], MusicFileInfo[2], SongChunks.get(i), i+1);
             MusicFileArray.add(musicFile);
         }
@@ -274,15 +250,12 @@ public class ReadMp3Files
         return MusicFileArray;
     }
 
-    public ArrayList<String> getPublisherArtistList(char start, char end)
-    {
+    public ArrayList<String> getPublisherArtistList(char start, char end) {
         ArrayList<String> publisherArtistList = new ArrayList<>();
         ArrayList<String> allArtistList = getArtistsList("Songs");
 
-        for(String artist : allArtistList)
-        {
-            if(artist.toLowerCase().charAt(0) >= start && artist.toLowerCase().charAt(0) <= end)
-            {
+        for(String artist : allArtistList) {
+            if(artist.toLowerCase().charAt(0) >= start && artist.toLowerCase().charAt(0) <= end) {
                 publisherArtistList.add(artist);
             }
         }
@@ -290,8 +263,7 @@ public class ReadMp3Files
         return publisherArtistList;
     }
 
-    public static void main(String args[]) throws InvalidDataException, IOException, UnsupportedTagException
-    {
+    public static void main(String args[]) throws InvalidDataException, IOException, UnsupportedTagException {
         ReadMp3Files mp3Methods = new ReadMp3Files();
         String path = "Songs";
         /*
