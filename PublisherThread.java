@@ -51,11 +51,14 @@ public class PublisherThread extends Thread{
 
                 if (data.equalsIgnoreCase("artist names")){
                     brokerAstists = (ArrayList<ArtistName>) in.readObject();
+                    broker.setBrokerList(brokerAstists);
                     for (ArtistName a : brokerAstists){
                         System.out.println(a.getArtistName());
 
                         System.out.println(a.getKey());
+
                     }
+
                 }
 
 

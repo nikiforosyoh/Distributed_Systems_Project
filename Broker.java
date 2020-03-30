@@ -14,6 +14,7 @@ public class Broker extends Node{
     String request; //input from Consumer
     boolean newRequest = false; //notify for new Consumer request
     Broker b= this;
+    int forlistOfBrokers=0;
 
     ServerSocket ConsumerServer = null;
     ServerSocket PublisherServer=null;
@@ -26,6 +27,7 @@ public class Broker extends Node{
     public static void main(String[] args) throws IOException {
         Broker broker=new Broker("127.0.0.1",5004,5005 );
         broker.openServer();
+
     }
 
     public Broker(){}
@@ -73,7 +75,7 @@ public class Broker extends Node{
             while(true) {
                 connectCon = ConsumerServer.accept();
                 System.out.println("Consumer connected! --> " + connectCon.getInetAddress().getHostAddress());
-                ConsumerThread ct=new ConsumerThread(connectCon,key,registeredUsers, this);
+                ConsumerThread ct=new ConsumerThread(connectCon,key,registeredUsers,this);
                 registeredUsers.add(ct);
                 ct.start();
 
@@ -106,6 +108,13 @@ public class Broker extends Node{
         return newRequest;
     }
 
+    public void setBrokerList(ArrayList<ArtistName> b){
+
+        for(int i=0; i<b.size();i++){
+            publisher0Astists.add(b.get(i));
+        }
+        forlistOfBrokers++;
+    }
 
     public Publisher acceptConection(Publisher p){
         return null;
