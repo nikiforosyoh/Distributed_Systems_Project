@@ -1,3 +1,4 @@
-Broker IP: 127.0.0.1	,Broker Port: 5001
-Broker IP: 127.0.0.1	,Broker Port: 5003
 Broker IP: 127.0.0.1	,Broker Port: 5005
+Broker IP: 127.0.0.1	,Broker Port: 5003
+Broker IP: 127.0.0.1	,Broker Port: 5001
+

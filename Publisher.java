@@ -9,8 +9,9 @@ public class Publisher extends Node
     private static ArrayList<ArtistName> artists = new ArrayList<ArtistName>();
     private int keysCount=0;
     private static String[][] availableBrokers = new String[3][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
-    char start;
+    char start; //to split artists to publishers
     char end;
+
     public static void main(String args[]){
         Publisher pub=new Publisher('A', 'N');
         pub.initialization();
@@ -60,8 +61,6 @@ public class Publisher extends Node
     public void openPublisher(){
 
         //three threads for connections with all three brokers
-
-
         for(int i=0;i<3;i++) {
 
             final int j=i;
@@ -91,22 +90,6 @@ public class Publisher extends Node
                             availableBrokers[j][2]=key;
                             keysCount++;
                         }
-
-                        //print stored info for brokers
-                        /*
-                        if(j==2){
-                            System.out.println("BrokersIp \tPorts \tkeys ");
-                            for (int k=0; k<3; k++){
-                                for (int l=0; l<3; l++){
-                                    System.out.print(availableBrokers[k][l]);
-                                    System.out.print("\t");
-                                }
-                                System.out.print("\n");
-                            }
-                        }
-
-
-                         */
 
                         while (true) {
                             try {
@@ -139,9 +122,10 @@ public class Publisher extends Node
                 availableBrokers=sorting(availableBrokers);
                 break;
             }
-
-
         }
+
+        //print available Broker's info: IP, port, key
+        /*
         System.out.println("BrokersIp \tPorts \tkeys ");
         for (int k=0; k<3; k++){
             for (int l=0; l<3; l++){
@@ -150,6 +134,7 @@ public class Publisher extends Node
             }
             System.out.print("\n");
         }
+        */
 
     }
 
@@ -162,6 +147,7 @@ public class Publisher extends Node
 
     public void notifyFailure(Broker broker){}
 
+    //get  ip, port of every broker
     public static String[][] getBrokerInfo(ObjectInputStream input, String[][] availableBrokers) throws IOException, ClassNotFoundException {
         String info = "";
         for (int i=0; i<3; i++){
@@ -170,27 +156,22 @@ public class Publisher extends Node
             availableBrokers[i][0] = info.trim().substring(info.indexOf(":")+1,info.indexOf(",")).trim();
             info = info.trim().substring(info.indexOf(",")+1);
             availableBrokers[i][1] = info.trim().substring(info.indexOf(":")+1).trim();
-
         }
-
         return availableBrokers;
     }
+
+    //sort keys in availableBrokers array
     public String[][] sorting(String[][] a) {
         String temp;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3 - i - 1; j++)
                 if (Integer.parseInt(a[j][2]) > Integer.parseInt(a[j + 1][2])) {
-                    temp = a[j][2];
-                    a[j][2] = a[j+1][2];
-                    a[j+1][2] = temp;
-                    temp = a[j][1];
-                    a[j][1] = a[j+1][1];
-                    a[j+1][1] = temp;
-                    temp = a[j][0];
-                    a[j][0] = a[j+1][0];
-                    a[j+1][0] = temp;
+                    for (int k = 0; k < 3; k++) {
+                        temp = a[j][k];
+                        a[j][k] = a[j + 1][k];
+                        a[j + 1][k] = temp;
+                    }
                 }
-
         }
         return a;
     }

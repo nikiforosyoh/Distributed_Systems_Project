@@ -8,11 +8,11 @@ import java.net.*;
 public class Broker extends Node{
 
     String ipBroker="127.0.0.1";
-    int ConsumersPort=5000;
-    int PublishersPort=5001;
-    int key=1;
-    String request;
-    boolean newRequest = false;
+    int ConsumersPort=5004;
+    int PublishersPort=5005;
+    int key; //Hash(IP+port)
+    String request; //input from Consumer
+    boolean newRequest = false; //notify for new Consumer request
     Broker b= this;
 
     ServerSocket ConsumerServer = null;
@@ -22,8 +22,7 @@ public class Broker extends Node{
     List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
     List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
 
-    public void createTxt(int ConsumersPort,int PublishersPort)
-    {
+    public void createTxt(int ConsumersPort,int PublishersPort) {
         try {
             BufferedWriter output = new BufferedWriter(new FileWriter("src\\Broker.txt", true));
 
@@ -38,12 +37,10 @@ public class Broker extends Node{
         }
     }
 
-
     public Broker(){}
     public Broker(Socket socket){
         this.connectCon=socket;
     }
-
 
     public void openServer(){
 
@@ -60,10 +57,12 @@ public class Broker extends Node{
 
                         PublisherServer = new ServerSocket(PublishersPort);
 
+                        //thread that handles Publishers
                         while(true){
                             Socket connectPub= PublisherServer.accept();
                             calculateKeys();
                             System.out.println("Publisher connected! --> " + connectPub.getInetAddress().getHostAddress());
+                            System.out.println("broker key: " + key);
                             PublisherThread pt=new PublisherThread(connectPub, key, registeredPublishers, b);
                             registeredPublishers.add(pt);
                             pt.start();
@@ -77,10 +76,11 @@ public class Broker extends Node{
             };
             t1.start();
 
+            //thread that handles Consumers
             while(true) {
                 connectCon = ConsumerServer.accept();
                 System.out.println("Consumer connected! --> " + connectCon.getInetAddress().getHostAddress());
-                ConsumerThread ct=new ConsumerThread(connectCon,key,this);
+                ConsumerThread ct=new ConsumerThread(connectCon,key,registeredUsers, this);
                 registeredUsers.add(ct);
                 ct.start();
 
@@ -90,15 +90,17 @@ public class Broker extends Node{
             e.printStackTrace();
         }
     }
+
+    //Hash(IP+port) to calculate broker's key
     public void calculateKeys() throws NoSuchAlgorithmException {
         TestHashing hash = new TestHashing();
         key = Integer.parseInt( hash.getMd5(ipBroker + Integer.toString(PublishersPort)) );
     }
 
-
     public void setRequest(String request){
         this.request=request;
     }
+
     public String getRequest(){
         return this.request;
     }
@@ -112,9 +114,16 @@ public class Broker extends Node{
     }
 
 
-    public Publisher acceptConection(Publisher p){ return null; }
-    public Consumer acceptConection(Consumer c){return null; }
+    public Publisher acceptConection(Publisher p){
+        return null;
+    }
+
+    public Consumer acceptConection(Consumer c){
+        return null;
+    }
+
     public void notifyPublisher(String s){}
+
     public void pull(ArtistName a){}
 
 

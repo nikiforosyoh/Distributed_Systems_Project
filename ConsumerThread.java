@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 public class ConsumerThread extends Thread{
     Socket connection;
@@ -8,10 +9,12 @@ public class ConsumerThread extends Thread{
     int key;
     String request= "";
     Broker broker;
+    List<ConsumerThread> registeredUsers;
 
-    public ConsumerThread(Socket socket,int key, Broker broker){
+    public ConsumerThread(Socket socket,int key, List<ConsumerThread> registeredUsers, Broker broker){
         connection=socket;
         this.key=key;
+        this.registeredUsers=registeredUsers;
         this.broker=broker;
 
     }
@@ -31,6 +34,12 @@ public class ConsumerThread extends Thread{
         } catch (IOException | ClassNotFoundException  e) {
             //e.printStackTrace();
             System.out.println("Consumer disconnected! --> " + connection.getInetAddress().getHostAddress());
+            synchronized(registeredUsers) {
+                //remove this thread from consumer threads list
+                registeredUsers.remove(this);
+            }
+            return;
+
         }
     }
 
