@@ -8,8 +8,8 @@ import java.net.*;
 public class Broker extends Node{
 
     String ipBroker="127.0.0.1";
-    int ConsumersPort=5004;
-    int PublishersPort=5005;
+    int ConsumersPort=5000;
+    int PublishersPort=5001;
     int key=1;
     String request;
     boolean newRequest = false;
