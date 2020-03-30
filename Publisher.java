@@ -7,7 +7,7 @@ public class Publisher extends Node
 {
 
     private static ArrayList<ArtistName> artists = new ArrayList<ArtistName>();
-
+    private int keysCount=0;
     private static String[][] availableBrokers = new String[3][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
     char start;
     char end;
@@ -15,14 +15,6 @@ public class Publisher extends Node
         Publisher pub=new Publisher('A', 'N');
         pub.initialization();
         pub.openPublisher();
-        System.out.println("BrokersIp \tPorts \tkeys ");
-        for (int k=0; k<3; k++){
-            for (int l=0; l<3; l++){
-                System.out.print(availableBrokers[k][l]);
-                System.out.print("\t");
-            }
-            System.out.print("\n");
-        }
 
     }
 
@@ -68,6 +60,8 @@ public class Publisher extends Node
     public void openPublisher(){
 
         //three threads for connections with all three brokers
+
+
         for(int i=0;i<3;i++) {
 
             final int j=i;
@@ -95,6 +89,7 @@ public class Publisher extends Node
                         if (line.equalsIgnoreCase("key")) {
                             String key = (String) in.readObject();
                             availableBrokers[j][2]=key;
+                            keysCount++;
                         }
 
                         //print stored info for brokers
@@ -138,6 +133,23 @@ public class Publisher extends Node
             };
             t1.start();
         }
+        while(true){
+            System.out.print("");
+            if(keysCount==3){
+                availableBrokers=sorting(availableBrokers);
+                break;
+            }
+
+
+        }
+        System.out.println("BrokersIp \tPorts \tkeys ");
+        for (int k=0; k<3; k++){
+            for (int l=0; l<3; l++){
+                System.out.print(availableBrokers[k][l]);
+                System.out.print("\t");
+            }
+            System.out.print("\n");
+        }
 
     }
 
@@ -162,5 +174,24 @@ public class Publisher extends Node
         }
 
         return availableBrokers;
+    }
+    public String[][] sorting(String[][] a) {
+        String temp;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3 - i - 1; j++)
+                if (Integer.parseInt(a[j][2]) > Integer.parseInt(a[j + 1][2])) {
+                    temp = a[j][2];
+                    a[j][2] = a[j+1][2];
+                    a[j+1][2] = temp;
+                    temp = a[j][1];
+                    a[j][1] = a[j+1][1];
+                    a[j+1][1] = temp;
+                    temp = a[j][0];
+                    a[j][0] = a[j+1][0];
+                    a[j+1][0] = temp;
+                }
+
+        }
+        return a;
     }
 }

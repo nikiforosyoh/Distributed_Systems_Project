@@ -8,8 +8,8 @@ import java.net.*;
 public class Broker extends Node{
 
     String ipBroker="127.0.0.1";
-    int ConsumersPort=5004;
-    int PublishersPort=5005;
+    int ConsumersPort=5000;
+    int PublishersPort=5001;
     int key=1;
     String request;
     boolean newRequest = false;
@@ -47,7 +47,7 @@ public class Broker extends Node{
 
     public void openServer(){
 
-       //createTxt(ConsumersPort,PublishersPort);
+        //createTxt(ConsumersPort,PublishersPort);
         try {
             ConsumerServer=new ServerSocket(ConsumersPort);
             System.out.println("Broker> waiting for connection...");
@@ -97,7 +97,7 @@ public class Broker extends Node{
 
 
     public void setRequest(String request){
-       this.request=request;
+        this.request=request;
     }
     public String getRequest(){
         return this.request;

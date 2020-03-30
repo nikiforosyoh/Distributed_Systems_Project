@@ -14,7 +14,7 @@ public class PublisherThread extends Thread{
         connection=socket;
         this.key=key;
         for (PublisherThread publisherThread : this.registeredPublishers = registeredPublishers) {
-            
+
         }
         ;
         this.broker=broker;
