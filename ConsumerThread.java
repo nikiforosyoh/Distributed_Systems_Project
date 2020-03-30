@@ -25,7 +25,6 @@ public class ConsumerThread extends Thread{
                 this.request = (String) in.readObject();
                 broker.setRequest(this.request);
                 broker.setNewRequest(true);
-                System.out.println(broker.getNewRequest());
                 System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);
             }
 

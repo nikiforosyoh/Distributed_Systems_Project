@@ -2,17 +2,35 @@ import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Publisher extends Node
 {
-    private static String[][] availableBrokers = new String[3][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
 
+    private static ArrayList<ArtistName> artists = new ArrayList<ArtistName>();
+
+    private static String[][] availableBrokers = new String[3][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
+    char start;
+    char end;
     public static void main(String args[]){
-        Publisher pub=new Publisher();
+        Publisher pub=new Publisher('A', 'N');
         pub.initialization();
         pub.openPublisher();
+        System.out.println("BrokersIp \tPorts \tkeys ");
+        for (int k=0; k<3; k++){
+            for (int l=0; l<3; l++){
+                System.out.print(availableBrokers[k][l]);
+                System.out.print("\t");
+            }
+            System.out.print("\n");
+        }
+
     }
+
+    public Publisher(char start, char end){
+        this.start=Character.toLowerCase(start);
+        this.end=Character.toLowerCase(end);
+    }
+
 
     public void initialization(){
         Socket socket = null;
@@ -34,7 +52,6 @@ public class Publisher extends Node
             in.close();
             out.close();
             socket.close();
-
 
         }
         catch(UnknownHostException u) {
@@ -92,7 +109,9 @@ public class Publisher extends Node
                                 System.out.print("\n");
                             }
                         }
-                        */
+
+
+                         */
 
                         while (true) {
                             try {

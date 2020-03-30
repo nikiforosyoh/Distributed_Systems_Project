@@ -49,7 +49,7 @@ public class PublisherThread extends Thread{
 
                 if (data.equalsIgnoreCase("next")) {
                     while(true) {
-                        System.out.println("FUCK");
+                        System.out.print("");
                         if (broker.getNewRequest()) {
                             out.writeObject(broker.getRequest());
                             out.flush();
@@ -61,7 +61,7 @@ public class PublisherThread extends Thread{
 
             }
         } catch (IOException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             System.out.println("Publisher disconnected! --> " + connection.getInetAddress().getHostAddress());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
