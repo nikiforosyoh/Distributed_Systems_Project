@@ -8,9 +8,14 @@ public class Publisher extends Node
 
     private static ArrayList<ArtistName> artists = new ArrayList<ArtistName>();
     private int keysCount=0;
+    boolean sorted=false;
     private static String[][] availableBrokers = new String[3][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
     char start; //to split artists to publishers
     char end;
+    private static ArrayList<ArtistName> broker1Astists = new ArrayList<ArtistName>();
+    private static ArrayList<ArtistName> broker2Astists = new ArrayList<ArtistName>();
+    private static ArrayList<ArtistName> broker3Astists = new ArrayList<ArtistName>();
+
 
     public static void main(String args[]){
         Publisher pub=new Publisher('A', 'N');
@@ -91,6 +96,16 @@ public class Publisher extends Node
                             keysCount++;
                         }
 
+                        //distribute artists to brokers depending on hash(artistName) and hash(IP+port)
+                        while(true){
+                            System.out.print("");
+                            if(sorted){
+                                distributeArtists();
+                                break;
+                            }
+                        }
+
+
                         while (true) {
                             try {
 
@@ -116,14 +131,16 @@ public class Publisher extends Node
             };
             t1.start();
         }
+
+        //sort keys
         while(true){
             System.out.print("");
             if(keysCount==3){
                 availableBrokers=sorting(availableBrokers);
+                sorted=true;
                 break;
             }
         }
-
         //print available Broker's info: IP, port, key
         /*
         System.out.println("BrokersIp \tPorts \tkeys ");
@@ -135,6 +152,24 @@ public class Publisher extends Node
             System.out.print("\n");
         }
         */
+
+    }
+
+    private void distributeArtists() {
+
+        for ( ArtistName artist : artists) {
+
+            if (artist.getKey() < Integer.parseInt(availableBrokers[0][2]) | artist.getKey() >= Integer.parseInt(availableBrokers[2][2]) ) {
+                //to pairnei o 1os
+                broker1Astists.add(artist);
+            } else if (artist.getKey() < Integer.parseInt(availableBrokers[1][2])) {
+                //to pairnei o 2os
+                broker2Astists.add(artist);
+            } else if (artist.getKey() < Integer.parseInt(availableBrokers[2][2])) {
+                //to pairnei o 3os
+                broker3Astists.add(artist);
+            }
+        }
 
     }
 
