@@ -229,49 +229,6 @@ public class ReadMp3Files
     }
 
 
-    public static void main(String args[]) throws InvalidDataException, IOException, UnsupportedTagException
-    {
-        ReadMp3Files mp3Methods = new ReadMp3Files();
-        /*
-        String path = "Songs";
-
-
-        ArrayList<ArrayList<String>> listOfArtistSongs = mp3Methods.getListOfArtistSongs(path);
-        ArrayList <String> listOfArtists = getArtistsList(path);
-
-        for(int i = 0 ; i < listOfArtists.size() ; i++)
-        {
-            System.out.println("For the artist: " + listOfArtists.get(i));
-            int j = 1;
-            for(String songName : listOfArtistSongs.get(i))
-            {
-                System.out.println("The " + j + "th song name is: "+ songName);
-                j++;
-            }
-        }
-
-        */
-
-        /*
-
-        ArrayList<byte[]> ChunkList = mp3Methods.splitToChunk("A Waltz For Naseem");
-        byte[] mp3File = mp3Methods.recreateFile(ChunkList);
-
-        FileOutputStream stream = new FileOutputStream("src//Mitsos.mp3");
-        stream.write(mp3File);
-         */
-
-        /*
-        String[] MusicFileInfo = mp3Methods.getMusicFileAttributes("Ambush in Rattlesnake Gulch");
-        for(String info : MusicFileInfo)
-        {
-            System.out.println(info);
-        }
-
-         */
-
-
-    }
 
     public String[] getMusicFileAttributes(String songName) throws InvalidDataException, IOException, UnsupportedTagException
     {
@@ -317,5 +274,70 @@ public class ReadMp3Files
         return MusicFileArray;
     }
 
+    public ArrayList<String> getPublisherArtistList(char start, char end)
+    {
+        ArrayList<String> publisherArtistList = new ArrayList<>();
+        ArrayList<String> allArtistList = getArtistsList("Songs");
+
+        for(String artist : allArtistList)
+        {
+            if(artist.toLowerCase().charAt(0) >= start && artist.toLowerCase().charAt(0) <= end)
+            {
+                publisherArtistList.add(artist);
+            }
+        }
+
+        return publisherArtistList;
+    }
+
+    public static void main(String args[]) throws InvalidDataException, IOException, UnsupportedTagException
+    {
+        ReadMp3Files mp3Methods = new ReadMp3Files();
+        String path = "Songs";
+        /*
+
+        ArrayList<ArrayList<String>> listOfArtistSongs = mp3Methods.getListOfArtistSongs(path);
+        ArrayList <String> listOfArtists = getArtistsList(path);
+
+        for(int i = 0 ; i < listOfArtists.size() ; i++)
+        {
+            System.out.println("For the artist: " + listOfArtists.get(i));
+            int j = 1;
+            for(String songName : listOfArtistSongs.get(i))
+            {
+                System.out.println("The " + j + "th song name is: "+ songName);
+                j++;
+            }
+        }
+
+        */
+
+        /*
+
+        ArrayList<byte[]> ChunkList = mp3Methods.splitToChunk("A Waltz For Naseem");
+        byte[] mp3File = mp3Methods.recreateFile(ChunkList);
+
+        FileOutputStream stream = new FileOutputStream("src//Mitsos.mp3");
+        stream.write(mp3File);
+         */
+
+        /*
+        String[] MusicFileInfo = mp3Methods.getMusicFileAttributes("Ambush in Rattlesnake Gulch");
+        for(String info : MusicFileInfo)
+        {
+            System.out.println(info);
+        }
+
+         */
+
+        ArrayList<String> allArtistList = getArtistsList(path);
+        ArrayList<String> publisherArtistList1 = mp3Methods.getPublisherArtistList('a', 'm');
+        ArrayList<String> publisherArtistList2 = mp3Methods.getPublisherArtistList('n', 'z');
+
+        System.out.println(allArtistList.size());
+        System.out.println(publisherArtistList1.size());
+        System.out.println(publisherArtistList2.size());
+
+    }
 
 }
