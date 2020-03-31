@@ -7,7 +7,8 @@ A music streaming on demand system based on the Publisher - Broker - Consumer ar
 1. Σηκώνουμε τους Brokers(3) με τα στοιχεία που υπαρχουν στο brokers.txt 
 (τα βαζουμε ως παραμέτρους στον κατασκευαστή στη main).
 2. Σηκώνουμε τους Publishers βάζοντας τα γράμματα a,n και m,z αντίστοιχα στον κατασκευαστή στη main.
-3. Σηκώνουμε τους Consumers
+3. Σηκώνουμε τους Consumers.
+
 
 *ΑΛΛΑΓΕΣ ΓΙΑ ΤΗΝ ΕΞΕΤΑΣΗ*
 
