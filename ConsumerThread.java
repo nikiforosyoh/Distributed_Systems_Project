@@ -26,6 +26,7 @@ public class ConsumerThread extends Thread{
             while (true){
 
                 String data=(String) in.readObject();
+                //sos
                 //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
                 System.out.println(connection.getPort() + "> "  + data);
 
@@ -57,7 +58,8 @@ public class ConsumerThread extends Thread{
                 this.request = (String) in.readObject();
                 broker.setRequest(this.request);
                 broker.setNewRequest(true);
-               // System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);
+                //sos
+                //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);
                 System.out.println(connection.getPort() + "> "  + this.request);
 
             }
@@ -81,7 +83,6 @@ public class ConsumerThread extends Thread{
         String ip;
         String port;
         String line;
-        String[] brokers = new String[3];
 
         try {
             f = new File("src\\Broker.txt");

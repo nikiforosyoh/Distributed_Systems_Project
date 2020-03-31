@@ -79,63 +79,78 @@ public class Consumer extends Node {
         }
 
     }
+
+    public void openConsumer() throws IOException {
+
+        ObjectInputStream in = null;
+        ObjectOutputStream out = null;
+        DataInputStream input2 = null;
+        Socket socket = null;
+        String requestArtist = "";
+        String requestSong = "";
+        Boolean artistFound = false;
+        Boolean songFound = false;
+
+        //takes input from terminal
+        input2 = new DataInputStream(System.in);
+        requestArtist = input2.readLine();
+        do {
+            try {
+                //search all artist lists for this artist name
+                for (int i = 0; i < 3; i++) {
+                    for (String a : artists.get(i)) {
+
+                        //if artist name is found open connection with the responsible broker
+                        if (requestArtist.equalsIgnoreCase(a)) {
+
+                            artistFound = true;
+                            socket = new Socket(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
+                            out = new ObjectOutputStream(socket.getOutputStream());
+                            in = new ObjectInputStream(socket.getInputStream());
+
+                            System.out.println("Consumer Connected: " + socket);
+
+                            //sends user's request
+                            out.writeObject(requestArtist);
+                            out.flush();
+
+                            //input boolean to know if the song is found
+                            if(songFound) {
+                                //then take the song from broker
+                                //...in.readObject();
+                                //call recreateFile()
+                            }
+
+                            socket.close();
+                            break;
+                        }
+
+                    }
+                }
+                if(!artistFound) {
+                    System.out.println("There are no songs of this Artist..");
+                    System.out.println("Try an other one..");
+                }
+                artistFound = false;
+                songFound = false;
+
+                //takes input from terminal
+                input2 = new DataInputStream(System.in);
+                requestArtist = input2.readLine();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+
+        }while(!requestArtist.equalsIgnoreCase("over"));
+
+    }
+
     public Consumer(String BrokerIp, int BrokerPort){
         this.BrokerIp=BrokerIp;
         this.BrokerPort=BrokerPort;
     }
-
-    public void openConsumer() throws IOException {
-
-        for (int i=0; i<3; i++) {
-
-            Socket socket = null;
-            ObjectInputStream in = null;
-            ObjectOutputStream out = null;
-            DataInputStream input2 = null;
-
-
-            try {
-                socket = new Socket(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
-                out = new ObjectOutputStream(socket.getOutputStream());
-                in = new ObjectInputStream(socket.getInputStream());
-
-                System.out.println("Consumer Connected: " + socket);
-                //takes input from terminal
-                input2 = new DataInputStream(System.in);
-
-                String request = "";
-                while (!request.equalsIgnoreCase("over")) {
-                    try {
-                        request = input2.readLine();
-                        out.writeObject(request);
-
-                    } catch (IOException u) {
-                        System.out.println(u);
-                    }
-                }
-                socket.close();
-
-            } catch (UnknownHostException u) {
-                System.out.println(u);
-            } catch (IOException e) {
-                System.out.println(e);
-            }
-        }
-
-    }
-
-    //get  ip, port of every broker
-    public static String[][] getBrokerInfo(ObjectInputStream input, String[][] availableBrokers) throws IOException, ClassNotFoundException {
-        String info = "";
-        for (int i=0; i<3; i++){
-            info = (String) input.readObject();
-
-            availableBrokers[i][0] = info.trim().substring(info.indexOf(":")+1,info.indexOf(",")).trim();
-            info = info.trim().substring(info.indexOf(",")+1);
-            availableBrokers[i][1] = info.trim().substring(info.indexOf(":")+1).trim();
-        }
-        return availableBrokers;
-    }
-
 
 }

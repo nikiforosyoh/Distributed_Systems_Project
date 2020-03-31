@@ -31,6 +31,7 @@ public class PublisherThread extends Thread{
 
             while (true){
                 String data=(String) in.readObject();
+                //sos
                 //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
                 System.out.println(connection.getPort() + "> "  + data);
 
@@ -100,7 +101,6 @@ public class PublisherThread extends Thread{
         String ip;
         String port;
         String line;
-        String[] brokers = new String[3];
 
         try {
             f = new File("src\\Broker.txt");

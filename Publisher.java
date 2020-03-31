@@ -13,6 +13,7 @@ public class Publisher extends Node implements  Serializable{
     char end;
     int BrokerPort;
     String BrokerIp;
+    //list of artists for each broker
     private static ArrayList<ArtistName> broker0Astists = new ArrayList<ArtistName>();
     private static ArrayList<ArtistName> broker1Astists = new ArrayList<ArtistName>();
     private static ArrayList<ArtistName> broker2Astists = new ArrayList<ArtistName>();
@@ -53,8 +54,6 @@ public class Publisher extends Node implements  Serializable{
 
         System.out.print("Publisher ");
         init(BrokerIp,BrokerPort,availableBrokers);
-
-
 
     }
 
@@ -198,6 +197,8 @@ public class Publisher extends Node implements  Serializable{
 
     //sent Artists to brokers
     public void sendArtists(Socket socket, ObjectOutputStream out) throws IOException {
+
+        //sos
         //if(availableBrokers[0][0].equalsIgnoreCase(socket.getInetAddress().getHostAddress()) )
 
         if(availableBrokers[0][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
@@ -228,19 +229,6 @@ public class Publisher extends Node implements  Serializable{
                 }
         }
         return a;
-    }
-
-    //get  ip, port of every broker
-    public static String[][] getBrokerInfo(ObjectInputStream input, String[][] availableBrokers) throws IOException, ClassNotFoundException {
-        String info = "";
-        for (int i=0; i<3; i++){
-            info = (String) input.readObject();
-
-            availableBrokers[i][0] = info.trim().substring(info.indexOf(":")+1,info.indexOf(",")).trim();
-            info = info.trim().substring(info.indexOf(",")+1);
-            availableBrokers[i][1] = info.trim().substring(info.indexOf(":")+1).trim();
-        }
-        return availableBrokers;
     }
 
 }

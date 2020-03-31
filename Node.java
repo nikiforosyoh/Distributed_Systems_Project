@@ -45,7 +45,6 @@ public class Node {
 
     public void disconnect(Socket requestSocket){
         try {
-
             requestSocket.close();
         } catch (IOException ioException) {
             ioException.printStackTrace();

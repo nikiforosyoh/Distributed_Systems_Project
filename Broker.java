@@ -14,7 +14,6 @@ public class Broker extends Node{
     String request; //input from Consumer
     boolean newRequest = false; //notify for new Consumer request
     Broker b= this;
-    //int forlistOfBrokers=0;
 
     ServerSocket ConsumerServer = null;
     ServerSocket PublisherServer=null;
@@ -25,7 +24,7 @@ public class Broker extends Node{
     private static ArrayList<ArrayList<ArtistName>> publisherArtists = new ArrayList<ArrayList<ArtistName>>();
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-        Broker broker=new Broker("127.0.0.1",5004,5005 );
+        Broker broker=new Broker("127.0.0.1",5004,5005 ); //des to txt prin baleis tis port!!!!!!! <-----
         broker.calculateKeys();
         System.out.println("broker key: " + broker.key);
         broker.openServer();
@@ -57,9 +56,8 @@ public class Broker extends Node{
                         //thread that handles Publishers
                         while(true){
                             Socket connectPub= PublisherServer.accept();
-                            //calculateKeys();
-                            //System.out.println("broker key: " + key);
 
+                            //sos
                             //System.out.println("Publisher connected! --> " + connectPub.getInetAddress().getHostAddress());
                             System.out.println("Publisher connected! --> " + connectPub.getPort());
                             PublisherThread pt=new PublisherThread(connectPub, key, registeredPublishers, b);
@@ -78,6 +76,7 @@ public class Broker extends Node{
             //thread that handles Consumers
             while(true) {
                 connectCon = ConsumerServer.accept();
+                //sos
                 //System.out.println("Consumer connected! --> " + connectCon.getInetAddress().getHostAddress());
                 System.out.println("Consumer connected! --> " + connectCon.getPort());
                 ConsumerThread ct=new ConsumerThread(connectCon,registeredUsers,this);
@@ -137,8 +136,9 @@ public class Broker extends Node{
         try {
             BufferedWriter output = new BufferedWriter(new FileWriter("src\\Broker.txt", true));
 
-            output.write("Broker IP: "+BrokerIP+
-                    "\t,Broker Port: "+PublishersPort+"\n");
+            output.write("Broker IP: " + BrokerIP +
+                            "\t,Publisher Port: " + PublishersPort +
+                            "\t,Consumer Port: " + ConsumersPort + "\n");
             output.close();
 
         } catch (FileNotFoundException e) {
