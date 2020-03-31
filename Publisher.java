@@ -20,7 +20,7 @@ public class Publisher extends Node implements  Serializable{
 
 
     public static void main(String args[]) throws NoSuchAlgorithmException {
-        Publisher pub=new Publisher('a', 'z', "127.0.0.1", 5001);
+        Publisher pub=new Publisher('m', 'z', "127.0.0.1", 5001);
         pub.initialization();
         pub.openPublisher();
 
@@ -119,21 +119,10 @@ public class Publisher extends Node implements  Serializable{
                         while(true){
                             System.out.print("");
                             if(ready){
-
-                                //if(availableBrokers[0][0].equalsIgnoreCase(socket.getInetAddress().getHostAddress()) )
                                 out.writeObject("artist names");
-                                if(availableBrokers[0][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
-                                    out.writeObject(broker0Astists);
-
-                                }
-                                if(availableBrokers[1][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
-                                    out.writeObject(broker1Astists);
-                                }
-                                if(availableBrokers[2][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
-                                    out.writeObject(broker2Astists);
-                                }
+                                out.flush();
+                                sendArtists(socket, out);
                                 break;
-
                             }
 
                         }
@@ -231,6 +220,24 @@ public class Publisher extends Node implements  Serializable{
     public void push(ArtistName artistname, Value value){}
 
     public void notifyFailure(Broker broker){}
+
+    //sent Artists to brokers
+    public void sendArtists(Socket socket, ObjectOutputStream out) throws IOException {
+        //if(availableBrokers[0][0].equalsIgnoreCase(socket.getInetAddress().getHostAddress()) )
+
+        if(availableBrokers[0][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
+            out.writeObject(broker0Astists);
+            out.flush();
+        }
+        if(availableBrokers[1][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
+            out.writeObject(broker1Astists);
+            out.flush();
+        }
+        if(availableBrokers[2][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
+            out.writeObject(broker2Astists);
+            out.flush();
+        }
+    }
 
     //get  ip, port of every broker
     public static String[][] getBrokerInfo(ObjectInputStream input, String[][] availableBrokers) throws IOException, ClassNotFoundException {

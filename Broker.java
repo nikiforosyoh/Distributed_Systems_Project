@@ -14,7 +14,7 @@ public class Broker extends Node{
     String request; //input from Consumer
     boolean newRequest = false; //notify for new Consumer request
     Broker b= this;
-    int forlistOfBrokers=0;
+    //int forlistOfBrokers=0;
 
     ServerSocket ConsumerServer = null;
     ServerSocket PublisherServer=null;
@@ -22,7 +22,7 @@ public class Broker extends Node{
     private DataInputStream in = null;
     List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
     List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
-    private static ArrayList<ArtistName> publisher0Astists = new ArrayList<ArtistName>();
+    private static ArrayList<ArrayList<ArtistName>> publisherAstists = new ArrayList<ArrayList<ArtistName>>();
 
     public static void main(String[] args) throws IOException {
         Broker broker=new Broker("127.0.0.1",5004,5005 );
@@ -108,12 +108,12 @@ public class Broker extends Node{
         return newRequest;
     }
 
-    public void setBrokerList(ArrayList<ArtistName> b){
+    public void setArtistList(ArrayList<ArtistName> pubArt){
+        publisherAstists.add(pubArt);
+    }
 
-        for(int i=0; i<b.size();i++){
-            publisher0Astists.add(b.get(i));
-        }
-        forlistOfBrokers++;
+    public ArrayList<ArrayList<ArtistName>> getArtistList(){
+        return publisherAstists;
     }
 
     public Publisher acceptConection(Publisher p){

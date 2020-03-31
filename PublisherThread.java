@@ -51,18 +51,26 @@ public class PublisherThread extends Thread{
 
                 if (data.equalsIgnoreCase("artist names")){
                     brokerAstists = (ArrayList<ArtistName>) in.readObject();
-                    broker.setBrokerList(brokerAstists);
+                    broker.setArtistList(brokerAstists);
+                    /*
                     for (ArtistName a : brokerAstists){
                         System.out.println(a.getArtistName());
-
                         System.out.println(a.getKey());
-
                     }
-
+                    */
                 }
 
 
                 if (data.equalsIgnoreCase("next")) {
+
+                    //print artist list of each broker
+                    for (ArrayList<ArtistName> array : broker.getArtistList()) {
+                        for (ArtistName a : array){
+                            System.out.println(a.getArtistName());
+                            System.out.println(a.getKey());
+                        }
+                    }
+
                     while(true) {
                         System.out.print("");
                         if (broker.getNewRequest()) {
