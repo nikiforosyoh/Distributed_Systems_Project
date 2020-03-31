@@ -31,7 +31,8 @@ public class PublisherThread extends Thread{
 
             while (true){
                 String data=(String) in.readObject();
-                System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
+                //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
+                System.out.println(connection.getPort() + "> "  + data);
 
                 if(data.equalsIgnoreCase("brokers")){
                     sendBrokerInfo(out);
@@ -64,12 +65,14 @@ public class PublisherThread extends Thread{
                 if (data.equalsIgnoreCase("next")) {
 
                     //print artist list of each broker
+                    /*
                     for (ArrayList<ArtistName> array : broker.getArtistList()) {
                         for (ArtistName a : array){
                             System.out.println(a.getArtistName());
                             System.out.println(a.getKey());
                         }
                     }
+                    */
 
                     while(true) {
                         System.out.print("");
@@ -94,6 +97,8 @@ public class PublisherThread extends Thread{
     private static void sendBrokerInfo(ObjectOutputStream out) {
         File f = null;
         BufferedReader reader = null;
+        String ip;
+        String port;
         String line;
         String[] brokers = new String[3];
 
@@ -110,16 +115,17 @@ public class PublisherThread extends Thread{
         }
 
         try {
-            line = reader.readLine();
-
-            brokers[0] = line;
-            line = reader.readLine();
-            brokers[1] = line;
-            line = reader.readLine();
-            brokers[2] = line;
 
             for (int i=0; i<3; i++){
-                out.writeObject(brokers[i]);
+                line = reader.readLine();
+
+                ip=line.trim().substring(line.indexOf(":")+1,line.indexOf(",")).trim();
+                line = line.trim().substring(line.indexOf(",")+1);
+                port = line.trim().substring(line.indexOf(":")+1,line.indexOf(",")).trim();
+
+                out.writeObject(ip);
+                out.flush();
+                out.writeObject(port);
                 out.flush();
             }
 

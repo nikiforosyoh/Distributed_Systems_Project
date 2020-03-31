@@ -22,10 +22,12 @@ public class Broker extends Node{
     private DataInputStream in = null;
     List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
     List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
-    private static ArrayList<ArrayList<ArtistName>> publisherAstists = new ArrayList<ArrayList<ArtistName>>();
+    private static ArrayList<ArrayList<ArtistName>> publisherArtists = new ArrayList<ArrayList<ArtistName>>();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         Broker broker=new Broker("127.0.0.1",5004,5005 );
+        broker.calculateKeys();
+        System.out.println("broker key: " + broker.key);
         broker.openServer();
 
     }
@@ -55,16 +57,18 @@ public class Broker extends Node{
                         //thread that handles Publishers
                         while(true){
                             Socket connectPub= PublisherServer.accept();
-                            calculateKeys();
-                            System.out.println("Publisher connected! --> " + connectPub.getInetAddress().getHostAddress());
-                            System.out.println("broker key: " + key);
+                            //calculateKeys();
+                            //System.out.println("broker key: " + key);
+
+                            //System.out.println("Publisher connected! --> " + connectPub.getInetAddress().getHostAddress());
+                            System.out.println("Publisher connected! --> " + connectPub.getPort());
                             PublisherThread pt=new PublisherThread(connectPub, key, registeredPublishers, b);
                             registeredPublishers.add(pt);
                             pt.start();
                         }
 
                     }
-                    catch (IOException | NoSuchAlgorithmException e) {
+                    catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -74,8 +78,9 @@ public class Broker extends Node{
             //thread that handles Consumers
             while(true) {
                 connectCon = ConsumerServer.accept();
-                System.out.println("Consumer connected! --> " + connectCon.getInetAddress().getHostAddress());
-                ConsumerThread ct=new ConsumerThread(connectCon,key,registeredUsers,this);
+                //System.out.println("Consumer connected! --> " + connectCon.getInetAddress().getHostAddress());
+                System.out.println("Consumer connected! --> " + connectCon.getPort());
+                ConsumerThread ct=new ConsumerThread(connectCon,registeredUsers,this);
                 registeredUsers.add(ct);
                 ct.start();
 
@@ -88,7 +93,7 @@ public class Broker extends Node{
 
     //Hash(IP+port) to calculate broker's key
     public void calculateKeys() throws NoSuchAlgorithmException {
-        TestHashing hash = new TestHashing();
+        Hash hash = new Hash();
         key = Integer.parseInt( hash.getMd5(BrokerIP + Integer.toString(PublishersPort)) );
     }
 
@@ -109,11 +114,11 @@ public class Broker extends Node{
     }
 
     public void setArtistList(ArrayList<ArtistName> pubArt){
-        publisherAstists.add(pubArt);
+        publisherArtists.add(pubArt);
     }
 
     public ArrayList<ArrayList<ArtistName>> getArtistList(){
-        return publisherAstists;
+        return publisherArtists;
     }
 
     public Publisher acceptConection(Publisher p){

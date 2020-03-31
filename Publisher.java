@@ -37,7 +37,6 @@ public class Publisher extends Node implements  Serializable{
     //receive broker's information
     public void initialization() throws NoSuchAlgorithmException {
 
-
         ReadMp3Files readMp3Files = new ReadMp3Files();
 
         for ( String a : readMp3Files.getPublisherArtistList(start, end)){
@@ -46,41 +45,17 @@ public class Publisher extends Node implements  Serializable{
         }
 
         //print all artists of this Publisher
+        /*
         for (ArtistName a : artists){
             System.out.println(a.getArtistName());
         }
+        */
+
+        System.out.print("Publisher ");
+        init(BrokerIp,BrokerPort,availableBrokers);
 
 
-        Socket socket = null;
-        ObjectInputStream in=null;
-        ObjectOutputStream out =null;
 
-        try{
-            socket = new Socket(BrokerIp, BrokerPort);
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
-
-            System.out.println("Publisher Connected: " + socket);
-
-            out.writeObject("brokers");
-            out.flush();
-
-            availableBrokers = getBrokerInfo(in, availableBrokers );
-            System.out.println("Brokers' information received");
-            in.close();
-            out.close();
-            socket.close();
-
-        }
-        catch(UnknownHostException u) {
-            System.out.println(u);
-        }
-        catch(IOException i) {
-            System.out.println(i);
-        }
-        catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     public void openPublisher(){
@@ -179,7 +154,7 @@ public class Publisher extends Node implements  Serializable{
 
     }
 
-    //distribute artists to brokers depending on hash(artistName) and hash(IP+port)s
+    //distribute artists to brokers depending on hash(artistName) and hash(IP+port)
     private void distributeArtists() {
 
         for ( ArtistName artist : artists) {
@@ -239,19 +214,6 @@ public class Publisher extends Node implements  Serializable{
         }
     }
 
-    //get  ip, port of every broker
-    public static String[][] getBrokerInfo(ObjectInputStream input, String[][] availableBrokers) throws IOException, ClassNotFoundException {
-        String info = "";
-        for (int i=0; i<3; i++){
-            info = (String) input.readObject();
-
-            availableBrokers[i][0] = info.trim().substring(info.indexOf(":")+1,info.indexOf(",")).trim();
-            info = info.trim().substring(info.indexOf(",")+1);
-            availableBrokers[i][1] = info.trim().substring(info.indexOf(":")+1).trim();
-        }
-        return availableBrokers;
-    }
-
     //sort keys in availableBrokers array
     public String[][] sortKeys(String[][] a) {
         String temp;
@@ -266,6 +228,19 @@ public class Publisher extends Node implements  Serializable{
                 }
         }
         return a;
+    }
+
+    //get  ip, port of every broker
+    public static String[][] getBrokerInfo(ObjectInputStream input, String[][] availableBrokers) throws IOException, ClassNotFoundException {
+        String info = "";
+        for (int i=0; i<3; i++){
+            info = (String) input.readObject();
+
+            availableBrokers[i][0] = info.trim().substring(info.indexOf(":")+1,info.indexOf(",")).trim();
+            info = info.trim().substring(info.indexOf(",")+1);
+            availableBrokers[i][1] = info.trim().substring(info.indexOf(":")+1).trim();
+        }
+        return availableBrokers;
     }
 
 }

@@ -13,7 +13,7 @@ public class ArtistName implements Serializable {
     }
 
     public int calculateArtistHash(String artistName)throws NoSuchAlgorithmException {
-        TestHashing testHashArtist=new TestHashing();
+        Hash testHashArtist=new Hash();
         int key= Integer.parseInt(testHashArtist.getMd5(artistName));
 
         return key;
