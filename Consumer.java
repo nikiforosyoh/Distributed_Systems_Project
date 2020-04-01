@@ -114,8 +114,12 @@ public class Consumer extends Node {
                             out.writeObject(requestArtist);
                             out.flush();
 
+                            requestSong = input2.readLine();
+                            out.writeObject(requestSong);
+                            out.flush();
+
                             //input boolean to know if the song is found
-                            if(songFound) {
+                            if(!songFound) {
                                 //then take the song from broker
                                 //...in.readObject();
                                 //call recreateFile()
@@ -137,6 +141,7 @@ public class Consumer extends Node {
                 //takes input from terminal
                 input2 = new DataInputStream(System.in);
                 requestArtist = input2.readLine();
+
 
             } catch (IOException e) {
                 e.printStackTrace();

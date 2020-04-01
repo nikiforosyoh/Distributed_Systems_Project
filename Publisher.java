@@ -108,8 +108,11 @@ public class Publisher extends Node implements  Serializable{
                                 out.writeObject("next");
                                 out.flush();
 
-                                String request = (String) in.readObject();
-                                System.out.println("Consumer's request: " + request);
+                                String requestArtist = (String) in.readObject();
+                                System.out.println("Consumer's request: " + requestArtist);
+
+                                String requestSong = (String) in.readObject();
+                                System.out.println("Consumer's request: " + requestSong);
 
                             } catch (ClassNotFoundException e) {
                                 e.printStackTrace();

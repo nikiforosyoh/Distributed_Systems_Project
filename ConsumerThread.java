@@ -7,7 +7,8 @@ public class ConsumerThread extends Thread{
     Socket connection;
     ObjectInputStream in;
     ObjectOutputStream out;
-    String request= "";
+    String requestArtist;
+    String requestSong;
     Broker broker;
     List<ConsumerThread> registeredUsers;
 
@@ -55,12 +56,21 @@ public class ConsumerThread extends Thread{
                     out.flush();
                 }
 
-                this.request = (String) in.readObject();
-                broker.setRequest(this.request);
+
+                this.requestArtist = (String) in.readObject();
+                broker.setRequestArtist(this.requestArtist);
+                System.out.println("artist");
+
+                //this.requestSong = (String) in.readObject();
+                //broker.setRequestSong(this.requestSong);
+                //System.out.println("song");
+
                 broker.setNewRequest(true);
+                System.out.println(broker.getNewRequest());
                 //sos
                 //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);
-                System.out.println(connection.getPort() + "> "  + this.request);
+                System.out.println(connection.getPort() + "> "  + this.requestArtist);
+
 
             }
 

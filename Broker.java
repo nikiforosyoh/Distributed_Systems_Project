@@ -11,7 +11,8 @@ public class Broker extends Node{
     int ConsumersPort;
     int PublishersPort;
     int key; //Hash(IP+port)
-    String request; //input from Consumer
+    String requestArtist; //input Artist from Consumer
+    String requestSong; //input Songs from Consumer
     boolean newRequest = false; //notify for new Consumer request
     Broker b= this;
 
@@ -96,12 +97,12 @@ public class Broker extends Node{
         key = Integer.parseInt( hash.getMd5(BrokerIP + Integer.toString(PublishersPort)) );
     }
 
-    public void setRequest(String request){
-        this.request=request;
+    public void setRequestArtist(String requestArtist){
+        this.requestArtist=requestArtist;
     }
 
-    public String getRequest(){
-        return this.request;
+    public String getRequestArtist(){
+        return this.requestArtist;
     }
 
     public void setNewRequest(boolean newRequest) {
@@ -110,6 +111,14 @@ public class Broker extends Node{
 
     public boolean getNewRequest(){
         return newRequest;
+    }
+
+    public void setRequestSong(String requestArtist){
+        this.requestSong=requestSong;
+    }
+
+    public String getRequestSong(){
+        return this.requestSong;
     }
 
     public void setArtistList(ArrayList<ArtistName> pubArt){

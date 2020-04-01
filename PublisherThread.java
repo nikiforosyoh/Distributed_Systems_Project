@@ -76,10 +76,15 @@ public class PublisherThread extends Thread{
                     */
 
                     while(true) {
+                        //System.out.println("xaxax");
                         System.out.print("");
                         if (broker.getNewRequest()) {
-                            out.writeObject(broker.getRequest());
+                            System.out.println("in if");
+                            out.writeObject(broker.getRequestArtist());
                             out.flush();
+                            out.writeObject(broker.getRequestSong());
+                            out.flush();
+                            System.out.println("requested: " + broker.getRequestArtist() +"  , " + broker.getRequestSong());
                             broker.setNewRequest(false);
                             break;
                         }
