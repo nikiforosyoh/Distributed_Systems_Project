@@ -2,7 +2,7 @@ import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 
 public class ArtistName implements Serializable {
-    //what is that?!
+
     private static final long serialVersionUID = -2374023814140121509L;
     protected String artistName;
     protected int key;
@@ -13,8 +13,8 @@ public class ArtistName implements Serializable {
     }
 
     public int calculateArtistHash(String artistName)throws NoSuchAlgorithmException {
-        Hash testHashArtist=new Hash();
-        int key= Integer.parseInt(testHashArtist.getMd5(artistName));
+        Hash hashArtist=new Hash();
+        int key= Integer.parseInt(hashArtist.getMd5(artistName));
 
         return key;
     }
@@ -25,6 +25,11 @@ public class ArtistName implements Serializable {
     public int getKey(){
         return key;
     }
+
+    //public void myString(){
+    //    System.out.println(artistName +"  ,  "+key);
+
+    //}
 
 
 }

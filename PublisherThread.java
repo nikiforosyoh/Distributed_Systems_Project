@@ -10,7 +10,7 @@ public class PublisherThread extends Thread{
     int key;
     List<PublisherThread> registeredPublishers;
     Broker broker;
-    private static ArrayList<ArtistName> brokerAstists = new ArrayList<ArtistName>();
+    private static ArrayList<ArtistName> brokerArtists = new ArrayList<ArtistName>();
 
     public PublisherThread(Socket socket, int key, List<PublisherThread> registeredPublishers, Broker broker){
         connection=socket;
@@ -50,42 +50,43 @@ public class PublisherThread extends Thread{
                     out.writeObject(Integer.toString(key));
                     out.flush();
                 }
-
                 if (data.equalsIgnoreCase("artist names")){
-                    brokerAstists = (ArrayList<ArtistName>) in.readObject();
-                    broker.setArtistList(brokerAstists);
+                    brokerArtists = (ArrayList<ArtistName>) in.readObject();
+                    broker.setArtistList(brokerArtists);
+
                     /*
-                    for (ArtistName a : brokerAstists){
+                    for (ArtistName a : brokerArtists){
                         System.out.println(a.getArtistName());
                         System.out.println(a.getKey());
                     }
-                    */
+
+                     */
+
                 }
-
-
                 if (data.equalsIgnoreCase("next")) {
 
-                    //print artist list of each broker
-                    /*
-                    for (ArrayList<ArtistName> array : broker.getArtistList()) {
-                        for (ArtistName a : array){
-                            System.out.println(a.getArtistName());
-                            System.out.println(a.getKey());
-                        }
-                    }
-                    */
-
                     while(true) {
-                        //System.out.println("xaxax");
                         System.out.print("");
                         if (broker.getNewRequest()) {
-                            System.out.println("in if");
-                            out.writeObject(broker.getRequestArtist());
-                            out.flush();
-                            out.writeObject(broker.getRequestSong());
-                            out.flush();
-                            System.out.println("requested: " + broker.getRequestArtist() +"  , " + broker.getRequestSong());
-                            broker.setNewRequest(false);
+                            System.out.println("new request");
+                            synchronized(broker) {
+
+                                for(int i=0;i<broker.getArtistList().size();i++){
+                                    for (ArtistName art : broker.getArtistList().get(i)){
+                                        System.out.println("for for");
+                                        if( (art.getArtistName().equalsIgnoreCase(broker.getRequestArtist())) && (this==registeredPublishers.get(i))) {
+                                            System.out.println("in if");
+                                            out.writeObject(broker.getRequestArtist());
+                                            out.flush();
+                                            out.writeObject(broker.getRequestSong());
+                                            out.flush();
+
+                                            System.out.println("requested: " + broker.getRequestArtist() + "  , " + broker.getRequestSong());
+                                            broker.setNewRequest(false);
+                                        }
+                                    }
+                                }
+                            }
                             break;
                         }
                     }

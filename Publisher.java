@@ -21,7 +21,8 @@ public class Publisher extends Node implements  Serializable{
 
 
     public static void main(String args[]) throws NoSuchAlgorithmException {
-        Publisher pub=new Publisher('m', 'z', "127.0.0.1", 5001);
+        Publisher pub=new Publisher('s', 'z', "127.0.0.1", 5001);
+        System.out.println(Character.toUpperCase(pub.start) + "-" + Character.toUpperCase(pub.end) );
         pub.initialization();
         pub.openPublisher();
 
@@ -109,10 +110,10 @@ public class Publisher extends Node implements  Serializable{
                                 out.flush();
 
                                 String requestArtist = (String) in.readObject();
-                                System.out.println("Consumer's request: " + requestArtist);
+                                System.out.println("Consumer's Artist request: " + requestArtist);
 
                                 String requestSong = (String) in.readObject();
-                                System.out.println("Consumer's request: " + requestSong);
+                                System.out.println("Consumer's Song request: " + requestSong);
 
                             } catch (ClassNotFoundException e) {
                                 e.printStackTrace();

@@ -113,7 +113,7 @@ public class Broker extends Node{
         return newRequest;
     }
 
-    public void setRequestSong(String requestArtist){
+    public void setRequestSong(String requestSong){
         this.requestSong=requestSong;
     }
 

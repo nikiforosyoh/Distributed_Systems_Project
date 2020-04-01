@@ -33,10 +33,9 @@ public class Consumer extends Node {
 
         System.out.print("Consumer ");
         init(BrokerIp,BrokerPort,availableBrokers);
-        Socket socket = null;
-        ObjectInputStream in = null;
-        ObjectOutputStream out = null;
-        DataInputStream input2 = null;
+        Socket socket;
+        ObjectInputStream in;
+        ObjectOutputStream out;
 
         try {
             for (int i=0; i<3; i++) {
@@ -50,7 +49,6 @@ public class Consumer extends Node {
                 ArrayList<String> a = new ArrayList<>();
                 artists.add(a);
                 String name = (String) in.readObject();
-
 
                 while (!(name.equalsIgnoreCase("end"))) {
 
@@ -83,18 +81,19 @@ public class Consumer extends Node {
     public void openConsumer() throws IOException {
 
         ObjectInputStream in = null;
-        ObjectOutputStream out = null;
-        DataInputStream input2 = null;
-        Socket socket = null;
-        String requestArtist = "";
-        String requestSong = "";
+        DataInputStream input; //takes input from terminal
+        ObjectOutputStream out;
+        Socket socket;
+        String requestArtist;
+        String requestSong;
         Boolean artistFound = false;
         Boolean songFound = false;
 
-        //takes input from terminal
-        input2 = new DataInputStream(System.in);
-        requestArtist = input2.readLine();
+
         do {
+            input = new DataInputStream(System.in);
+            requestArtist = input.readLine();
+
             try {
                 //search all artist lists for this artist name
                 for (int i = 0; i < 3; i++) {
@@ -102,7 +101,6 @@ public class Consumer extends Node {
 
                         //if artist name is found open connection with the responsible broker
                         if (requestArtist.equalsIgnoreCase(a)) {
-
                             artistFound = true;
                             socket = new Socket(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
                             out = new ObjectOutputStream(socket.getOutputStream());
@@ -114,7 +112,7 @@ public class Consumer extends Node {
                             out.writeObject(requestArtist);
                             out.flush();
 
-                            requestSong = input2.readLine();
+                            requestSong = input.readLine();
                             out.writeObject(requestSong);
                             out.flush();
 
@@ -137,11 +135,6 @@ public class Consumer extends Node {
                 }
                 artistFound = false;
                 songFound = false;
-
-                //takes input from terminal
-                input2 = new DataInputStream(System.in);
-                requestArtist = input2.readLine();
-
 
             } catch (IOException e) {
                 e.printStackTrace();

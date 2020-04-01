@@ -54,23 +54,29 @@ public class ConsumerThread extends Thread{
 
                     out.writeObject("end");
                     out.flush();
+
+                    connection.close();
+
+                    synchronized(registeredUsers) {
+                        //remove this thread from Consumers threads list
+                        registeredUsers.remove(this);
+                    }
+                    return;
+
                 }
 
+                    this.requestArtist = data;
+                    broker.setRequestArtist(this.requestArtist);
 
-                this.requestArtist = (String) in.readObject();
-                broker.setRequestArtist(this.requestArtist);
-                System.out.println("artist");
+                    this.requestSong = (String) in.readObject();
+                    broker.setRequestSong(this.requestSong);
 
-                //this.requestSong = (String) in.readObject();
-                //broker.setRequestSong(this.requestSong);
-                //System.out.println("song");
 
-                broker.setNewRequest(true);
-                System.out.println(broker.getNewRequest());
-                //sos
-                //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);
-                System.out.println(connection.getPort() + "> "  + this.requestArtist);
+                    //sos
+                    //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);
+                    //System.out.println(connection.getPort() + "> " + this.requestArtist);
 
+                    broker.setNewRequest(true);
 
             }
 
