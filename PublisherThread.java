@@ -8,6 +8,7 @@ public class PublisherThread extends Thread{
     ObjectInputStream in;
     ObjectOutputStream out;
     int key;
+    boolean sendNext=true;
     List<PublisherThread> registeredPublishers;
     Broker broker;
     private static ArrayList<ArtistName> brokerArtists = new ArrayList<ArtistName>();
@@ -54,37 +55,54 @@ public class PublisherThread extends Thread{
                     brokerArtists = (ArrayList<ArtistName>) in.readObject();
                     broker.setArtistList(brokerArtists);
 
-                    /*
-                    for (ArtistName a : brokerArtists){
-                        System.out.println(a.getArtistName());
-                        System.out.println(a.getKey());
-                    }
-
-                     */
-
                 }
                 if (data.equalsIgnoreCase("next")) {
 
                     while(true) {
                         System.out.print("");
                         if (broker.getNewRequest()) {
-                            System.out.println("new request");
                             synchronized(broker) {
 
                                 for(int i=0;i<broker.getArtistList().size();i++){
                                     for (ArtistName art : broker.getArtistList().get(i)){
-                                        System.out.println("for for");
-                                        if( (art.getArtistName().equalsIgnoreCase(broker.getRequestArtist())) && (this==registeredPublishers.get(i))) {
-                                            System.out.println("in if");
-                                            out.writeObject(broker.getRequestArtist());
-                                            out.flush();
-                                            out.writeObject(broker.getRequestSong());
-                                            out.flush();
+                                        if( (art.getArtistName().equalsIgnoreCase(broker.getRequestArtist()))) {
+                                            if (this == registeredPublishers.get(i)) {
+                                                broker.setNewRequest(false);
+                                                out.writeObject(broker.getRequestArtist());
+                                                out.flush();
+                                                out.writeObject(broker.getRequestSong());
+                                                out.flush();
+                                                System.out.println("requested: " + broker.getRequestArtist() + "  , " + broker.getRequestSong());
+                                                String found=(String) in.readObject();
+                                                if(found.equalsIgnoreCase("Found")) {
+                                                    broker.setFound(true);
+                                                    int numOfChunks = (int) in.readObject();
+                                                    broker.setNumOfChunks(numOfChunks);
+                                                    System.out.println("Num of chunks received : "+broker.getNumOfChunks());
+                                                    /*
+                                                    for (int ch = 0; ch < numOfChunks; ch++) {
+                                                        MusicFile chunk = (MusicFile) in.readObject();
+                                                    }
+                                                    */
+                                                }
+                                                else{
+                                                    broker.setFound(false);
+                                                }
 
-                                            System.out.println("requested: " + broker.getRequestArtist() + "  , " + broker.getRequestSong());
-                                            broker.setNewRequest(false);
+                                                broker.setNewResponse(true);//o publisher apanthse
+                                                sendNext=false;
+                                            }
                                         }
                                     }
+                                }
+                                if(sendNext){
+                                    out.writeObject("null");
+                                    out.flush();
+                                    out.writeObject("null");
+                                    out.flush();
+                                }
+                                else {
+                                    sendNext=true;
                                 }
                             }
                             break;

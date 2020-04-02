@@ -106,38 +106,23 @@ public class ReadMp3Files
         return Artists;
     }
 
-    public ArrayList<ArrayList<String>> getListOfArtistSongs(String path) throws IOException, InvalidDataException, UnsupportedTagException {
-        ArrayList <ArrayList <String>> listOfArtistSongs = new ArrayList<>();
-
-        ArrayList <String> listOfArtists = getArtistsList(path);
+    public ArrayList<String> getSongs(String path) throws IOException, InvalidDataException, UnsupportedTagException
+    {
 
         ArrayList <String> listOfPaths = getListOfPaths(path);
 
-        int i = 0;
+        ArrayList<String> thisArtistSongList = new ArrayList<>();
 
-        for(String artist : listOfArtists)
+        for(String songPath : listOfPaths)
         {
-            ArrayList<String> thisArtistSongList = new ArrayList<>();
+            File file = new File(songPath);
+            Mp3File thisSong = new Mp3File(file);
+            ID3v2 thisSongTags = thisSong.getId3v2Tag();
 
-            for(String songPath : listOfPaths)
-            {
-                File file = new File(songPath);
-                Mp3File thisSong = new Mp3File(file);
-                ID3v2 thisSongTags = thisSong.getId3v2Tag();
+            thisArtistSongList.add(file.getName().substring(0, file.getName().length()-4));
 
-                //System.out.println("i="+ i + " " + artist + " "  + thisSongTags.getArtist());
-                if(artist.equalsIgnoreCase((String)thisSongTags.getArtist()))
-                {
-                    System.out.println("Adding songs for artist: " + artist);
-                    thisArtistSongList.add(file.getName().substring(0, file.getName().length()-4));
-                }
-                i++;
-            }
-
-            listOfArtistSongs.add(thisArtistSongList);
         }
-
-        return listOfArtistSongs;
+        return thisArtistSongList;
     }
 
     public static byte[] recreateFile(ArrayList<byte[]> ChunkList) {

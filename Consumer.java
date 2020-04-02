@@ -116,12 +116,12 @@ public class Consumer extends Node {
                             out.writeObject(requestSong);
                             out.flush();
                             String response=(String) in.readObject();
-                            //input boolean to know if the song is found
+
                             if(response.equalsIgnoreCase("Found")) {
-                                //then take the song from broker
+                                //then takes the song from broker
                                 //...in.readObject();
                                 //call recreateFile()
-                                System.out.println("The song found");
+                                System.out.println("Song found");
                                 System.out.println("Num of chunks: "+(int)in.readObject());
                             }
                             else{
@@ -135,7 +135,7 @@ public class Consumer extends Node {
                     }
                 }
                 if(!artistFound) {
-                    System.out.println("There are no songs of this Artist..");
+                    System.out.println("Sorry.. There are no songs of this Artist..");
                     System.out.println("Try an other one..");
                 }
                 artistFound = false;
