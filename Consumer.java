@@ -115,12 +115,17 @@ public class Consumer extends Node {
                             requestSong = input.readLine();
                             out.writeObject(requestSong);
                             out.flush();
-
+                            String response=(String) in.readObject();
                             //input boolean to know if the song is found
-                            if(!songFound) {
+                            if(response.equalsIgnoreCase("Found")) {
                                 //then take the song from broker
                                 //...in.readObject();
                                 //call recreateFile()
+                                System.out.println("The song found");
+                                System.out.println("Num of chunks: "+(int)in.readObject());
+                            }
+                            else{
+                                System.out.println("The song doesn't exist!");
                             }
 
                             socket.close();
@@ -139,6 +144,8 @@ public class Consumer extends Node {
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NumberFormatException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
