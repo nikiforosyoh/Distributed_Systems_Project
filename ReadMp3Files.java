@@ -106,23 +106,37 @@ public class ReadMp3Files
         return Artists;
     }
 
-    public ArrayList<String> getSongs(String path) throws IOException, InvalidDataException, UnsupportedTagException
+    //returns songs of each artists
+    public ArrayList<ArrayList<String>> getListSongs(String path, ArrayList <String> listOfArtists) throws IOException, InvalidDataException, UnsupportedTagException
     {
+        ArrayList <ArrayList <String>> listOfArtistSongs = new ArrayList<>();
 
         ArrayList <String> listOfPaths = getListOfPaths(path);
 
-        ArrayList<String> thisArtistSongList = new ArrayList<>();
+        int i = 0;
 
-        for(String songPath : listOfPaths)
+        for(String artist : listOfArtists)
         {
-            File file = new File(songPath);
-            Mp3File thisSong = new Mp3File(file);
-            ID3v2 thisSongTags = thisSong.getId3v2Tag();
+            ArrayList<String> thisArtistSongList = new ArrayList<>();
 
-            thisArtistSongList.add(file.getName().substring(0, file.getName().length()-4));
+            for(String songPath : listOfPaths)
+            {
+                File file = new File(songPath);
+                Mp3File thisSong = new Mp3File(file);
+                ID3v2 thisSongTags = thisSong.getId3v2Tag();
 
+
+                if(artist.equalsIgnoreCase((String)thisSongTags.getArtist()))
+                {
+                    thisArtistSongList.add(file.getName().substring(0, file.getName().length()-4));
+                }
+                i++;
+            }
+
+            listOfArtistSongs.add(thisArtistSongList);
         }
-        return thisArtistSongList;
+
+        return listOfArtistSongs;
     }
 
     public static byte[] recreateFile(ArrayList<byte[]> ChunkList) {
@@ -155,6 +169,7 @@ public class ReadMp3Files
         return Mp3ByteArray;
     }
 
+    //splits song into chunks
     public ArrayList<byte[]> splitToChunk(String songName) throws IOException {
         int chunkSize = 524288;
         String pathOfSong = "Songs\\"+songName+".mp3";

@@ -9,8 +9,9 @@ import java.util.ArrayList;
 
 public class Publisher extends Node implements  Serializable{
 
+    ReadMp3Files readMp3Files = new ReadMp3Files();
     private static ArrayList<ArtistName> artists = new ArrayList<ArtistName>();
-    private static ArrayList<ArrayList<String>> songsOfArtists = new ArrayList<ArrayList<String>>();
+    private static ArrayList<ArrayList<String>> songsOfArtists = new ArrayList<ArrayList<String>>(); //Songs of all songs of each artist
     private int keysCount=0;
     private static String[][] availableBrokers = new String[3][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
     char start; //to split artists to publishers
@@ -18,13 +19,11 @@ public class Publisher extends Node implements  Serializable{
     int BrokerPort;
     String BrokerIp;
     //list of artists for each broker
-    private static ArrayList<ArtistName> broker0Astists = new ArrayList<ArtistName>();
-    private static ArrayList<ArtistName> broker1Astists = new ArrayList<ArtistName>();
-    private static ArrayList<ArtistName> broker2Astists = new ArrayList<ArtistName>();
+    private static ArrayList<ArtistName> broker0Artists = new ArrayList<ArtistName>();
+    private static ArrayList<ArtistName> broker1Artists = new ArrayList<ArtistName>();
+    private static ArrayList<ArtistName> broker2Artists = new ArrayList<ArtistName>();
 
     boolean ready=false;
-
-
 
     public static void main(String args[]) throws NoSuchAlgorithmException, InvalidDataException, IOException, UnsupportedTagException {
         Publisher pub=new Publisher('k', 'z', "127.0.0.1", 4090);
@@ -45,30 +44,12 @@ public class Publisher extends Node implements  Serializable{
     //receive broker's information
     public void initialization() throws NoSuchAlgorithmException, InvalidDataException, IOException, UnsupportedTagException {
 
-        ReadMp3Files readMp3Files = new ReadMp3Files();
-
         for ( String a : readMp3Files.getPublisherArtistList(start, end)){
             ArtistName newArtist = new ArtistName(a);
             artists.add(newArtist);
         }
 
-        //print all artists of this Publisher
-        /*
-        for (ArtistName a : artists){
-            System.out.println(a.getArtistName());
-        }
-        */
-        //songsOfArtists=readMp3Files.getListSongs("Songs",readMp3Files.getPublisherArtistList(start, end));
-        /*
-        for(int i=0; i <songsOfArtists.size(); i++){
-            System.out.println("-----Artist------");
-            System.out.println(artists.get(i).getArtistName());
-            for(String s :songsOfArtists.get(i)){
-                System.out.println(s);
-            }
-        }
-
-         */
+        songsOfArtists = readMp3Files.getListSongs("Songs",readMp3Files.getPublisherArtistList(start, end));
 
         System.out.print("Publisher ");
         init(BrokerIp,BrokerPort,availableBrokers);
@@ -76,7 +57,6 @@ public class Publisher extends Node implements  Serializable{
     }
 
     public void openPublisher() throws InvalidDataException, IOException, UnsupportedTagException {
-        ReadMp3Files readMp3Files = new ReadMp3Files();
 
         //three threads for connections with all three brokers
         for(int i=0;i<3;i++) {
@@ -90,21 +70,19 @@ public class Publisher extends Node implements  Serializable{
                     ObjectOutputStream out ;
 
                     try {
+
                         socket = new Socket(availableBrokers[j][0], Integer.parseInt(availableBrokers[j][1]));
                         out = new ObjectOutputStream(socket.getOutputStream());
                         in = new ObjectInputStream(socket.getInputStream());
 
                         System.out.println("Publisher Connected: " + socket);
 
-                        String line="key";
-                        out.writeObject(line);
+                        //take keys from brokers
+                        out.writeObject("key");
                         out.flush();
-
-                        if (line.equalsIgnoreCase("key")) {
-                            String key = (String) in.readObject();
-                            availableBrokers[j][2]=key;
-                            keysCount++;
-                        }
+                        String key = (String) in.readObject();
+                        availableBrokers[j][2]=key;
+                        keysCount++;
 
                         while(true){
                             System.out.print("");
@@ -114,55 +92,57 @@ public class Publisher extends Node implements  Serializable{
                                 sendArtists(socket, out);
                                 break;
                             }
-
                         }
 
 
                         while (true) {
-                            try {
 
-                                out.writeObject("next");
-                                out.flush();
+                            out.writeObject("next");
+                            out.flush();
 
-                                String requestArtist = (String) in.readObject();
-                                String requestSong = (String) in.readObject();
+                            String requestArtist = (String) in.readObject();
+                            String requestSong = (String) in.readObject();
 
-                                if(!requestArtist.equalsIgnoreCase("null")){
+                            if(!requestArtist.equalsIgnoreCase("null")){
 
-                                    System.out.println("Consumer's Artist request: " + requestArtist);
-                                    System.out.println("Consumer's Song request: " + requestSong);
-                                    boolean songExists=false;
+                                System.out.println("Consumer's Artist request: " + requestArtist);
+                                System.out.println("Consumer's Song request: " + requestSong);
+                                boolean songExists=false;
 
-                                    for (String a : readMp3Files.getSongs("Songs")) {
-                                        if (requestSong.equalsIgnoreCase(a)) {
-                                            System.out.println("Song found!1!");
-                                            // musicFiles = readMp3Files.getMusicFiles(requestSong);
-                                            songExists = true;
-                                            out.writeObject("Found");
-                                            out.flush();
-                                            //out.writeObject(musicFiles.size());
-                                            out.writeObject(8);
-                                            out.flush();/*
-                                                 for(MusicFile m: musicFiles){
-                                                     out.writeObject(m);
-                                                     out.flush();
-                                                 }*/
+                                for(int x=0; x<artists.size(); x++) {
+                                    //System.out.println("in 1st for: " + artists.get(x).getArtistName());
+                                    if (artists.get(x).getArtistName().equalsIgnoreCase(requestArtist)) {
+                                        //System.out.println("in if: artist found");
+                                        for (String a : songsOfArtists.get(x)) {
+                                            //System.out.println("Song of this artist: " + songsOfArtists.get(x) );
+                                            if (requestSong.equalsIgnoreCase(a)) {
+                                                System.out.println("Song found!!!");
+                                                // musicFiles = readMp3Files.getMusicFiles(requestSong);
+                                                songExists = true;
+                                                out.writeObject("Found");
+                                                out.flush();
+                                                //out.writeObject(musicFiles.size());
+                                                out.writeObject(8);
+                                                out.flush();
+                                                /*
+                                                for(MusicFile m: musicFiles){
+                                                 out.writeObject(m);
+                                                 out.flush();
+                                                }
+                                                */
+                                                break;
+                                            }
                                         }
                                     }
-                                    if(!songExists){
-                                        out.writeObject("Not Found");
-                                        out.flush();
-                                    }
                                 }
-
-                            } catch (ClassNotFoundException e) {
-                                e.printStackTrace();
-                            } catch (InvalidDataException e) {
-                                e.printStackTrace();
-                            } catch (UnsupportedTagException e) {
-                                e.printStackTrace();
+                                if(!songExists){
+                                    System.out.println("Song not found!!!");
+                                    out.writeObject("Not Found");
+                                    out.flush();
+                                }
                             }
-                        }
+
+                        }//while next
 
                     } catch (UnknownHostException u) {
                         System.out.println(u);
@@ -187,52 +167,25 @@ public class Publisher extends Node implements  Serializable{
                 break;
             }
         }
-        //print available Broker's info: IP, port, key
-        /*
-        System.out.println("BrokersIp \tPorts \tkeys ");
-        for (int k=0; k<3; k++){
-            for (int l=0; l<3; l++){
-                System.out.print(availableBrokers[k][l]);
-                System.out.print("\t");
-            }
-            System.out.print("\n");
-        }
-        */
 
     }
 
     //distribute artists to brokers depending on hash(artistName) and hash(IP+port)
-
     private void distributeArtists() {
 
         for ( ArtistName artist : artists) {
 
             if (artist.getKey() < Integer.parseInt(availableBrokers[0][2]) || artist.getKey() >= Integer.parseInt(availableBrokers[2][2]) ) {
                 // o 1os
-                broker0Astists.add(artist);
+                broker0Artists.add(artist);
             } else if (artist.getKey() < Integer.parseInt(availableBrokers[1][2])) {
                 // o 2os
-                broker1Astists.add(artist);
+                broker1Artists.add(artist);
             } else if (artist.getKey() < Integer.parseInt(availableBrokers[2][2])) {
                 // o 3os
-                broker2Astists.add(artist);
+                broker2Artists.add(artist);
             }
         }
-
-        /*
-        System.out.println("\n 1st broker:");
-        for (ArtistName a : broker0Astists){
-            System.out.println(a.getArtistName());
-        }
-        System.out.println("\n 2nd broker:");
-        for (ArtistName a : broker1Astists){
-            System.out.println(a.getArtistName());
-        }
-        System.out.println("\n 3rd broker:");
-        for (ArtistName a : broker2Astists){
-            System.out.println(a.getArtistName());
-        }
-        */
 
     }
 
@@ -251,15 +204,15 @@ public class Publisher extends Node implements  Serializable{
         //if(availableBrokers[0][0].equalsIgnoreCase(socket.getInetAddress().getHostAddress()) )
 
         if(availableBrokers[0][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
-            out.writeObject(broker0Astists);
+            out.writeObject(broker0Artists);
             out.flush();
         }
         if(availableBrokers[1][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
-            out.writeObject(broker1Astists);
+            out.writeObject(broker1Artists);
             out.flush();
         }
         if(availableBrokers[2][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
-            out.writeObject(broker2Astists);
+            out.writeObject(broker2Artists);
             out.flush();
         }
     }

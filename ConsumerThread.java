@@ -96,9 +96,7 @@ public class ConsumerThread extends Thread{
                         broker.setNewResponse(false);
                         break;
                     }
-
                 }
-
 
             }
 
@@ -110,7 +108,6 @@ public class ConsumerThread extends Thread{
                 registeredUsers.remove(this);
             }
             return;
-
         }
     }
 

@@ -28,8 +28,8 @@ public class Broker extends Node{
     int numOfChunks;
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-        Broker broker=new Broker("127.0.0.1",5004
-                                                      ,5005 ); //des to txt prin baleis tis port!!!!!!! <-----
+        Broker broker=new Broker("127.0.0.1",5000
+                                                      ,4090 ); //des to txt prin baleis tis port!!!!!!! <-----
         broker.calculateKeys();
         System.out.println("broker key: " + broker.key);
         broker.openServer();

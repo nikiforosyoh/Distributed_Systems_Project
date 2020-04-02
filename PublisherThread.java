@@ -89,7 +89,7 @@ public class PublisherThread extends Thread{
                                                     broker.setFound(false);
                                                 }
 
-                                                broker.setNewResponse(true);//o publisher apanthse
+                                                broker.setNewResponse(true);//publisher replied
                                                 sendNext=false;
                                             }
                                         }

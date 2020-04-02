@@ -109,11 +109,11 @@ public class Consumer extends Node {
                             System.out.println("Consumer Connected: " + socket);
 
                             //sends user's request
-                            out.writeObject(requestArtist);
+                            out.writeObject(requestArtist.trim());
                             out.flush();
 
                             requestSong = input.readLine();
-                            out.writeObject(requestSong);
+                            out.writeObject(requestSong.trim());
                             out.flush();
                             String response=(String) in.readObject();
 
@@ -121,8 +121,10 @@ public class Consumer extends Node {
                                 //then takes the song from broker
                                 //...in.readObject();
                                 //call recreateFile()
+                                System.out.println("----------");
                                 System.out.println("Song found");
-                                System.out.println("Num of chunks: "+(int)in.readObject());
+                                int reply = (int)in.readObject();
+                                System.out.println("Num of chunks: " + reply);
                             }
                             else{
                                 System.out.println("The song doesn't exist!");
