@@ -15,6 +15,8 @@ public class Broker extends Node{
     String requestSong; //input Songs from Consumer
     boolean newRequest = false; //notify for new Consumer request
     Broker b= this;
+    boolean newResponse;
+    boolean found;
 
     ServerSocket ConsumerServer = null;
     ServerSocket PublisherServer=null;
@@ -23,9 +25,11 @@ public class Broker extends Node{
     List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
     List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
     private static ArrayList<ArrayList<ArtistName>> publisherArtists = new ArrayList<ArrayList<ArtistName>>();
+    int numOfChunks;
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-        Broker broker=new Broker("127.0.0.1",5004,5005 ); //des to txt prin baleis tis port!!!!!!! <-----
+        Broker broker=new Broker("127.0.0.1",5004
+                                                      ,5005 ); //des to txt prin baleis tis port!!!!!!! <-----
         broker.calculateKeys();
         System.out.println("broker key: " + broker.key);
         broker.openServer();
@@ -121,6 +125,27 @@ public class Broker extends Node{
         return this.requestSong;
     }
 
+    public void setNewResponse(boolean response){
+        this.newResponse=response;
+    }
+
+    public boolean getNewResponse(){
+        return newResponse;
+    }
+    public void setFound(boolean f){
+        this.found=f;
+    }
+
+    public boolean getFound(){
+        return found;
+    }
+    public void setNumOfChunks(int numOfChunks){
+        this.numOfChunks=numOfChunks;
+    }
+    public int getNumOfChunks(){
+        return numOfChunks;
+    }
+
     public void setArtistList(ArrayList<ArtistName> pubArt){
         publisherArtists.add(pubArt);
     }
@@ -146,8 +171,8 @@ public class Broker extends Node{
             BufferedWriter output = new BufferedWriter(new FileWriter("src\\Broker.txt", true));
 
             output.write("Broker IP: " + BrokerIP +
-                            "\t,Publisher Port: " + PublishersPort +
-                            "\t,Consumer Port: " + ConsumersPort + "\n");
+                    "\t,Publisher Port: " + PublishersPort +
+                    "\t,Consumer Port: " + ConsumersPort + "\n");
             output.close();
 
         } catch (FileNotFoundException e) {
