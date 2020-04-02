@@ -65,18 +65,40 @@ public class ConsumerThread extends Thread{
 
                 }
 
-                    this.requestArtist = data;
-                    broker.setRequestArtist(this.requestArtist);
+                this.requestArtist = data;
+                broker.setRequestArtist(this.requestArtist);
 
-                    this.requestSong = (String) in.readObject();
-                    broker.setRequestSong(this.requestSong);
+                this.requestSong = (String) in.readObject();
+                broker.setRequestSong(this.requestSong);
 
 
-                    //sos
-                    //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);
-                    //System.out.println(connection.getPort() + "> " + this.requestArtist);
+                //sos
+                //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);
+                //System.out.println(connection.getPort() + "> " + this.requestArtist);
 
-                    broker.setNewRequest(true);
+                broker.setNewRequest(true);
+
+                while(true){
+                    System.out.print("");
+                    if(broker.getNewResponse()){
+                        if(broker.getFound()){
+                            out.writeObject("Found");
+                            out.flush();
+                            out.writeObject(broker.getNumOfChunks());
+                            out.flush();
+                            System.out.println("Consumerthread numOfchunks: "+broker.getNumOfChunks());
+                            broker.setFound(false);
+                        }
+                        else{
+                            out.writeObject("Not Found");
+                            out.flush();
+                        }
+                        broker.setNewResponse(false);
+                        break;
+                    }
+
+                }
+
 
             }
 
