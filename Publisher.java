@@ -6,8 +6,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
-public class Publisher extends Node implements  Serializable{
+public class Publisher extends Node{
 
     ReadMp3Files readMp3Files = new ReadMp3Files();
     private static ArrayList<ArtistName> artists = new ArrayList<ArtistName>();
@@ -22,6 +24,8 @@ public class Publisher extends Node implements  Serializable{
     private static ArrayList<ArtistName> broker0Artists = new ArrayList<ArtistName>();
     private static ArrayList<ArtistName> broker1Artists = new ArrayList<ArtistName>();
     private static ArrayList<ArtistName> broker2Artists = new ArrayList<ArtistName>();
+
+    Queue<Request> requestQueue = new LinkedList<>();//queue for consumer requests
 
     boolean ready=false;
 
@@ -100,16 +104,21 @@ public class Publisher extends Node implements  Serializable{
                             out.writeObject("next");
                             out.flush();
 
+                            //synchronized(requestQueue)
+                            //requestQueue.add((Request) in.readObject());
+                            //String requestArtist = requestQueue.peek().getRequestArtist();
+                            //String requestSong = requestQueue.remove().getRequestSong();
+
                             String requestArtist = (String) in.readObject();
                             String requestSong = (String) in.readObject();
 
-                            if(!requestArtist.equalsIgnoreCase("null")){
+                            if (!requestArtist.equalsIgnoreCase("null")) {
 
                                 System.out.println("Consumer's Artist request: " + requestArtist);
                                 System.out.println("Consumer's Song request: " + requestSong);
-                                boolean songExists=false;
+                                boolean songExists = false;
 
-                                for(int x=0; x<artists.size(); x++) {
+                                for (int x = 0; x < artists.size(); x++) {
                                     //System.out.println("in 1st for: " + artists.get(x).getArtistName());
                                     if (artists.get(x).getArtistName().equalsIgnoreCase(requestArtist)) {
                                         //System.out.println("in if: artist found");
@@ -124,18 +133,18 @@ public class Publisher extends Node implements  Serializable{
                                                 //out.writeObject(musicFiles.size());
                                                 out.writeObject(8);
                                                 out.flush();
-                                                /*
-                                                for(MusicFile m: musicFiles){
-                                                 out.writeObject(m);
-                                                 out.flush();
-                                                }
-                                                */
+                                            /*
+                                            for(MusicFile m: musicFiles){
+                                             out.writeObject(m);
+                                             out.flush();
+                                            }
+                                            */
                                                 break;
                                             }
                                         }
                                     }
                                 }
-                                if(!songExists){
+                                if (!songExists) {
                                     System.out.println("Song not found!!!");
                                     out.writeObject("Not Found");
                                     out.flush();
@@ -188,8 +197,6 @@ public class Publisher extends Node implements  Serializable{
         }
 
     }
-
-    public void getBrokerList(){}
 
     public Broker hashTopic(ArtistName artistname){return null; }
 

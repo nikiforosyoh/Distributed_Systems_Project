@@ -1,9 +1,10 @@
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.net.*;
+import java.util.Queue;
 
 public class Broker extends Node{
 
@@ -13,10 +14,12 @@ public class Broker extends Node{
     int key; //Hash(IP+port)
     String requestArtist; //input Artist from Consumer
     String requestSong; //input Songs from Consumer
+    Queue<Request> requestQueue = new LinkedList<>();//queue for consumer requests
     boolean newRequest = false; //notify for new Consumer request
     Broker b= this;
     boolean newResponse;
     boolean found;
+
 
     ServerSocket ConsumerServer = null;
     ServerSocket PublisherServer=null;
@@ -28,8 +31,8 @@ public class Broker extends Node{
     int numOfChunks;
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-        Broker broker=new Broker("127.0.0.1",5000
-                                                      ,4090 ); //des to txt prin baleis tis port!!!!!!! <-----
+        Broker broker=new Broker("127.0.0.1",5004
+                                                      ,5005 ); //des to txt prin baleis tis port!!!!!!! <-----
         broker.calculateKeys();
         System.out.println("broker key: " + broker.key);
         broker.openServer();
@@ -132,6 +135,7 @@ public class Broker extends Node{
     public boolean getNewResponse(){
         return newResponse;
     }
+
     public void setFound(boolean f){
         this.found=f;
     }
@@ -139,9 +143,11 @@ public class Broker extends Node{
     public boolean getFound(){
         return found;
     }
+
     public void setNumOfChunks(int numOfChunks){
         this.numOfChunks=numOfChunks;
     }
+
     public int getNumOfChunks(){
         return numOfChunks;
     }
@@ -154,11 +160,11 @@ public class Broker extends Node{
         return publisherArtists;
     }
 
-    public Publisher acceptConection(Publisher p){
+    public Publisher acceptConnection(Publisher p){
         return null;
     }
 
-    public Consumer acceptConection(Consumer c){
+    public Consumer acceptConenction(Consumer c){
         return null;
     }
 

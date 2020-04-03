@@ -26,13 +26,13 @@ public class ConsumerThread extends Thread{
 
             while (true){
 
-                String data=(String) in.readObject();
+                String input = (String) in.readObject();
                 //sos
                 //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
-                System.out.println(connection.getPort() + "> "  + data);
+                System.out.println(connection.getPort() + "> "  + input);
 
 
-                if(data.equalsIgnoreCase("brokers")){
+                if(input.equalsIgnoreCase("brokers")){
                     sendBrokerInfo(out);
                     connection.close();
 
@@ -43,7 +43,7 @@ public class ConsumerThread extends Thread{
                     return;
                 }
 
-                if (data.equalsIgnoreCase("artist names")){
+                if (input.equalsIgnoreCase("artist names")){
 
                     for (ArrayList<ArtistName> array : broker.getArtistList()) {
                         for (ArtistName a : array){
@@ -65,12 +65,16 @@ public class ConsumerThread extends Thread{
 
                 }
 
-                this.requestArtist = data;
+
+                this.requestArtist = input;
                 broker.setRequestArtist(this.requestArtist);
 
                 this.requestSong = (String) in.readObject();
                 broker.setRequestSong(this.requestSong);
 
+                synchronized(broker.requestQueue) {
+                     broker.requestQueue.add(new Request(requestArtist, requestSong));
+                }
 
                 //sos
                 //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);

@@ -60,18 +60,23 @@ public class PublisherThread extends Thread{
 
                     while(true) {
                         System.out.print("");
+                        // if(broker.requestQueue.peek()!= null){
                         if (broker.getNewRequest()) {
+                            //synchronized(broker.requestQueue){
                             synchronized(broker) {
 
                                 for(int i=0;i<broker.getArtistList().size();i++){
                                     for (ArtistName art : broker.getArtistList().get(i)){
                                         if( (art.getArtistName().equalsIgnoreCase(broker.getRequestArtist()))) {
                                             if (this == registeredPublishers.get(i)) {
+                                                //
                                                 broker.setNewRequest(false);
+                                                //out.writeObject(broker.requestQueue.peek());
                                                 out.writeObject(broker.getRequestArtist());
                                                 out.flush();
                                                 out.writeObject(broker.getRequestSong());
                                                 out.flush();
+                                                //System.out.println("requested: " + broker.requestQueue.peek().getRequestArtist() + "  , " + broker.requestQueue.remove().getRequestSong());
                                                 System.out.println("requested: " + broker.getRequestArtist() + "  , " + broker.getRequestSong());
                                                 String found=(String) in.readObject();
                                                 if(found.equalsIgnoreCase("Found")) {
