@@ -1,7 +1,6 @@
-import java.util.ArrayList;
+import java.io.Serializable;
 
-public class MusicFile
-{
+public class MusicFile implements Serializable{
     protected String trackName;
     protected String artistName;
     protected String albumInfo;
