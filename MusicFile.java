@@ -1,11 +1,12 @@
 import java.io.Serializable;
 
-public class MusicFile implements Serializable{
+public class MusicFile implements Serializable {
     protected String trackName;
     protected String artistName;
     protected String albumInfo;
     protected byte[] musicFileExtract;
     protected int chunkNumber;
+    protected int totalChunks;
 
     public MusicFile(String trackName, String artistName, String albumInfo, byte[] musicFileExtract, int chunkNumber)
     {
@@ -16,6 +17,13 @@ public class MusicFile implements Serializable{
         this.chunkNumber = chunkNumber;
     }
 
+    public void setTotalChunks(int totalChunks){
+        this.totalChunks = totalChunks;
+    }
+
+    public int getTotalChunks(){
+        return totalChunks;
+    }
     public String getTrackName()
     {
         return this.trackName;

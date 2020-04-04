@@ -22,14 +22,11 @@ public class ArtistName implements Serializable {
     public String getArtistName(){
         return artistName;
     }
+    
     public int getKey(){
         return key;
     }
 
-    //public void myString(){
-    //    System.out.println(artistName +"  ,  "+key);
-
-    //}
 
 
 }

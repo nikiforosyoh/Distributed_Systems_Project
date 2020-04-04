@@ -15,6 +15,8 @@ public class Broker extends Node{
     String requestArtist; //input Artist from Consumer
     String requestSong; //input Songs from Consumer
     Queue<Request> requestQueue = new LinkedList<>();//queue for consumer requests
+    Queue<MusicFile> chunkQueue = new LinkedList<>();//queue for chunks
+
     boolean newRequest = false; //notify for new Consumer request
     Broker b= this;
     boolean newResponse;
@@ -28,7 +30,7 @@ public class Broker extends Node{
     List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
     List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
     private static ArrayList<ArrayList<ArtistName>> publisherArtists = new ArrayList<ArrayList<ArtistName>>();
-    int numOfChunks;
+
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         Broker broker=new Broker("127.0.0.1",5004
@@ -144,12 +146,30 @@ public class Broker extends Node{
         return found;
     }
 
-    public void setNumOfChunks(int numOfChunks){
-        this.numOfChunks=numOfChunks;
+    //methods for synchronization of requests
+    public void addToRequestQueue(Request request){
+        this.requestQueue.add(request);
     }
 
-    public int getNumOfChunks(){
-        return numOfChunks;
+    public Request removeFromRequestQueue(){
+        return requestQueue.remove();
+    }
+
+    public Request peekFromRequestQueue(){
+        return requestQueue.peek();
+    }
+
+    //methods for synchronization of chunks ..synchronized
+    public void addToChunkQueue(MusicFile chunk){
+        this.chunkQueue.add(chunk);
+    }
+
+    public MusicFile removeFromChunkQueue(){
+        return chunkQueue.poll();
+    }
+
+    public MusicFile peekFromChunkQueue(){
+        return chunkQueue.peek();
     }
 
     public void setArtistList(ArrayList<ArtistName> pubArt){
@@ -158,14 +178,6 @@ public class Broker extends Node{
 
     public ArrayList<ArrayList<ArtistName>> getArtistList(){
         return publisherArtists;
-    }
-
-    public Publisher acceptConnection(Publisher p){
-        return null;
-    }
-
-    public Consumer acceptConenction(Consumer c){
-        return null;
     }
 
     public void notifyPublisher(String s){}

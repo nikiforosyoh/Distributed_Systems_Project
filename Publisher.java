@@ -30,7 +30,7 @@ public class Publisher extends Node{
     boolean ready=false;
 
     public static void main(String args[]) throws NoSuchAlgorithmException, InvalidDataException, IOException, UnsupportedTagException {
-        Publisher pub=new Publisher('k', 'z', "127.0.0.1", 4090);
+        Publisher pub=new Publisher('a', 'z', "127.0.0.1", 4090);
         System.out.println(Character.toUpperCase(pub.start) + "-" + Character.toUpperCase(pub.end) );
         pub.initialization();
         pub.openPublisher();
@@ -68,8 +68,8 @@ public class Publisher extends Node{
             final int j=i;
             Thread t1 = new Thread() {
                 public void run() {
-                    ArrayList<MusicFile> musicFiles = new ArrayList<MusicFile>();
-                    Socket socket = null;
+
+                    Socket socket;
                     ObjectInputStream in ;
                     ObjectOutputStream out ;
 
@@ -101,6 +101,7 @@ public class Publisher extends Node{
 
                         while (true) {
 
+                            //thread poy tha dexetai syndeseis me broker
                             out.writeObject("next");
                             out.flush();
 
@@ -119,26 +120,15 @@ public class Publisher extends Node{
                                 boolean songExists = false;
 
                                 for (int x = 0; x < artists.size(); x++) {
-                                    //System.out.println("in 1st for: " + artists.get(x).getArtistName());
                                     if (artists.get(x).getArtistName().equalsIgnoreCase(requestArtist)) {
-                                        //System.out.println("in if: artist found");
                                         for (String a : songsOfArtists.get(x)) {
-                                            //System.out.println("Song of this artist: " + songsOfArtists.get(x) );
                                             if (requestSong.equalsIgnoreCase(a)) {
                                                 System.out.println("Song found!!!");
-                                                // musicFiles = readMp3Files.getMusicFiles(requestSong);
                                                 songExists = true;
                                                 out.writeObject("Found");
                                                 out.flush();
-                                                //out.writeObject(musicFiles.size());
-                                                out.writeObject(8);
-                                                out.flush();
-                                            /*
-                                            for(MusicFile m: musicFiles){
-                                             out.writeObject(m);
-                                             out.flush();
-                                            }
-                                            */
+                                                //sends chunks to broker
+                                                push(requestSong, out );
                                                 break;
                                             }
                                         }
@@ -159,6 +149,10 @@ public class Publisher extends Node{
                         System.out.println(i);
                     } catch (ClassNotFoundException e) {
                         e.printStackTrace();
+                    } catch (InvalidDataException e) {
+                        e.printStackTrace();
+                    } catch (UnsupportedTagException e) {
+                        e.printStackTrace();
                     }
                 }
             };
@@ -169,7 +163,7 @@ public class Publisher extends Node{
         while(true){
             System.out.print("");
             if(keysCount==3){
-                availableBrokers=sortKeys(availableBrokers);
+                availableBrokers = sortKeys(availableBrokers);
                 //distribute artists to brokers depending on hash(artistName) and hash(IP+port)
                 distributeArtists();
                 ready= true;
@@ -198,11 +192,21 @@ public class Publisher extends Node{
 
     }
 
-    public Broker hashTopic(ArtistName artistname){return null; }
+    //sends chunks to broker
+    public void push(String requestSong, ObjectOutputStream out ) throws InvalidDataException, IOException, UnsupportedTagException {
+        ArrayList<MusicFile> musicFiles = new ArrayList<MusicFile>();
+        musicFiles = readMp3Files.getMusicFiles(requestSong);
 
-    public void push(ArtistName artistname, Value value){}
+        int totalChunks = musicFiles.size();
 
-    public void notifyFailure(Broker broker){}
+        for(MusicFile m: musicFiles){
+            m.setTotalChunks(totalChunks);
+            out.writeObject(m);
+            out.flush();
+            System.out.println("SENT: " + m.getChunkNumber());
+        }
+        System.out.println("ALL SENT");
+    }
 
     //sent Artists to brokers
     public void sendArtists(Socket socket, ObjectOutputStream out) throws IOException {

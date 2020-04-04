@@ -139,7 +139,7 @@ public class ReadMp3Files
         return listOfArtistSongs;
     }
 
-    public static byte[] recreateFile(ArrayList<byte[]> ChunkList) {
+    public byte[] recreateFile(ArrayList<byte[]> ChunkList) {
         int chunkSize = 524288;
         int lastChunkSize = ChunkList.get(ChunkList.size()-1).length;
         int numOfBytes = (ChunkList.size()-1)*chunkSize + ChunkList.get(ChunkList.size()-1).length;

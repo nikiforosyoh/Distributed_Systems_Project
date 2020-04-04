@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class ConsumerThread extends Thread{
@@ -84,13 +85,24 @@ public class ConsumerThread extends Thread{
 
                 while(true){
                     System.out.print("");
+                    //if(broker.peekFromChunkQueue()!=null ){
                     if(broker.getNewResponse()){
                         if(broker.getFound()){
                             out.writeObject("Found");
                             out.flush();
-                            out.writeObject(broker.getNumOfChunks());
-                            out.flush();
-                            System.out.println("Consumerthread numOfchunks: "+broker.getNumOfChunks());
+                            System.out.println("Consumerthread numOfchunks: " + broker.peekFromChunkQueue().getTotalChunks());
+                            synchronized (broker) {
+                                Iterator<MusicFile> iter = broker.chunkQueue.iterator();
+                                while(iter.hasNext()) {
+                                    MusicFile chunk = iter.next();
+                                    out.writeObject(chunk);
+                                    out.flush();
+                                    iter.remove();
+                                }
+                                System.out.println("Queue size: " + broker.chunkQueue.size());
+                            }
+
+                            System.out.println("SENT");
                             broker.setFound(false);
                         }
                         else{

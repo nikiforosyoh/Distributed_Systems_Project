@@ -3,6 +3,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 
 public class Consumer extends Node {
@@ -11,17 +13,6 @@ public class Consumer extends Node {
     private static int BrokerPort;
     private static String[][] availableBrokers = new String[3][2]; //broker1: brokerIP, Integer.parseInt(brokerPort)
     private static ArrayList<ArrayList<String>> artists = new ArrayList<ArrayList<String>>();
-
-
-    public void register(Broker broker, ArtistName artistName){
-    }
-
-    public void disconnect(Broker broker, ArtistName artistName){
-
-    }
-    public void playData(ArtistName artistName, Value value){
-
-    }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         Consumer cons = new Consumer("127.0.0.1", 5000);
@@ -37,6 +28,7 @@ public class Consumer extends Node {
         ObjectInputStream in;
         ObjectOutputStream out;
 
+        //makes a list of each artist of a broker
         try {
             for (int i=0; i<3; i++) {
                 socket = new Socket(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
@@ -80,17 +72,16 @@ public class Consumer extends Node {
 
     public void openConsumer() throws IOException {
 
-        ObjectInputStream in = null;
+        ObjectInputStream in;
         DataInputStream input; //takes input from terminal
         ObjectOutputStream out;
         Socket socket;
         String requestArtist;
         String requestSong;
         Boolean artistFound = false;
-        Boolean songFound = false;
-
 
         do {
+            ArrayList<byte[]> chunkQueue = new ArrayList<>();//queue for chunks
             input = new DataInputStream(System.in);
             requestArtist = input.readLine();
 
@@ -118,16 +109,35 @@ public class Consumer extends Node {
                             String response=(String) in.readObject();
 
                             if(response.equalsIgnoreCase("Found")) {
-                                //then takes the song from broker
-                                //...in.readObject();
-                                //call recreateFile()
+
                                 System.out.println("----------");
                                 System.out.println("Song found");
-                                int reply = (int)in.readObject();
-                                System.out.println("Num of chunks: " + reply);
+                                //then takes the song from broker
+                                MusicFile chunk=(MusicFile) in.readObject();
+                                chunkQueue.add(chunk.getMusicFileExtract());
+                                System.out.println("received: " + chunk.getChunkNumber());
+
+                                for (int ch = 0; ch < chunk.getTotalChunks()-1; ch++) {
+
+                                    chunk = (MusicFile) in.readObject();
+                                    System.out.println("received: " + chunk.getChunkNumber());
+                                    chunkQueue.add(chunk.getMusicFileExtract());
+
+                                }
+
+                                ReadMp3Files readMp3Files = new ReadMp3Files();
+                                byte[] mp3File = readMp3Files.recreateFile(chunkQueue);
+
+                                FileOutputStream stream = new FileOutputStream(requestSong +"_new.mp3");
+                                stream.write(mp3File);
+
+                                System.out.println("Song received successfully! ");
+
                             }
-                            else{
+                            else if(response.equalsIgnoreCase("Not Found")){
                                 System.out.println("The song doesn't exist!");
+                            }else{
+                                System.out.println("Problem");
                             }
 
                             socket.close();
@@ -141,7 +151,6 @@ public class Consumer extends Node {
                     System.out.println("Try an other one..");
                 }
                 artistFound = false;
-                songFound = false;
 
             } catch (IOException e) {
                 e.printStackTrace();

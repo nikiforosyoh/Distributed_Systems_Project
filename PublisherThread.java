@@ -55,7 +55,11 @@ public class PublisherThread extends Thread{
                     brokerArtists = (ArrayList<ArtistName>) in.readObject();
                     broker.setArtistList(brokerArtists);
 
+                    //publisher info
+
+
                 }
+
                 if (data.equalsIgnoreCase("next")) {
 
                     while(true) {
@@ -69,6 +73,7 @@ public class PublisherThread extends Thread{
                                     for (ArtistName art : broker.getArtistList().get(i)){
                                         if( (art.getArtistName().equalsIgnoreCase(broker.getRequestArtist()))) {
                                             if (this == registeredPublishers.get(i)) {
+                                                //thread pou zhtaei syndesh me afton ton publisher
                                                 //
                                                 broker.setNewRequest(false);
                                                 //out.writeObject(broker.requestQueue.peek());
@@ -80,17 +85,27 @@ public class PublisherThread extends Thread{
                                                 System.out.println("requested: " + broker.getRequestArtist() + "  , " + broker.getRequestSong());
                                                 String found=(String) in.readObject();
                                                 if(found.equalsIgnoreCase("Found")) {
-                                                    broker.setFound(true);
-                                                    int numOfChunks = (int) in.readObject();
-                                                    broker.setNumOfChunks(numOfChunks);
-                                                    System.out.println("Num of chunks received : "+broker.getNumOfChunks());
-                                                    /*
-                                                    for (int ch = 0; ch < numOfChunks; ch++) {
-                                                        MusicFile chunk = (MusicFile) in.readObject();
+
+                                                    MusicFile chunk = (MusicFile) in.readObject();
+                                                    System.out.println("Num of chunks: " + chunk.getTotalChunks());
+                                                    synchronized (broker) {
+                                                        broker.setFound(true);
+                                                        broker.addToChunkQueue(chunk);
+                                                        System.out.println("Received: " +chunk.getChunkNumber());
                                                     }
-                                                    */
+                                                    for (int ch = 0; ch < chunk.getTotalChunks()-1; ch++) {
+                                                        chunk = (MusicFile) in.readObject();
+
+                                                        //addToChunkQueue method
+                                                        synchronized (broker) {
+                                                            broker.setFound(true);
+                                                            broker.addToChunkQueue(chunk);
+                                                            System.out.println("Received: " +chunk.getChunkNumber());
+                                                        }
+                                                    }
                                                 }
-                                                else{
+                                                else if(found.equalsIgnoreCase("Not Found")){
+
                                                     broker.setFound(false);
                                                 }
 
