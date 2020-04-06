@@ -1,12 +1,13 @@
 import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.net.*;
 import java.util.Queue;
 
-public class Broker extends Node{
+public class Broker extends Node {
 
     String BrokerIP;
     int ConsumersPort;
@@ -152,7 +153,7 @@ public class Broker extends Node{
     }
 
     public Request removeFromRequestQueue(){
-        return requestQueue.remove();
+        return requestQueue.poll();
     }
 
     public Request peekFromRequestQueue(){
@@ -179,8 +180,6 @@ public class Broker extends Node{
     public ArrayList<ArrayList<ArtistName>> getArtistList(){
         return publisherArtists;
     }
-
-    public void notifyPublisher(String s){}
 
     public void pull(ArtistName a){}
 

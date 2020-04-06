@@ -3,8 +3,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 
 public class Consumer extends Node {
@@ -20,7 +18,7 @@ public class Consumer extends Node {
         cons.openConsumer();
     }
 
-    public void initialization() throws NoSuchAlgorithmException {
+    public void initialization(){
 
         System.out.print("Consumer ");
         init(BrokerIp,BrokerPort,availableBrokers);
@@ -49,7 +47,7 @@ public class Consumer extends Node {
                 }
 
                 //print artist names
-                System.out.println("\n---Broker " + i + " ---");
+                System.out.println("\n---- Broker " + (i+1) + " ----");
                 for (String b : artists.get(i)){
                     System.out.println(b);
                 }
@@ -59,6 +57,7 @@ public class Consumer extends Node {
                 socket.close();
 
             }
+            System.out.println("-----------------\n");
 
         } catch (UnknownHostException u) {
             System.out.println(u);
@@ -81,9 +80,12 @@ public class Consumer extends Node {
         Boolean artistFound = false;
 
         do {
-            ArrayList<byte[]> chunkQueue = new ArrayList<>();//queue for chunks
+            ArrayList<byte[]> chunkList = new ArrayList<>();//queue for chunks
             input = new DataInputStream(System.in);
+            System.out.print("Artist name: ");
             requestArtist = input.readLine();
+
+            if(requestArtist.equalsIgnoreCase("over")){break;}
 
             try {
                 //search all artist lists for this artist name
@@ -103,6 +105,7 @@ public class Consumer extends Node {
                             out.writeObject(requestArtist.trim());
                             out.flush();
 
+                            System.out.print("Song title: ");
                             requestSong = input.readLine();
                             out.writeObject(requestSong.trim());
                             out.flush();
@@ -110,28 +113,28 @@ public class Consumer extends Node {
 
                             if(response.equalsIgnoreCase("Found")) {
 
-                                System.out.println("----------");
+                                System.out.println("-----------------");
                                 System.out.println("Song found");
-                                //then takes the song from broker
-                                MusicFile chunk=(MusicFile) in.readObject();
-                                chunkQueue.add(chunk.getMusicFileExtract());
-                                System.out.println("received: " + chunk.getChunkNumber());
 
+                                //takes the song from broker
+                                MusicFile chunk=(MusicFile) in.readObject();
+                                chunkList.add(chunk.getMusicFileExtract());
+                                System.out.println("received: " + chunk.getChunkNumber() + " chunk");
                                 for (int ch = 0; ch < chunk.getTotalChunks()-1; ch++) {
 
                                     chunk = (MusicFile) in.readObject();
-                                    System.out.println("received: " + chunk.getChunkNumber());
-                                    chunkQueue.add(chunk.getMusicFileExtract());
+                                    System.out.println("received: " + chunk.getChunkNumber() +  " chunk");
+                                    chunkList.add(chunk.getMusicFileExtract());
 
                                 }
 
-                                ReadMp3Files readMp3Files = new ReadMp3Files();
-                                byte[] mp3File = readMp3Files.recreateFile(chunkQueue);
+                                byte[] mp3File = recreateFile(chunkList);
 
-                                FileOutputStream stream = new FileOutputStream(requestSong +"_new.mp3");
+                                FileOutputStream stream = new FileOutputStream(requestSong +"(new).mp3");
                                 stream.write(mp3File);
 
                                 System.out.println("Song received successfully! ");
+                                System.out.println("-----------------");
 
                             }
                             else if(response.equalsIgnoreCase("Not Found")){
@@ -140,10 +143,11 @@ public class Consumer extends Node {
                                 System.out.println("Problem");
                             }
 
+                            in.close();
+                            out.close();
                             socket.close();
                             break;
                         }
-
                     }
                 }
                 if(!artistFound) {
@@ -160,13 +164,41 @@ public class Consumer extends Node {
                 e.printStackTrace();
             }
 
-        }while(!requestArtist.equalsIgnoreCase("over"));
+        }while(true);
 
     }
 
     public Consumer(String BrokerIp, int BrokerPort){
         this.BrokerIp=BrokerIp;
         this.BrokerPort=BrokerPort;
+    }
+
+    //recreate mp3 file
+    public byte[] recreateFile(ArrayList<byte[]> ChunkList) {
+        int chunkSize = 524288;
+        int lastChunkSize = ChunkList.get(ChunkList.size()-1).length;
+        int numOfBytes = (ChunkList.size()-1)*chunkSize + ChunkList.get(ChunkList.size()-1).length;
+
+        byte[] Mp3ByteArray = new byte[numOfBytes];
+
+        int indexOfChunk = 1;
+        int indexOfByte = 0;
+        for (byte[] chunk : ChunkList) {
+            if(indexOfChunk < ChunkList.size()){
+                for(int i = 0 ; i < chunkSize ; i++){
+                    Mp3ByteArray[indexOfByte] = chunk[i];
+                    indexOfByte++;
+                }
+            }else{
+                for(int i = 0 ; i < lastChunkSize ; i++){
+                    Mp3ByteArray[indexOfByte] = chunk[i];
+                    indexOfByte++;
+                }
+            }
+            indexOfChunk++;
+        }
+
+        return Mp3ByteArray;
     }
 
 }

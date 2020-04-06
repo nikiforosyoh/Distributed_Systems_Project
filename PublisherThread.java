@@ -91,7 +91,7 @@ public class PublisherThread extends Thread{
                                                     synchronized (broker) {
                                                         broker.setFound(true);
                                                         broker.addToChunkQueue(chunk);
-                                                        System.out.println("Received: " +chunk.getChunkNumber());
+                                                        //System.out.println("Received: " + chunk.getChunkNumber() + " chunk");
                                                     }
                                                     for (int ch = 0; ch < chunk.getTotalChunks()-1; ch++) {
                                                         chunk = (MusicFile) in.readObject();
@@ -100,7 +100,7 @@ public class PublisherThread extends Thread{
                                                         synchronized (broker) {
                                                             broker.setFound(true);
                                                             broker.addToChunkQueue(chunk);
-                                                            System.out.println("Received: " +chunk.getChunkNumber());
+                                                            //System.out.println("Received: " + chunk.getChunkNumber() + " chunk");
                                                         }
                                                     }
                                                 }

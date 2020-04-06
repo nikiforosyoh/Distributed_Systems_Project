@@ -1,20 +1,18 @@
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
-    //fields
-    List<Broker> brokers=new ArrayList<Broker>();
 
     //receive broker's information
     public void init(String BrokerIp, int BrokerPort, String[][] availableBrokers){
-        Socket socket = null;
-        ObjectInputStream in=null;
-        ObjectOutputStream out =null;
+        Socket socket ;
+        ObjectInputStream in;
+        ObjectOutputStream out;
 
         try{
             socket = new Socket(BrokerIp, BrokerPort);
@@ -43,9 +41,9 @@ public class Node {
         }
     }
 
-    public void disconnect(Socket requestSocket){
+    public void disconnect(Socket socket){
         try {
-            requestSocket.close();
+            socket.close();
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }

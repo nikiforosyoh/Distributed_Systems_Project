@@ -66,7 +66,6 @@ public class ConsumerThread extends Thread{
 
                 }
 
-
                 this.requestArtist = input;
                 broker.setRequestArtist(this.requestArtist);
 
@@ -90,7 +89,7 @@ public class ConsumerThread extends Thread{
                         if(broker.getFound()){
                             out.writeObject("Found");
                             out.flush();
-                            System.out.println("Consumerthread numOfchunks: " + broker.peekFromChunkQueue().getTotalChunks());
+                            //System.out.println("Consumerthread numOfchunks: " + broker.peekFromChunkQueue().getTotalChunks());
                             synchronized (broker) {
                                 Iterator<MusicFile> iter = broker.chunkQueue.iterator();
                                 while(iter.hasNext()) {
@@ -99,10 +98,9 @@ public class ConsumerThread extends Thread{
                                     out.flush();
                                     iter.remove();
                                 }
-                                System.out.println("Queue size: " + broker.chunkQueue.size());
+                                //System.out.println("Queue size: " + broker.chunkQueue.size());
                             }
-
-                            System.out.println("SENT");
+                            //System.out.println("SENT");
                             broker.setFound(false);
                         }
                         else{
