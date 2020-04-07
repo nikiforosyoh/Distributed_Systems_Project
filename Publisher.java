@@ -4,8 +4,8 @@ import com.mpatric.mp3agic.UnsupportedTagException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -16,12 +16,14 @@ public class Publisher extends Node {
     ReadMp3Files readMp3Files = new ReadMp3Files();
     private static ArrayList<ArtistName> artists = new ArrayList<ArtistName>();
     private static ArrayList<ArrayList<String>> songsOfArtists = new ArrayList<ArrayList<String>>(); //Songs of all songs of each artist
-    private int keysCount=0;
     private static String[][] availableBrokers = new String[3][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
     char start; //to split artists to publishers
     char end;
     int BrokerPort;
     String BrokerIp;
+    ServerSocket PublisherServer=null;
+    String pubIp;
+    int serverPort;
     //list of artists for each broker
     private static ArrayList<ArtistName> broker0Artists = new ArrayList<ArtistName>();
     private static ArrayList<ArtistName> broker1Artists = new ArrayList<ArtistName>();
@@ -29,21 +31,22 @@ public class Publisher extends Node {
 
     Queue<Request> requestQueue = new LinkedList<>();//queue for consumer requests
 
-    boolean ready=false;
-
     public static void main(String args[]) throws NoSuchAlgorithmException, InvalidDataException, IOException, UnsupportedTagException {
-        Publisher pub=new Publisher('k', 'z', "127.0.0.1", 4090);
+        Publisher pub=new Publisher('k', 'z', "127.0.0.1", 4090, "127.0.0.1", 2008);//kathe fora allazoyme to pub port
         System.out.println(Character.toUpperCase(pub.start) + "-" + Character.toUpperCase(pub.end) );
         pub.initialization();
+        pub.exchangeInfo();
         pub.openPublisher();
 
     }
 
-    public Publisher(char start, char end, String BrokerIp, int BrokerPort){
+    public Publisher(char start, char end, String BrokerIp, int BrokerPort, String pubIp, int serverPort){
         this.start=Character.toLowerCase(start);
         this.end=Character.toLowerCase(end);
         this.BrokerIp=BrokerIp;
         this.BrokerPort=BrokerPort;
+        this.pubIp = pubIp;
+        this.serverPort=serverPort;
     }
 
     //fill artists ArrayList
@@ -62,121 +65,139 @@ public class Publisher extends Node {
 
     }
 
-    public void openPublisher() throws InvalidDataException, IOException, UnsupportedTagException {
+    //client part
+    public void exchangeInfo() throws IOException {
+        Socket socket;
+        ObjectInputStream in=null;
+        ObjectOutputStream out=null;
 
-        //three threads for connections with all three brokers
-        for(int i=0;i<3;i++) {
+        for (int i = 0; i < 3; i++) {
+            try {
+                socket = new Socket(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
+                out = new ObjectOutputStream(socket.getOutputStream());
+                in = new ObjectInputStream(socket.getInputStream());
+                System.out.println("Publisher Connected: " + socket);
+                //take keys from brokers
+                out.writeObject("key");
+                out.flush();
+                String key = (String) in.readObject();
+                availableBrokers[i][2] = key;
 
-            final int j=i;
-            Thread t1 = new Thread() {
-                public void run() {
+                in.close();
+                out.close();
+                socket.close();
 
-                    Socket socket;
-                    ObjectInputStream in ;
-                    ObjectOutputStream out ;
-
-                    try {
-
-                        socket = new Socket(availableBrokers[j][0], Integer.parseInt(availableBrokers[j][1]));
-                        out = new ObjectOutputStream(socket.getOutputStream());
-                        in = new ObjectInputStream(socket.getInputStream());
-
-                        System.out.println("Publisher Connected: " + socket);
-
-                        //take keys from brokers
-                        out.writeObject("key");
-                        out.flush();
-                        String key = (String) in.readObject();
-                        availableBrokers[j][2]=key;
-                        keysCount++;
-
-                        while(true){
-                            System.out.print("");
-                            if(ready){
-                                out.writeObject("artist names");
-                                out.flush();
-                                sendArtists(socket, out);
-                                break;
-                            }
-                        }
-
-
-                        while (true) {
-
-                            //thread poy tha dexetai syndeseis me broker
-                            out.writeObject("next");
-                            out.flush();
-
-                            //synchronized(requestQueue)
-                            //requestQueue.add((Request) in.readObject());
-                            //String requestArtist = requestQueue.peek().getRequestArtist();
-                            //String requestSong = requestQueue.remove().getRequestSong();
-
-                            String requestArtist = (String) in.readObject();
-                            String requestSong = (String) in.readObject();
-
-                            if (!requestArtist.equalsIgnoreCase("null")) {
-
-                                System.out.println("Consumer's Artist request: " + requestArtist);
-                                System.out.println("Consumer's Song request: " + requestSong);
-                                boolean songExists = false;
-
-                                for (int x = 0; x < artists.size(); x++) {
-                                    if (artists.get(x).getArtistName().equalsIgnoreCase(requestArtist)) {
-                                        for (String a : songsOfArtists.get(x)) {
-                                            if (requestSong.equalsIgnoreCase(a)) {
-                                                System.out.println("Song found!!!");
-                                                songExists = true;
-                                                out.writeObject("Found");
-                                                out.flush();
-                                                //sends chunks to broker
-                                                push(requestSong, out );
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                if (!songExists) {
-                                    System.out.println("Song not found!!!");
-                                    out.writeObject("Not Found");
-                                    out.flush();
-                                }
-                            }
-
-                        }//while next
-
-                    } catch (UnknownHostException u) {
-                        System.out.println(u);
-                    } catch (IOException i) {
-                        System.out.println(i);
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (InvalidDataException e) {
-                        e.printStackTrace();
-                    } catch (UnsupportedTagException e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            t1.start();
+            } catch (IOException u) {
+                System.out.println(u);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
-
         //sort keys
-        while(true){
-            System.out.print("");
-            if(keysCount==3){
-                availableBrokers = sortKeys(availableBrokers);
-                //distribute artists to brokers depending on hash(artistName) and hash(IP+port)
-                distributeArtists();
-                ready= true;
-                break;
+        availableBrokers = sortKeys(availableBrokers);
+        //distribute artists to brokers depending on hash(artistName) and hash(IP+port)
+        distributeArtists();
+        for (int i = 0; i < 3; i++) {
+
+            try {
+                socket = new Socket(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
+                out = new ObjectOutputStream(socket.getOutputStream());
+                in = new ObjectInputStream(socket.getInputStream());
+                System.out.println("Publisher Connected: " + socket);
+
+                //send artist to brokers
+                out.writeObject("artist names");
+                out.flush();
+                sendArtists(socket, out);
+
+                //Send Publisher's info
+                out.writeObject(pubIp);
+                out.flush();
+                out.writeObject(serverPort);
+                out.flush();
+
+                in.close();
+                out.close();
+                socket.close();
+
+            } catch (IOException u) {
+                System.out.println(u);
             }
         }
 
     }
 
+    //server part
+    public void openPublisher() throws IOException {
+
+        PublisherServer = new ServerSocket(serverPort);
+
+        while (true) {
+
+            Socket brokerRequest = PublisherServer.accept();
+            //sos
+            //System.out.println("Publisher connected! --> " + connectPub.getInetAddress().getHostAddress());
+            Thread requestListener = new Thread() {
+                public void run() {
+                    System.out.println("THREAD CREATED");
+                    try {
+                        ObjectInputStream in;
+                        ObjectOutputStream out;
+
+                        out = new ObjectOutputStream(brokerRequest.getOutputStream());
+                        in = new ObjectInputStream(brokerRequest.getInputStream());
+
+                        //synchronized(requestQueue)
+                        //requestQueue.add((Request) in.readObject());
+                        //String requestArtist = requestQueue.peek().getRequestArtist();
+                        //String requestSong = requestQueue.remove().getRequestSong();
+                        String requestArtist = (String) in.readObject();
+                        String requestSong = (String) in.readObject();
+
+                        System.out.println("Consumer's Artist request: " + requestArtist);
+                        System.out.println("Consumer's Song request: " + requestSong);
+                        boolean songExists = false;
+                        for (int x = 0; x < artists.size(); x++) {
+                            if (artists.get(x).getArtistName().equalsIgnoreCase(requestArtist)) {
+                                for (String a : songsOfArtists.get(x)) {
+                                    if (requestSong.equalsIgnoreCase(a)) {
+                                        System.out.println("Song found!!!");
+                                        songExists = true;
+                                        out.writeObject("Found");
+                                        out.flush();
+                                        //sends chunks to broker
+                                        push(requestSong, out);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (!songExists) {
+                            System.out.println("Song not found!!!");
+                            out.writeObject("Not Found");
+                            out.flush();
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (UnsupportedTagException e) {
+                        e.printStackTrace();
+                    } catch (InvalidDataException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                }//run
+            };
+
+            requestListener.start();
+        }//while true
+    }
+
+
     //distribute artists to brokers depending on hash(artistName) and hash(IP+port)
-    private void distributeArtists() {
+    private static void distributeArtists() {
 
         for ( ArtistName artist : artists) {
 
@@ -231,7 +252,7 @@ public class Publisher extends Node {
     }
 
     //sort keys in availableBrokers array
-    public String[][] sortKeys(String[][] a) {
+    public static String[][] sortKeys(String[][] a) {
         String temp;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3 - i - 1; j++)

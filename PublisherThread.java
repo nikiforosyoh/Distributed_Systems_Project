@@ -12,6 +12,8 @@ public class PublisherThread extends Thread{
     List<PublisherThread> registeredPublishers;
     Broker broker;
     private static ArrayList<ArtistName> brokerArtists = new ArrayList<ArtistName>();
+    String pubIp;
+    int pubPort;
 
     public PublisherThread(Socket socket, int key, List<PublisherThread> registeredPublishers, Broker broker){
         connection=socket;
@@ -30,113 +32,135 @@ public class PublisherThread extends Thread{
             out = new ObjectOutputStream(connection.getOutputStream());
             in = new ObjectInputStream(connection.getInputStream());
 
-            while (true){
-                String data=(String) in.readObject();
+            //initialization server part
+            while (true) {
+                String data = (String) in.readObject();
                 //sos
                 //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
-                System.out.println(connection.getPort() + "> "  + data);
+                System.out.println(connection.getPort() + "> " + data);
 
-                if(data.equalsIgnoreCase("brokers")){
+                if (data.equalsIgnoreCase("brokers")) {
                     sendBrokerInfo(out);
                     connection.close();
 
-                    synchronized(registeredPublishers) {
+                    synchronized (registeredPublishers) {
                         //remove this thread from publisher threads list
                         registeredPublishers.remove(this);
                     }
                     return;
 
                 }
-                if (data.equalsIgnoreCase("key")){
+                if (data.equalsIgnoreCase("key")) {
                     out.writeObject(Integer.toString(key));
                     out.flush();
+
+                    connection.close();
+
+                    synchronized (registeredPublishers) {
+                        //remove this thread from publisher threads list
+                        registeredPublishers.remove(this);
+                    }
+                    return;
+
                 }
-                if (data.equalsIgnoreCase("artist names")){
+                if (data.equalsIgnoreCase("artist names")) {
                     brokerArtists = (ArrayList<ArtistName>) in.readObject();
                     broker.setArtistList(brokerArtists);
 
-                    //publisher info
-
-
+                    //Publisher's info
+                    pubIp = (String) in.readObject();
+                    pubPort = (int) in.readObject();
+                    break;
                 }
 
-                if (data.equalsIgnoreCase("next")) {
+            }
 
-                    while(true) {
-                        System.out.print("");
-                        // if(broker.requestQueue.peek()!= null){
-                        if (broker.getNewRequest()) {
-                            //synchronized(broker.requestQueue){
-                            synchronized(broker) {
+            in.close();
+            out.close();
+            connection.close();
 
-                                for(int i=0;i<broker.getArtistList().size();i++){
-                                    for (ArtistName art : broker.getArtistList().get(i)){
-                                        if( (art.getArtistName().equalsIgnoreCase(broker.getRequestArtist()))) {
-                                            if (this == registeredPublishers.get(i)) {
-                                                //thread pou zhtaei syndesh me afton ton publisher
-                                                //
-                                                broker.setNewRequest(false);
+            while(true) {
+
+                System.out.print("");
+                // if(broker.requestQueue.peek()!= null){
+
+                    //synchronized(broker.requestQueue){
+                synchronized (broker) {
+                    if (broker.getNewRequest()) {
+                        for (int i = 0; i < broker.getArtistList().size(); i++) {
+                            for (ArtistName art : broker.getArtistList().get(i)) {
+                                if ((art.getArtistName().equalsIgnoreCase(broker.getRequestArtist()))) {
+                                    if (this == registeredPublishers.get(i)) {
+                                        broker.setNewRequest(false);
+                                    //thread pou zhtaei syndesh me afton ton publisher
+                                    Thread requestListener = new Thread() {
+                                        public void run() {
+                                            System.out.println("THREAD CREATED");
+                                            Socket socket;
+                                            ObjectInputStream in;
+                                            ObjectOutputStream out;
+                                            try {
+                                                socket = new Socket(pubIp, pubPort);
+                                                out = new ObjectOutputStream(socket.getOutputStream());
+                                                in = new ObjectInputStream(socket.getInputStream());
+
                                                 //out.writeObject(broker.requestQueue.peek());
+                                                System.out.println("request sent");
                                                 out.writeObject(broker.getRequestArtist());
                                                 out.flush();
                                                 out.writeObject(broker.getRequestSong());
                                                 out.flush();
                                                 //System.out.println("requested: " + broker.requestQueue.peek().getRequestArtist() + "  , " + broker.requestQueue.remove().getRequestSong());
                                                 System.out.println("requested: " + broker.getRequestArtist() + "  , " + broker.getRequestSong());
-                                                String found=(String) in.readObject();
-                                                if(found.equalsIgnoreCase("Found")) {
-
+                                                String found = (String) in.readObject();
+                                                if (found.equalsIgnoreCase("Found")) {
                                                     MusicFile chunk = (MusicFile) in.readObject();
                                                     System.out.println("Num of chunks: " + chunk.getTotalChunks());
                                                     synchronized (broker) {
                                                         broker.setFound(true);
-                                                        broker.addToChunkQueue(chunk);
-                                                        //System.out.println("Received: " + chunk.getChunkNumber() + " chunk");
+                                                        broker.chunkQueue.add(chunk);
+                                                        System.out.println("Received: " + chunk.getChunkNumber() + " chunk");
                                                     }
-                                                    for (int ch = 0; ch < chunk.getTotalChunks()-1; ch++) {
+                                                    for (int ch = 0; ch < chunk.getTotalChunks() - 1; ch++) {
                                                         chunk = (MusicFile) in.readObject();
 
-                                                        //addToChunkQueue method
                                                         synchronized (broker) {
                                                             broker.setFound(true);
-                                                            broker.addToChunkQueue(chunk);
-                                                            //System.out.println("Received: " + chunk.getChunkNumber() + " chunk");
+                                                            broker.chunkQueue.add(chunk);
+                                                            System.out.println("Received: " + chunk.getChunkNumber() + " chunk");
                                                         }
                                                     }
-                                                }
-                                                else if(found.equalsIgnoreCase("Not Found")){
-
+                                                } else if (found.equalsIgnoreCase("Not Found")) {
                                                     broker.setFound(false);
                                                 }
-
                                                 broker.setNewResponse(true);//publisher replied
-                                                sendNext=false;
+                                                sendNext = false;
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            } catch (ClassNotFoundException e) {
+                                                e.printStackTrace();
                                             }
                                         }
+                                    };//thread
+                                    requestListener.start();
+                                    //requestListener.join();
+
                                     }
                                 }
-                                if(sendNext){
-                                    out.writeObject("null");
-                                    out.flush();
-                                    out.writeObject("null");
-                                    out.flush();
-                                }
-                                else {
-                                    sendNext=true;
-                                }
                             }
-                            break;
                         }
-                    }
+
+                    }//synchronized
                 }
 
-            }
+            }//while true
         } catch (IOException e) {
             //e.printStackTrace();
             System.out.println("Publisher disconnected! --> " + connection.getInetAddress().getHostAddress());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
     }
     //load file
     private static void sendBrokerInfo(ObjectOutputStream out) {

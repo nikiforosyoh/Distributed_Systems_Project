@@ -31,6 +31,7 @@ public class Broker extends Node {
     List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
     List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
     private static ArrayList<ArrayList<ArtistName>> publisherArtists = new ArrayList<ArrayList<ArtistName>>();
+    private static ArrayList<ArrayList<String>> publisherInfo = new ArrayList<ArrayList<String>>();
 
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
@@ -145,32 +146,6 @@ public class Broker extends Node {
 
     public boolean getFound(){
         return found;
-    }
-
-    //methods for synchronization of requests
-    public void addToRequestQueue(Request request){
-        this.requestQueue.add(request);
-    }
-
-    public Request removeFromRequestQueue(){
-        return requestQueue.poll();
-    }
-
-    public Request peekFromRequestQueue(){
-        return requestQueue.peek();
-    }
-
-    //methods for synchronization of chunks ..synchronized
-    public void addToChunkQueue(MusicFile chunk){
-        this.chunkQueue.add(chunk);
-    }
-
-    public MusicFile removeFromChunkQueue(){
-        return chunkQueue.poll();
-    }
-
-    public MusicFile peekFromChunkQueue(){
-        return chunkQueue.peek();
     }
 
     public void setArtistList(ArrayList<ArtistName> pubArt){
