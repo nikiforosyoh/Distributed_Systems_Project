@@ -17,6 +17,11 @@ public class MusicFile implements Serializable {
         this.chunkNumber = chunkNumber;
     }
 
+    public MusicFile(int totalChunks){
+        this.totalChunks = -1;
+
+    }
+
     public void setTotalChunks(int totalChunks){
         this.totalChunks = totalChunks;
     }

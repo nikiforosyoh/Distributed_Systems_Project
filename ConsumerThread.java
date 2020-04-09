@@ -1,8 +1,12 @@
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ConsumerThread extends Thread{
     Socket connection;
@@ -10,14 +14,20 @@ public class ConsumerThread extends Thread{
     ObjectOutputStream out;
     String requestArtist;
     String requestSong;
-    Broker broker;
     List<ConsumerThread> registeredUsers;
+    private static ArrayList<ArrayList<ArtistName>> publisherArtists;
 
-    public ConsumerThread(Socket socket, List<ConsumerThread> registeredUsers, Broker broker){
+    HashMap<ArtistName, PublisherInfo> art_to_pub;//artist name -> publisher
+    HashMap<PublisherInfo, PublisherThread> pub_to_pubThread ;//publisher -> publisherThread
+
+    LinkedBlockingQueue<MusicFile> chunkQueue = new LinkedBlockingQueue<MusicFile>();
+
+    public ConsumerThread(Socket socket, List<ConsumerThread> registeredUsers, ArrayList<ArrayList<ArtistName>> publisherArtists,HashMap<ArtistName, PublisherInfo> art_to_pub, HashMap<PublisherInfo, PublisherThread> pub_to_pubThread){
         connection=socket;
         this.registeredUsers=registeredUsers;
-        this.broker=broker;
-
+        this.publisherArtists=publisherArtists;
+        this.art_to_pub=art_to_pub;
+        this.pub_to_pubThread=pub_to_pubThread;
     }
 
     public void run(){
@@ -46,7 +56,7 @@ public class ConsumerThread extends Thread{
 
                 if (input.equalsIgnoreCase("artist names")){
 
-                    for (ArrayList<ArtistName> array : broker.getArtistList()) {
+                    for (ArrayList<ArtistName> array : publisherArtists) {
                         for (ArtistName a : array){
                             out.writeObject(a.getArtistName());
                             out.flush();
@@ -67,54 +77,45 @@ public class ConsumerThread extends Thread{
                 }
 
                 this.requestArtist = input;
-                broker.setRequestArtist(this.requestArtist);
-
                 this.requestSong = (String) in.readObject();
-                broker.setRequestSong(this.requestSong);
+                Request request = new Request(requestArtist, requestSong);
 
-                synchronized(broker.requestQueue) {
-                     broker.requestQueue.add(new Request(requestArtist, requestSong));
-                }
+                PublisherInfo publisher = art_to_pub.get(requestArtist);
+                PublisherThread thread = pub_to_pubThread.get(publisher);
+
+                thread.addRequest(request, this);
 
                 //sos
                 //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);
                 //System.out.println(connection.getPort() + "> " + this.requestArtist);
 
-                broker.setNewRequest(true);
+                MusicFile chunk = chunkQueue.take();
 
-                while(true){
-                    System.out.print("");
-                    //if(broker.peekFromChunkQueue()!=null ){
-                    if(broker.getNewResponse()){
-                        if(broker.getFound()){
-                            out.writeObject("Found");
-                            out.flush();
-                            //System.out.println("Consumerthread numOfchunks: " + broker.peekFromChunkQueue().getTotalChunks());
-                            synchronized (broker) {
-                                Iterator<MusicFile> iter = broker.chunkQueue.iterator();
-                                while(iter.hasNext()) {
-                                    MusicFile chunk = iter.next();
-                                    out.writeObject(chunk);
-                                    out.flush();
-                                    iter.remove();
-                                }
-                                //System.out.println("Queue size: " + broker.chunkQueue.size());
-                            }
-                            //System.out.println("SENT");
-                            broker.setFound(false);
-                        }
-                        else{
-                            out.writeObject("Not Found");
-                            out.flush();
-                        }
-                        broker.setNewResponse(false);
-                        break;
+                if(chunk.getTotalChunks()>0){
+                    out.writeObject("Found");
+                    out.flush();
+                    //System.out.println("Consumerthread numOfchunks: " + chunkQueue.peek().getTotalChunks());
+
+                    Iterator<MusicFile> iterator = chunkQueue.iterator();
+
+                    while(iterator.hasNext()) {
+                        chunk = iterator.next();
+                        out.writeObject(chunk);
+                        out.flush();
+                        iterator.remove();
                     }
+                    //System.out.println("Queue size: " + chunkQueue.size());
+
+                    //System.out.println("SENT");
+                }
+                else{
+                    out.writeObject("Not Found");
+                    out.flush();
                 }
 
             }
 
-        } catch (IOException | ClassNotFoundException  e) {
+        } catch (IOException | ClassNotFoundException | InterruptedException e) {
             //e.printStackTrace();
             System.out.println("Consumer disconnected! --> " + connection.getInetAddress().getHostAddress());
             synchronized(registeredUsers) {
@@ -123,6 +124,10 @@ public class ConsumerThread extends Thread{
             }
             return;
         }
+    }
+
+    public void addChunks(LinkedBlockingQueue<MusicFile> chunkQueue){
+        this.chunkQueue = chunkQueue;
     }
 
     //load file

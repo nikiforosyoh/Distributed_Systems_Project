@@ -23,13 +23,12 @@ public class Publisher extends Node {
     String BrokerIp;
     ServerSocket PublisherServer=null;
     String pubIp;
-    int serverPort;
+    int pubPort;
     //list of artists for each broker
     private static ArrayList<ArtistName> broker0Artists = new ArrayList<ArtistName>();
     private static ArrayList<ArtistName> broker1Artists = new ArrayList<ArtistName>();
     private static ArrayList<ArtistName> broker2Artists = new ArrayList<ArtistName>();
 
-    Queue<Request> requestQueue = new LinkedList<>();//queue for consumer requests
 
     public static void main(String args[]) throws NoSuchAlgorithmException, InvalidDataException, IOException, UnsupportedTagException {
         Publisher pub=new Publisher('k', 'z', "127.0.0.1", 4090, "127.0.0.1", 2008);//kathe fora allazoyme to pub port
@@ -46,7 +45,7 @@ public class Publisher extends Node {
         this.BrokerIp=BrokerIp;
         this.BrokerPort=BrokerPort;
         this.pubIp = pubIp;
-        this.serverPort=serverPort;
+        this.pubPort=serverPort;
     }
 
     //fill artists ArrayList
@@ -113,7 +112,7 @@ public class Publisher extends Node {
                 //Send Publisher's info
                 out.writeObject(pubIp);
                 out.flush();
-                out.writeObject(serverPort);
+                out.writeObject(pubPort);
                 out.flush();
 
                 in.close();
@@ -130,7 +129,7 @@ public class Publisher extends Node {
     //server part
     public void openPublisher() throws IOException {
 
-        PublisherServer = new ServerSocket(serverPort);
+        PublisherServer = new ServerSocket(pubPort);
 
         while (true) {
 
@@ -147,12 +146,10 @@ public class Publisher extends Node {
                         out = new ObjectOutputStream(brokerRequest.getOutputStream());
                         in = new ObjectInputStream(brokerRequest.getInputStream());
 
-                        //synchronized(requestQueue)
-                        //requestQueue.add((Request) in.readObject());
-                        //String requestArtist = requestQueue.peek().getRequestArtist();
-                        //String requestSong = requestQueue.remove().getRequestSong();
-                        String requestArtist = (String) in.readObject();
-                        String requestSong = (String) in.readObject();
+                        Request request = (Request) in.readObject();
+
+                        String requestArtist = request.getRequestArtist();
+                        String requestSong = request.getRequestSong();
 
                         System.out.println("Consumer's Artist request: " + requestArtist);
                         System.out.println("Consumer's Song request: " + requestSong);
@@ -177,6 +174,8 @@ public class Publisher extends Node {
                             out.writeObject("Not Found");
                             out.flush();
                         }
+                        in.close();
+                        out.close();
 
                     } catch (IOException e) {
                         e.printStackTrace();

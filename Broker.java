@@ -2,10 +2,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Broker extends Node {
 
@@ -13,25 +11,17 @@ public class Broker extends Node {
     int ConsumersPort;
     int PublishersPort;
     int key; //Hash(IP+port)
-    String requestArtist; //input Artist from Consumer
-    String requestSong; //input Songs from Consumer
-    Queue<Request> requestQueue = new LinkedList<>();//queue for consumer requests
-    Queue<MusicFile> chunkQueue = new LinkedList<>();//queue for chunks
+    LinkedBlockingQueue<Request> requestQueue = new LinkedBlockingQueue<Request>();//queue for consumer requests
+    HashMap<ArtistName, PublisherInfo> art_to_pub = new HashMap<ArtistName, PublisherInfo>();//artist name -> publisher
+    HashMap<PublisherInfo, PublisherThread> pub_to_pubThread = new HashMap<PublisherInfo, PublisherThread>();//publisher -> publisherThread
 
-    boolean newRequest = false; //notify for new Consumer request
-    Broker b= this;
-    boolean newResponse;
-    boolean found;
-
+    private static ArrayList<ArrayList<ArtistName>> publisherArtists = new ArrayList<ArrayList<ArtistName>>();
 
     ServerSocket ConsumerServer = null;
     ServerSocket PublisherServer=null;
     Socket connectCon = null;
-    private DataInputStream in = null;
     List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
     List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
-    private static ArrayList<ArrayList<ArtistName>> publisherArtists = new ArrayList<ArrayList<ArtistName>>();
-    private static ArrayList<ArrayList<String>> publisherInfo = new ArrayList<ArrayList<String>>();
 
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
@@ -65,14 +55,14 @@ public class Broker extends Node {
 
                         PublisherServer = new ServerSocket(PublishersPort);
 
-                        //thread that handles Publishers
+                        //thread that handles Publisher
                         while(true){
                             Socket connectPub= PublisherServer.accept();
 
                             //sos
                             //System.out.println("Publisher connected! --> " + connectPub.getInetAddress().getHostAddress());
                             System.out.println("Publisher connected! --> " + connectPub.getPort());
-                            PublisherThread pt=new PublisherThread(connectPub, key, registeredPublishers, b);
+                            PublisherThread pt = new PublisherThread(connectPub, key, registeredPublishers, publisherArtists,art_to_pub, pub_to_pubThread );
                             registeredPublishers.add(pt);
                             pt.start();
                         }
@@ -85,13 +75,13 @@ public class Broker extends Node {
             };
             t1.start();
 
-            //thread that handles Consumers
+            //thread that handles Consumer
             while(true) {
                 connectCon = ConsumerServer.accept();
                 //sos
                 //System.out.println("Consumer connected! --> " + connectCon.getInetAddress().getHostAddress());
                 System.out.println("Consumer connected! --> " + connectCon.getPort());
-                ConsumerThread ct=new ConsumerThread(connectCon,registeredUsers,this);
+                ConsumerThread ct=new ConsumerThread(connectCon,registeredUsers,publisherArtists, art_to_pub, pub_to_pubThread );
                 registeredUsers.add(ct);
                 ct.start();
 
@@ -106,54 +96,6 @@ public class Broker extends Node {
     public void calculateKeys() throws NoSuchAlgorithmException {
         Hash hash = new Hash();
         key = Integer.parseInt( hash.getMd5(BrokerIP + Integer.toString(PublishersPort)) );
-    }
-
-    public void setRequestArtist(String requestArtist){
-        this.requestArtist=requestArtist;
-    }
-
-    public String getRequestArtist(){
-        return this.requestArtist;
-    }
-
-    public void setNewRequest(boolean newRequest) {
-        this.newRequest = newRequest;
-    }
-
-    public boolean getNewRequest(){
-        return newRequest;
-    }
-
-    public void setRequestSong(String requestSong){
-        this.requestSong=requestSong;
-    }
-
-    public String getRequestSong(){
-        return this.requestSong;
-    }
-
-    public void setNewResponse(boolean response){
-        this.newResponse=response;
-    }
-
-    public boolean getNewResponse(){
-        return newResponse;
-    }
-
-    public void setFound(boolean f){
-        this.found=f;
-    }
-
-    public boolean getFound(){
-        return found;
-    }
-
-    public void setArtistList(ArrayList<ArtistName> pubArt){
-        publisherArtists.add(pubArt);
-    }
-
-    public ArrayList<ArrayList<ArtistName>> getArtistList(){
-        return publisherArtists;
     }
 
     public void pull(ArtistName a){}
