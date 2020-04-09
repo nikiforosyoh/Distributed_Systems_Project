@@ -7,21 +7,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Broker extends Node {
 
-    String BrokerIP;
-    int ConsumersPort;
-    int PublishersPort;
-    int key; //Hash(IP+port)
-    LinkedBlockingQueue<Request> requestQueue = new LinkedBlockingQueue<Request>();//queue for consumer requests
-    HashMap<ArtistName, PublisherInfo> art_to_pub = new HashMap<ArtistName, PublisherInfo>();//artist name -> publisher
-    HashMap<PublisherInfo, PublisherThread> pub_to_pubThread = new HashMap<PublisherInfo, PublisherThread>();//publisher -> publisherThread
+    private String BrokerIP;
+    private int ConsumersPort;
+    private int PublishersPort;
+    private int key; //Hash(IP+port)
+    private LinkedBlockingQueue<Request> requestQueue = new LinkedBlockingQueue<Request>();//queue for consumer requests
+    private HashMap<ArtistName, PublisherInfo> art_to_pub = new HashMap<ArtistName, PublisherInfo>();//artist name -> publisher
+    private HashMap<PublisherInfo, PublisherThread> pub_to_pubThread = new HashMap<PublisherInfo, PublisherThread>();//publisher -> publisherThread
 
     private static ArrayList<ArrayList<ArtistName>> publisherArtists = new ArrayList<ArrayList<ArtistName>>();
 
-    ServerSocket ConsumerServer = null;
-    ServerSocket PublisherServer=null;
-    Socket connectCon = null;
-    List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
-    List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
+    private ServerSocket ConsumerServer = null;
+    private ServerSocket PublisherServer=null;
+    private Socket connectCon = null;
+    private List<ConsumerThread> registeredUsers = new ArrayList<ConsumerThread>();
+    private List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
 
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {

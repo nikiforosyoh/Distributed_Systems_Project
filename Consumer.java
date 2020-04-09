@@ -140,7 +140,7 @@ public class Consumer extends Node {
                             else if(response.equalsIgnoreCase("Not Found")){
                                 System.out.println("The song doesn't exist!");
                             }else{
-                                System.out.println("Problem");
+                                System.out.println("Oops! A problem occured. Try again..");
                             }
 
                             in.close();

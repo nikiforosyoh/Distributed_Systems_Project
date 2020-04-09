@@ -2,10 +2,8 @@ import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ConsumerThread extends Thread{
@@ -78,35 +76,36 @@ public class ConsumerThread extends Thread{
 
                 this.requestArtist = input;
                 this.requestSong = (String) in.readObject();
-                Request request = new Request(requestArtist, requestSong);
+                Request request = new Request(requestArtist, requestSong, this );
 
-                PublisherInfo publisher = art_to_pub.get(requestArtist);
+                PublisherInfo publisher = art_to_pub.get(new ArtistName(requestArtist));
+                request.setPublisher(publisher);
                 PublisherThread thread = pub_to_pubThread.get(publisher);
 
-                thread.addRequest(request, this);
+                thread.addRequest(request);
 
                 //sos
-                //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + this.request);
-                //System.out.println(connection.getPort() + "> " + this.requestArtist);
+                //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
+                //System.out.println(connection.getPort() + "> " + request.getRequestArtist() + " - " + request.getRequestSong());
 
                 MusicFile chunk = chunkQueue.take();
-
+                //System.out.println("ConsumerThread--->3 chunk queue size: " + chunkQueue.size());
                 if(chunk.getTotalChunks()>0){
                     out.writeObject("Found");
                     out.flush();
-                    //System.out.println("Consumerthread numOfchunks: " + chunkQueue.peek().getTotalChunks());
+                    System.out.println("Consumerthread---> numOfchunks: " + chunk.getTotalChunks());
 
-                    Iterator<MusicFile> iterator = chunkQueue.iterator();
-
-                    while(iterator.hasNext()) {
-                        chunk = iterator.next();
+                    out.writeObject(chunk);
+                    out.flush();
+                    while(!chunkQueue.isEmpty()){
+                        chunk=chunkQueue.take();
                         out.writeObject(chunk);
                         out.flush();
-                        iterator.remove();
                     }
-                    //System.out.println("Queue size: " + chunkQueue.size());
 
-                    //System.out.println("SENT");
+                    System.out.println("Queue size: " + chunkQueue.size());
+
+                    System.out.println("SENT");
                 }
                 else{
                     out.writeObject("Not Found");
@@ -115,7 +114,7 @@ public class ConsumerThread extends Thread{
 
             }
 
-        } catch (IOException | ClassNotFoundException | InterruptedException e) {
+        } catch (IOException | ClassNotFoundException | InterruptedException | NoSuchAlgorithmException e) {
             //e.printStackTrace();
             System.out.println("Consumer disconnected! --> " + connection.getInetAddress().getHostAddress());
             synchronized(registeredUsers) {
@@ -127,7 +126,7 @@ public class ConsumerThread extends Thread{
     }
 
     public void addChunks(LinkedBlockingQueue<MusicFile> chunkQueue){
-        this.chunkQueue = chunkQueue;
+        chunkQueue.drainTo(this.chunkQueue);
     }
 
     //load file
@@ -177,4 +176,24 @@ public class ConsumerThread extends Thread{
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConsumerThread that = (ConsumerThread) o;
+        return Objects.equals(connection, that.connection) &&
+                Objects.equals(in, that.in) &&
+                Objects.equals(out, that.out) &&
+                Objects.equals(requestArtist, that.requestArtist) &&
+                Objects.equals(requestSong, that.requestSong) &&
+                Objects.equals(registeredUsers, that.registeredUsers) &&
+                Objects.equals(art_to_pub, that.art_to_pub) &&
+                Objects.equals(pub_to_pubThread, that.pub_to_pubThread) &&
+                Objects.equals(chunkQueue, that.chunkQueue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(connection, in, out, requestArtist, requestSong, registeredUsers, art_to_pub, pub_to_pubThread, chunkQueue);
+    }
 }

@@ -1,6 +1,5 @@
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.UnsupportedTagException;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -8,8 +7,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 public class Publisher extends Node {
 
@@ -146,10 +143,8 @@ public class Publisher extends Node {
                         out = new ObjectOutputStream(brokerRequest.getOutputStream());
                         in = new ObjectInputStream(brokerRequest.getInputStream());
 
-                        Request request = (Request) in.readObject();
-
-                        String requestArtist = request.getRequestArtist();
-                        String requestSong = request.getRequestSong();
+                        String requestArtist = (String) in.readObject();
+                        String requestSong = (String) in.readObject();
 
                         System.out.println("Consumer's Artist request: " + requestArtist);
                         System.out.println("Consumer's Song request: " + requestSong);

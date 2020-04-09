@@ -3,23 +3,23 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class PublisherThread extends Thread{
-    Socket connection;
-    ObjectInputStream in;
-    ObjectOutputStream out;
-    int key;
-    List<PublisherThread> registeredPublishers;
+    private Socket connection;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private int key;
+    private List<PublisherThread> registeredPublishers;
     private static ArrayList<ArrayList<ArtistName>> publisherArtists;
     private static ArrayList<ArtistName> brokerArtists = new ArrayList<ArtistName>();
-    String pubIp;
-    int pubPort;
-    LinkedBlockingQueue<Request> requestQueue = new LinkedBlockingQueue<Request>();//queue for consumer requests
-    HashMap<Request, ConsumerThread> request_to_consumer = new HashMap<Request, ConsumerThread>();
+    private String pubIp;
+    private int pubPort;
+    private LinkedBlockingQueue<Request> requestQueue = new LinkedBlockingQueue<Request>();//queue for consumer requests
 
-    HashMap<ArtistName, PublisherInfo> art_to_pub ;//artist name -> publisher
-    HashMap<PublisherInfo, PublisherThread> pub_to_pubThread;//publisher -> publisherThread
+    private HashMap<ArtistName, PublisherInfo> art_to_pub ;//artist name -> publisher
+    private HashMap<PublisherInfo, PublisherThread> pub_to_pubThread;//publisher -> publisherThread
 
     public PublisherThread(Socket socket, int key, List<PublisherThread> registeredPublishers, ArrayList<ArrayList<ArtistName>> publisherArtists,HashMap<ArtistName, PublisherInfo> art_to_pub, HashMap<PublisherInfo, PublisherThread> pub_to_pubThread){
         connection=socket;
@@ -69,6 +69,11 @@ public class PublisherThread extends Thread{
 
                 }
                 if (data.equalsIgnoreCase("artist names")) {
+
+                    //sos
+                    //System.out.println("Publisher connected! --> " + connectPub.getInetAddress().getHostAddress());
+                    //System.out.println("Publisher connected! --> " + connection.getPort());
+
                     //Artist names
                     brokerArtists = (ArrayList<ArtistName>) in.readObject();
                     publisherArtists.add(brokerArtists);
@@ -99,8 +104,11 @@ public class PublisherThread extends Thread{
 
                 //waits here for a request to come
                 Request request = requestQueue.take();
-                ConsumerThread consumerThread = request_to_consumer.remove(request);
-                requestHandle(request, consumerThread);
+                //sos
+                //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
+                //System.out.println(connection.getPort() + "> " + request.getRequestArtist() + " - " + request.getRequestSong());
+
+                requestHandle(request);
             }//while true
 
         } catch (IOException e) {
@@ -114,9 +122,9 @@ public class PublisherThread extends Thread{
 
     }
 
-    public void requestHandle(Request request, ConsumerThread thread){
+    public void requestHandle(Request request){
 
-        Thread requestListener = new Thread(() -> {
+        Thread workingThread = new Thread(() -> {
 
             System.out.println("THREAD CREATED");
             LinkedBlockingQueue<MusicFile> chunkQueue = new LinkedBlockingQueue<MusicFile>();
@@ -128,7 +136,9 @@ public class PublisherThread extends Thread{
                 out = new ObjectOutputStream(pubSocket.getOutputStream());
                 in = new ObjectInputStream(pubSocket.getInputStream());
 
-                out.writeObject(request);
+                out.writeObject(request.getRequestArtist());
+                out.flush();
+                out.writeObject(request.getRequestSong());
                 out.flush();
                 System.out.println("requested: " + request.getRequestArtist() + "  , " + request.getRequestSong());
 
@@ -158,7 +168,9 @@ public class PublisherThread extends Thread{
                     System.out.println("PROBLEM");
                 }
 
-                thread.addChunks(chunkQueue);
+                System.out.println("Chunk Queue size: " + chunkQueue.size());
+                request.getThread().addChunks(chunkQueue);
+                System.out.println("chunks passed to ConsumerThread");
 
 
             } catch (IOException e) {
@@ -167,13 +179,12 @@ public class PublisherThread extends Thread{
                 e.printStackTrace();
             }
         });//thread
-        requestListener.start();
+        workingThread.start();
 
     }
 
-    public void addRequest( Request request, ConsumerThread thread){
+    public void addRequest( Request request){
         requestQueue.add(request);
-        request_to_consumer.put(request, thread);
     }
 
     //load file
@@ -223,5 +234,25 @@ public class PublisherThread extends Thread{
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PublisherThread thread = (PublisherThread) o;
+        return key == thread.key &&
+                pubPort == thread.pubPort &&
+                Objects.equals(connection, thread.connection) &&
+                Objects.equals(in, thread.in) &&
+                Objects.equals(out, thread.out) &&
+                Objects.equals(registeredPublishers, thread.registeredPublishers) &&
+                Objects.equals(pubIp, thread.pubIp) &&
+                Objects.equals(requestQueue, thread.requestQueue) &&
+                Objects.equals(art_to_pub, thread.art_to_pub) &&
+                Objects.equals(pub_to_pubThread, thread.pub_to_pubThread);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(connection, in, out, key, registeredPublishers, pubIp, pubPort, requestQueue, art_to_pub, pub_to_pubThread);
+    }
 }

@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 public class ArtistName implements Serializable {
 
@@ -27,6 +28,16 @@ public class ArtistName implements Serializable {
         return key;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ArtistName that = (ArtistName) o;
+        return artistName.equalsIgnoreCase(that.artistName);
+    }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(artistName.toLowerCase());
+    }
 }
