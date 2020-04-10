@@ -3,6 +3,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 
 public class Consumer extends Node {
@@ -11,6 +13,8 @@ public class Consumer extends Node {
     private static int BrokerPort;
     private static String[][] availableBrokers = new String[3][2]; //broker1: brokerIP, Integer.parseInt(brokerPort)
     private static ArrayList<ArrayList<String>> artists = new ArrayList<ArrayList<String>>();
+
+    private HashMap<String,Info> brokerArtists = new HashMap<String,Info>();
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         Consumer cons = new Consumer("127.0.0.1", 5000);
@@ -39,8 +43,10 @@ public class Consumer extends Node {
                 ArrayList<String> a = new ArrayList<>();
                 artists.add(a);
                 String name = (String) in.readObject();
-
+                Info broker = new Info(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
                 while (!(name.equalsIgnoreCase("end"))) {
+
+                    brokerArtists.put(name.toLowerCase(), broker);
 
                     artists.get(i).add(name);
                     name = (String) in.readObject();
@@ -77,7 +83,6 @@ public class Consumer extends Node {
         Socket socket;
         String requestArtist;
         String requestSong;
-        Boolean artistFound = false;
 
         do {
             ArrayList<byte[]> chunkList = new ArrayList<>();//queue for chunks
@@ -85,84 +90,84 @@ public class Consumer extends Node {
             System.out.print("Artist name: ");
             requestArtist = input.readLine();
 
-            if(requestArtist.equalsIgnoreCase("over")){break;}
+            if (requestArtist.equalsIgnoreCase("over")) {
+                break;
+            }
 
             try {
-                //search all artist lists for this artist name
-                for (int i = 0; i < 3; i++) {
-                    for (String a : artists.get(i)) {
+                //search for this artist name
+                if (brokerArtists.containsKey(requestArtist.toLowerCase())) {
 
-                        //if artist name is found open connection with the responsible broker
-                        if (requestArtist.equalsIgnoreCase(a)) {
-                            artistFound = true;
-                            socket = new Socket(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
-                            out = new ObjectOutputStream(socket.getOutputStream());
-                            in = new ObjectInputStream(socket.getInputStream());
+                    Info broker = brokerArtists.get(requestArtist.toLowerCase());
+                    //connect with the responsible broker
+                    socket = new Socket(broker.getIP(), broker.getPort());
+                    out = new ObjectOutputStream(socket.getOutputStream());
+                    in = new ObjectInputStream(socket.getInputStream());
 
-                            System.out.println("Consumer Connected: " + socket);
+                    System.out.println("Consumer Connected: " + socket);
 
-                            //sends user's request
-                            out.writeObject(requestArtist.trim());
-                            out.flush();
+                    //sends user's request
+                    out.writeObject(requestArtist.trim());
+                    out.flush();
 
-                            System.out.print("Song title: ");
-                            requestSong = input.readLine();
-                            out.writeObject(requestSong.trim());
-                            out.flush();
-                            String response=(String) in.readObject();
+                    System.out.print("Song title: ");
+                    requestSong = input.readLine();
+                    out.writeObject(requestSong.trim());
+                    out.flush();
+                    String response = (String) in.readObject();
 
-                            if(response.equalsIgnoreCase("Found")) {
+                    if (response.equalsIgnoreCase("Found")) {
 
-                                System.out.println("-----------------");
-                                System.out.println("Song found");
+                        System.out.println("-----------------");
+                        System.out.println("Song found");
 
-                                //takes the song from broker
-                                MusicFile chunk=(MusicFile) in.readObject();
-                                chunkList.add(chunk.getMusicFileExtract());
-                                System.out.println("received: " + chunk.getChunkNumber() + " chunk");
-                                for (int ch = 0; ch < chunk.getTotalChunks()-1; ch++) {
+                        //takes the song from broker
+                        MusicFile chunk = (MusicFile) in.readObject();
+                        chunkList.add(chunk.getMusicFileExtract());
+                        System.out.println("received: " + chunk.getChunkNumber() + " chunk");
+                        for (int ch = 0; ch < chunk.getTotalChunks() - 1; ch++) {
 
-                                    chunk = (MusicFile) in.readObject();
-                                    System.out.println("received: " + chunk.getChunkNumber() +  " chunk");
-                                    chunkList.add(chunk.getMusicFileExtract());
+                            chunk = (MusicFile) in.readObject();
+                            System.out.println("received: " + chunk.getChunkNumber() + " chunk");
+                            chunkList.add(chunk.getMusicFileExtract());
 
-                                }
-
-                                byte[] mp3File = recreateFile(chunkList);
-
-                                FileOutputStream stream = new FileOutputStream(requestSong +"(new).mp3");
-                                stream.write(mp3File);
-
-                                System.out.println("Song received successfully! ");
-                                System.out.println("-----------------");
-
-                            }
-                            else if(response.equalsIgnoreCase("Not Found")){
-                                System.out.println("The song doesn't exist!");
-                            }else{
-                                System.out.println("Oops! A problem occured. Try again..");
-                            }
-
-                            in.close();
-                            out.close();
-                            socket.close();
-                            break;
                         }
+
+                        byte[] mp3File = recreateFile(chunkList);
+
+                        FileOutputStream stream = new FileOutputStream(requestSong + "(new).mp3");
+                        stream.write(mp3File);
+
+                        System.out.println("Song received successfully! ");
+                        System.out.println("-----------------");
+
+                    } else if (response.equalsIgnoreCase("Not Found")) {
+                        System.out.println("The song doesn't exist!");
+                    } else {
+                        System.out.println("Oops! A problem occurred. Try again..");
                     }
-                }
-                if(!artistFound) {
+
+                    in.close();
+                    out.close();
+                    socket.close();
+                    break;
+
+
+                }else{
                     System.out.println("Sorry.. There are no songs of this Artist..");
                     System.out.println("Try an other one..");
                 }
-                artistFound = false;
 
-            } catch (IOException e) {
+
+
+            } catch(IOException e){
                 e.printStackTrace();
-            } catch (NumberFormatException e) {
+            } catch(NumberFormatException e){
                 e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch(ClassNotFoundException e){
                 e.printStackTrace();
             }
+
 
         }while(true);
 

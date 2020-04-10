@@ -10,17 +10,17 @@ import java.util.ArrayList;
 
 public class Publisher extends Node {
 
-    ReadMp3Files readMp3Files = new ReadMp3Files();
+    private ReadMp3Files readMp3Files = new ReadMp3Files();
     private static ArrayList<ArtistName> artists = new ArrayList<ArtistName>();
     private static ArrayList<ArrayList<String>> songsOfArtists = new ArrayList<ArrayList<String>>(); //Songs of all songs of each artist
     private static String[][] availableBrokers = new String[3][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
-    char start; //to split artists to publishers
-    char end;
-    int BrokerPort;
-    String BrokerIp;
-    ServerSocket PublisherServer=null;
-    String pubIp;
-    int pubPort;
+    private char start; //to split artists to publishers
+    private char end;
+    private int BrokerPort;
+    private String BrokerIp;
+    private ServerSocket PublisherServer=null;
+    private String pubIp;
+    private int pubPort;
     //list of artists for each broker
     private static ArrayList<ArtistName> broker0Artists = new ArrayList<ArtistName>();
     private static ArrayList<ArtistName> broker1Artists = new ArrayList<ArtistName>();

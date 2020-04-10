@@ -18,10 +18,10 @@ public class PublisherThread extends Thread{
     private int pubPort;
     private LinkedBlockingQueue<Request> requestQueue = new LinkedBlockingQueue<Request>();//queue for consumer requests
 
-    private HashMap<ArtistName, PublisherInfo> art_to_pub ;//artist name -> publisher
-    private HashMap<PublisherInfo, PublisherThread> pub_to_pubThread;//publisher -> publisherThread
+    private HashMap<ArtistName, Info> art_to_pub ;//artist name -> publisher
+    private HashMap<Info, PublisherThread> pub_to_pubThread;//publisher -> publisherThread
 
-    public PublisherThread(Socket socket, int key, List<PublisherThread> registeredPublishers, ArrayList<ArrayList<ArtistName>> publisherArtists,HashMap<ArtistName, PublisherInfo> art_to_pub, HashMap<PublisherInfo, PublisherThread> pub_to_pubThread){
+    public PublisherThread(Socket socket, int key, List<PublisherThread> registeredPublishers, ArrayList<ArrayList<ArtistName>> publisherArtists,HashMap<ArtistName, Info> art_to_pub, HashMap<Info, PublisherThread> pub_to_pubThread){
         connection=socket;
         this.key=key;
         this.registeredPublishers=registeredPublishers;
@@ -81,7 +81,7 @@ public class PublisherThread extends Thread{
                     //Publisher's info
                     pubIp = (String) in.readObject();
                     pubPort = (int) in.readObject();
-                    PublisherInfo publisher = new PublisherInfo(pubIp,pubPort);
+                    Info publisher = new Info(pubIp,pubPort);
 
                     //Artist to Publisher HashMap
                     for(ArtistName artist : brokerArtists){

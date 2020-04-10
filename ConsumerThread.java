@@ -7,20 +7,20 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ConsumerThread extends Thread{
-    Socket connection;
-    ObjectInputStream in;
-    ObjectOutputStream out;
-    String requestArtist;
-    String requestSong;
-    List<ConsumerThread> registeredUsers;
+    private Socket connection;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private String requestArtist;
+    private String requestSong;
+    private List<ConsumerThread> registeredUsers;
     private static ArrayList<ArrayList<ArtistName>> publisherArtists;
 
-    HashMap<ArtistName, PublisherInfo> art_to_pub;//artist name -> publisher
-    HashMap<PublisherInfo, PublisherThread> pub_to_pubThread ;//publisher -> publisherThread
+    HashMap<ArtistName, Info> art_to_pub;//artist name -> publisher
+    HashMap<Info, PublisherThread> pub_to_pubThread ;//publisher -> publisherThread
 
     LinkedBlockingQueue<MusicFile> chunkQueue = new LinkedBlockingQueue<MusicFile>();
 
-    public ConsumerThread(Socket socket, List<ConsumerThread> registeredUsers, ArrayList<ArrayList<ArtistName>> publisherArtists,HashMap<ArtistName, PublisherInfo> art_to_pub, HashMap<PublisherInfo, PublisherThread> pub_to_pubThread){
+    public ConsumerThread(Socket socket, List<ConsumerThread> registeredUsers, ArrayList<ArrayList<ArtistName>> publisherArtists,HashMap<ArtistName, Info> art_to_pub, HashMap<Info, PublisherThread> pub_to_pubThread){
         connection=socket;
         this.registeredUsers=registeredUsers;
         this.publisherArtists=publisherArtists;
@@ -78,7 +78,7 @@ public class ConsumerThread extends Thread{
                 this.requestSong = (String) in.readObject();
                 Request request = new Request(requestArtist, requestSong, this );
 
-                PublisherInfo publisher = art_to_pub.get(new ArtistName(requestArtist));
+                Info publisher = art_to_pub.get(new ArtistName(requestArtist));
                 request.setPublisher(publisher);
                 PublisherThread thread = pub_to_pubThread.get(publisher);
 

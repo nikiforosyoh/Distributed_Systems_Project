@@ -12,8 +12,8 @@ public class Broker extends Node {
     private int PublishersPort;
     private int key; //Hash(IP+port)
     private LinkedBlockingQueue<Request> requestQueue = new LinkedBlockingQueue<Request>();//queue for consumer requests
-    private HashMap<ArtistName, PublisherInfo> art_to_pub = new HashMap<ArtistName, PublisherInfo>();//artist name -> publisher
-    private HashMap<PublisherInfo, PublisherThread> pub_to_pubThread = new HashMap<PublisherInfo, PublisherThread>();//publisher -> publisherThread
+    private HashMap<ArtistName, Info> art_to_pub = new HashMap<ArtistName, Info>();//artist name -> publisher
+    private HashMap<Info, PublisherThread> pub_to_pubThread = new HashMap<Info, PublisherThread>();//publisher -> publisherThread
 
     private static ArrayList<ArrayList<ArtistName>> publisherArtists = new ArrayList<ArrayList<ArtistName>>();
 

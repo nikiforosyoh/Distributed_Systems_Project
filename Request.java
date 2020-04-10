@@ -2,10 +2,10 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Request implements Serializable {
-    String requestArtist;
-    String requestSong;
-    ConsumerThread thread;
-    PublisherInfo publisher;
+    private String requestArtist;
+    private String requestSong;
+    private ConsumerThread thread;
+    private Info publisher;
 
     public Request(String requestArtist, String requestSong, ConsumerThread thread){
         this.requestArtist = requestArtist;
@@ -25,7 +25,7 @@ public class Request implements Serializable {
         return thread;
     }
 
-    public void setPublisher(PublisherInfo publisher){
+    public void setPublisher(Info publisher){
         this.publisher=publisher;
     }
 
