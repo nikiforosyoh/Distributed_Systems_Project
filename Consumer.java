@@ -150,9 +150,7 @@ public class Consumer extends Node {
                     in.close();
                     out.close();
                     socket.close();
-                    break;
-
-
+                   
                 }else{
                     System.out.println("Sorry.. There are no songs of this Artist..");
                     System.out.println("Try an other one..");
