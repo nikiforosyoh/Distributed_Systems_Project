@@ -1,3 +1,5 @@
 Broker IP: 127.0.0.1	,Publisher Port: 4090,   Consumer Port: 5000
 Broker IP: 127.0.0.1	,Publisher Port: 5012,   Consumer Port: 5002
 Broker IP: 127.0.0.1	,Publisher Port: 5005,   Consumer Port: 5004
+Broker IP: 127.0.0.1	,Publisher Port: 5007,   Consumer Port: 5006
+Broker IP: 127.0.0.1	,Publisher Port: 5009,   Consumer Port: 5008

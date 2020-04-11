@@ -7,6 +7,12 @@ import java.net.UnknownHostException;
 
 public class Node {
 
+    private static final int N=3; //Num of brokers
+
+    public static final int getN(){
+        return N;
+    }
+
     //receive broker's information
     public void init(String BrokerIp, int BrokerPort, String[][] availableBrokers){
         Socket socket ;
@@ -18,8 +24,9 @@ public class Node {
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
-            System.out.println("Connected: " + socket);
+            //System.out.println("Connected: " + socket);
 
+            //take brokers' information
             out.writeObject("brokers");
             out.flush();
 
@@ -50,8 +57,7 @@ public class Node {
 
     //get  ip, port of every broker
     public static String[][] getBrokerInfo(ObjectInputStream input, String[][] availableBrokers) throws IOException, ClassNotFoundException {
-        String info = "";
-        for (int i=0; i<3; i++){
+        for (int i=0; i<N; i++){
             for (int j=0; j<2; j++) {
                 availableBrokers[i][j] = (String) input.readObject();
             }

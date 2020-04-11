@@ -7,6 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Broker extends Node {
 
+    private static final int N=getN(); //Num of brokers
     private String BrokerIP;
     private int ConsumersPort;
     private int PublishersPort;
@@ -24,9 +25,10 @@ public class Broker extends Node {
     private List<PublisherThread> registeredPublishers = new ArrayList<PublisherThread>();
 
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-        Broker broker=new Broker("127.0.0.1",5004
-                                                      ,5005 ); //des to txt prin baleis tis port!!!!!!! <-----
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        Broker broker=new Broker("127.0.0.1",5008
+                                                      ,5009 ); //des to txt prin baleis tis port!!!!!!! <-----
+                                                                            //orizoyme ton arithmo ton broker sthn metavliti N tis klasis Node
         broker.calculateKeys();
         System.out.println("broker key: " + broker.key);
         broker.openServer();
@@ -34,6 +36,7 @@ public class Broker extends Node {
     }
 
     public Broker(){}
+
     public Broker(String BrokerIP, int ConsumersPort, int PublishersPort ){
         this.BrokerIP=BrokerIP;
         this.ConsumersPort= ConsumersPort;
@@ -42,10 +45,9 @@ public class Broker extends Node {
 
     public void openServer(){
 
-        //createTxt(ConsumersPort,PublishersPort);
         try {
             ConsumerServer=new ServerSocket(ConsumersPort);
-            System.out.println("Broker> waiting for connection...");
+            System.out.println("Broker> Waiting for connection...");
             System.out.println("Available Consumer Port: "+ConsumersPort);
             System.out.println("Available Publisher Port: "+PublishersPort);
 
@@ -61,8 +63,8 @@ public class Broker extends Node {
 
                             //sos
                             //System.out.println("Publisher connected! --> " + connectPub.getInetAddress().getHostAddress());
-                            System.out.println("Publisher connected! --> " + connectPub.getPort());
-                            PublisherThread pt = new PublisherThread(connectPub, key, registeredPublishers, publisherArtists,art_to_pub, pub_to_pubThread );
+
+                            PublisherThread pt = new PublisherThread(N, connectPub, key, registeredPublishers, publisherArtists,art_to_pub, pub_to_pubThread );
                             registeredPublishers.add(pt);
                             pt.start();
                         }
@@ -80,8 +82,8 @@ public class Broker extends Node {
                 connectCon = ConsumerServer.accept();
                 //sos
                 //System.out.println("Consumer connected! --> " + connectCon.getInetAddress().getHostAddress());
-                System.out.println("Consumer connected! --> " + connectCon.getPort());
-                ConsumerThread ct=new ConsumerThread(connectCon,registeredUsers,publisherArtists, art_to_pub, pub_to_pubThread );
+
+                ConsumerThread ct=new ConsumerThread(N,connectCon,registeredUsers,publisherArtists, art_to_pub, pub_to_pubThread );
                 registeredUsers.add(ct);
                 ct.start();
 
@@ -98,22 +100,5 @@ public class Broker extends Node {
         key = Integer.parseInt( hash.getMd5(BrokerIP + Integer.toString(PublishersPort)) );
     }
 
-    public void pull(ArtistName a){}
-
-    public void createTxt(int ConsumersPort,int PublishersPort) {
-        try {
-            BufferedWriter output = new BufferedWriter(new FileWriter("src\\Broker.txt", true));
-
-            output.write("Broker IP: " + BrokerIP +
-                    "\t,Publisher Port: " + PublishersPort +
-                    "\t,Consumer Port: " + ConsumersPort + "\n");
-            output.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 }

@@ -17,6 +17,7 @@ public class MusicFile implements Serializable {
         this.chunkNumber = chunkNumber;
     }
 
+    //in case song not found
     public MusicFile(int totalChunks){
         this.totalChunks = -1;
 

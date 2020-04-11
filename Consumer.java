@@ -4,16 +4,14 @@ import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
-
 
 public class Consumer extends Node {
 
+    private static final int N=getN(); //Num of brokers
     private static String BrokerIp;
     private static int BrokerPort;
-    private static String[][] availableBrokers = new String[3][2]; //broker1: brokerIP, Integer.parseInt(brokerPort)
+    private static String[][] availableBrokers = new String[N][2]; //broker1: brokerIP, Integer.parseInt(brokerPort)
     private static ArrayList<ArrayList<String>> artists = new ArrayList<ArrayList<String>>();
-
     private HashMap<String,Info> brokerArtists = new HashMap<String,Info>();
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
@@ -24,7 +22,6 @@ public class Consumer extends Node {
 
     public void initialization(){
 
-        System.out.print("Consumer ");
         init(BrokerIp,BrokerPort,availableBrokers);
         Socket socket;
         ObjectInputStream in;
@@ -32,7 +29,7 @@ public class Consumer extends Node {
 
         //makes a list of each artist of a broker
         try {
-            for (int i=0; i<3; i++) {
+            for (int i=0; i<N; i++) {
                 socket = new Socket(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
                 out = new ObjectOutputStream(socket.getOutputStream());
                 in = new ObjectInputStream(socket.getInputStream());
@@ -150,13 +147,11 @@ public class Consumer extends Node {
                     in.close();
                     out.close();
                     socket.close();
-                   
+
                 }else{
                     System.out.println("Sorry.. There are no songs of this Artist..");
                     System.out.println("Try an other one..");
                 }
-
-
 
             } catch(IOException e){
                 e.printStackTrace();

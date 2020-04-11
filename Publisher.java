@@ -10,10 +10,11 @@ import java.util.ArrayList;
 
 public class Publisher extends Node {
 
+    private static final int N=getN(); //Num of brokers
     private ReadMp3Files readMp3Files = new ReadMp3Files();
     private static ArrayList<ArtistName> artists = new ArrayList<ArtistName>();
     private static ArrayList<ArrayList<String>> songsOfArtists = new ArrayList<ArrayList<String>>(); //Songs of all songs of each artist
-    private static String[][] availableBrokers = new String[3][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
+    private static String[][] availableBrokers = new String[N][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
     private char start; //to split artists to publishers
     private char end;
     private int BrokerPort;
@@ -22,13 +23,11 @@ public class Publisher extends Node {
     private String pubIp;
     private int pubPort;
     //list of artists for each broker
-    private static ArrayList<ArtistName> broker0Artists = new ArrayList<ArtistName>();
-    private static ArrayList<ArtistName> broker1Artists = new ArrayList<ArtistName>();
-    private static ArrayList<ArtistName> broker2Artists = new ArrayList<ArtistName>();
+    private static ArrayList<ArrayList<ArtistName>> distributedArtist = new ArrayList<ArrayList<ArtistName>>();
 
 
     public static void main(String args[]) throws NoSuchAlgorithmException, InvalidDataException, IOException, UnsupportedTagException {
-        Publisher pub=new Publisher('k', 'z', "127.0.0.1", 4090, "127.0.0.1", 2008);//kathe fora allazoyme to pub port
+        Publisher pub=new Publisher('k', 'z', "127.0.0.1", 4090, "127.0.0.1", 2012);//kathe fora allazoyme to pub port
         System.out.println(Character.toUpperCase(pub.start) + "-" + Character.toUpperCase(pub.end) );
         pub.initialization();
         pub.exchangeInfo();
@@ -56,7 +55,6 @@ public class Publisher extends Node {
 
         songsOfArtists = readMp3Files.getListSongs("Songs",readMp3Files.getPublisherArtistList(start, end));
 
-        System.out.print("Publisher ");
         init(BrokerIp,BrokerPort,availableBrokers);
 
     }
@@ -64,21 +62,27 @@ public class Publisher extends Node {
     //client part
     public void exchangeInfo() throws IOException {
         Socket socket;
-        ObjectInputStream in=null;
-        ObjectOutputStream out=null;
+        ObjectInputStream in;
+        ObjectOutputStream out;
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < N; i++) {
             try {
                 socket = new Socket(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
                 out = new ObjectOutputStream(socket.getOutputStream());
                 in = new ObjectInputStream(socket.getInputStream());
-                System.out.println("Publisher Connected: " + socket);
+                //System.out.println("Publisher Connected: " + socket);
+
                 //take keys from brokers
                 out.writeObject("key");
                 out.flush();
                 String key = (String) in.readObject();
                 availableBrokers[i][2] = key;
 
+                //add a list for this broker artist
+                ArrayList<ArtistName> a = new ArrayList<ArtistName>() ;
+                distributedArtist.add(a);
+
+                //close connection
                 in.close();
                 out.close();
                 socket.close();
@@ -89,22 +93,25 @@ public class Publisher extends Node {
                 e.printStackTrace();
             }
         }
+
         //sort keys
         availableBrokers = sortKeys(availableBrokers);
+
         //distribute artists to brokers depending on hash(artistName) and hash(IP+port)
         distributeArtists();
-        for (int i = 0; i < 3; i++) {
+
+        for (int i = 0; i < N; i++) {
 
             try {
                 socket = new Socket(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
                 out = new ObjectOutputStream(socket.getOutputStream());
                 in = new ObjectInputStream(socket.getInputStream());
-                System.out.println("Publisher Connected: " + socket);
+                //System.out.println("Publisher Connected: " + socket);
 
                 //send artist to brokers
                 out.writeObject("artist names");
                 out.flush();
-                sendArtists(socket, out);
+                sendArtists(out, i);
 
                 //Send Publisher's info
                 out.writeObject(pubIp);
@@ -112,6 +119,7 @@ public class Publisher extends Node {
                 out.writeObject(pubPort);
                 out.flush();
 
+                //close connection
                 in.close();
                 out.close();
                 socket.close();
@@ -130,6 +138,7 @@ public class Publisher extends Node {
 
         while (true) {
 
+            System.out.println("Publisher> Waiting for requests...");
             Socket brokerRequest = PublisherServer.accept();
             //sos
             //System.out.println("Publisher connected! --> " + connectPub.getInetAddress().getHostAddress());
@@ -165,7 +174,7 @@ public class Publisher extends Node {
                             }
                         }
                         if (!songExists) {
-                            System.out.println("Song not found!!!");
+                            System.out.println("Song doesn't exist!!!");
                             out.writeObject("Not Found");
                             out.flush();
                         }
@@ -195,18 +204,24 @@ public class Publisher extends Node {
 
         for ( ArtistName artist : artists) {
 
-            if (artist.getKey() < Integer.parseInt(availableBrokers[0][2]) || artist.getKey() >= Integer.parseInt(availableBrokers[2][2]) ) {
-                // o 1os
-                broker0Artists.add(artist);
-            } else if (artist.getKey() < Integer.parseInt(availableBrokers[1][2])) {
-                // o 2os
-                broker1Artists.add(artist);
-            } else if (artist.getKey() < Integer.parseInt(availableBrokers[2][2])) {
-                // o 3os
-                broker2Artists.add(artist);
+            if (artist.getKey() < Integer.parseInt(availableBrokers[0][2]) || artist.getKey() >= Integer.parseInt(availableBrokers[N-1][2])){
+                distributedArtist.get(0).add(artist);
+            }else {
+                checkOthers(artist);
             }
         }
 
+    }
+
+    //assists distribute()
+    private static void checkOthers(ArtistName artist){
+        for (int i = 1; i < N; i++) {
+            if (artist.getKey() < Integer.parseInt(availableBrokers[i][2])) {
+                distributedArtist.get(i).add(artist);
+                break;
+            }
+
+        }
     }
 
     //sends chunks to broker
@@ -226,30 +241,19 @@ public class Publisher extends Node {
     }
 
     //sent Artists to brokers
-    public void sendArtists(Socket socket, ObjectOutputStream out) throws IOException {
+    public void sendArtists(ObjectOutputStream out, int i) throws IOException {
 
-        //sos
-        //if(availableBrokers[0][0].equalsIgnoreCase(socket.getInetAddress().getHostAddress()) )
+        out.writeObject(distributedArtist.get(i));
+        out.flush();
 
-        if(availableBrokers[0][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
-            out.writeObject(broker0Artists);
-            out.flush();
-        }
-        if(availableBrokers[1][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
-            out.writeObject(broker1Artists);
-            out.flush();
-        }
-        if(availableBrokers[2][1].equalsIgnoreCase(String.valueOf(socket.getPort())) ) {
-            out.writeObject(broker2Artists);
-            out.flush();
-        }
     }
 
     //sort keys in availableBrokers array
     public static String[][] sortKeys(String[][] a) {
+
         String temp;
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3 - i - 1; j++)
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N - i - 1; j++) {
                 if (Integer.parseInt(a[j][2]) > Integer.parseInt(a[j + 1][2])) {
                     for (int k = 0; k < 3; k++) {
                         temp = a[j][k];
@@ -257,6 +261,7 @@ public class Publisher extends Node {
                         a[j + 1][k] = temp;
                     }
                 }
+            }
         }
         return a;
     }

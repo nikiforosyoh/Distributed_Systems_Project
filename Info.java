@@ -1,7 +1,7 @@
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Info implements Serializable {
+public class Info{
     private String IP;
     private int port;
     private int brokerKey;

@@ -36,8 +36,6 @@ public class Request implements Serializable {
         Request request = (Request) o;
         return requestArtist.equalsIgnoreCase(request.requestArtist) &&
                 requestSong.equalsIgnoreCase(request.requestSong);
-
-                //&& Objects.equals(thread, request.thread)
     }
 
     @Override

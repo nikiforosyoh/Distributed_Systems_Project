@@ -1,5 +1,3 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.io.*;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
@@ -7,6 +5,8 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ConsumerThread extends Thread{
+
+    private static int N; //Num of brokers
     private Socket connection;
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -20,7 +20,8 @@ public class ConsumerThread extends Thread{
 
     LinkedBlockingQueue<MusicFile> chunkQueue = new LinkedBlockingQueue<MusicFile>();
 
-    public ConsumerThread(Socket socket, List<ConsumerThread> registeredUsers, ArrayList<ArrayList<ArtistName>> publisherArtists,HashMap<ArtistName, Info> art_to_pub, HashMap<Info, PublisherThread> pub_to_pubThread){
+    public ConsumerThread(final int N,Socket socket, List<ConsumerThread> registeredUsers, ArrayList<ArrayList<ArtistName>> publisherArtists,HashMap<ArtistName, Info> art_to_pub, HashMap<Info, PublisherThread> pub_to_pubThread){
+        this.N=N;
         connection=socket;
         this.registeredUsers=registeredUsers;
         this.publisherArtists=publisherArtists;
@@ -38,7 +39,7 @@ public class ConsumerThread extends Thread{
                 String input = (String) in.readObject();
                 //sos
                 //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
-                System.out.println(connection.getPort() + "> "  + input);
+                //System.out.println(connection.getPort() + "> "  + input);
 
 
                 if(input.equalsIgnoreCase("brokers")){
@@ -78,23 +79,27 @@ public class ConsumerThread extends Thread{
                 this.requestSong = (String) in.readObject();
                 Request request = new Request(requestArtist, requestSong, this );
 
+                System.out.println("Consumer connected! --> " + connection.getInetAddress().getHostAddress());
+
                 Info publisher = art_to_pub.get(new ArtistName(requestArtist));
                 request.setPublisher(publisher);
                 PublisherThread thread = pub_to_pubThread.get(publisher);
 
+                //pass request to publisher thread
                 thread.addRequest(request);
 
                 //sos
-                //System.out.println(connection.getInetAddress().getHostAddress() + "> "  + data);
-                //System.out.println(connection.getPort() + "> " + request.getRequestArtist() + " - " + request.getRequestSong());
+                System.out.println(connection.getInetAddress().getHostAddress() + " (Consumer Thread)> " + request.getRequestArtist() + " - " + request.getRequestSong());
 
+                //waits for chunks
                 MusicFile chunk = chunkQueue.take();
-                //System.out.println("ConsumerThread--->3 chunk queue size: " + chunkQueue.size());
+                System.out.println("(Consumer Thread)> chunks received from publisher thread");
+
                 if(chunk.getTotalChunks()>0){
                     out.writeObject("Found");
                     out.flush();
-                    System.out.println("Consumerthread---> numOfchunks: " + chunk.getTotalChunks());
 
+                    //send chunks
                     out.writeObject(chunk);
                     out.flush();
                     while(!chunkQueue.isEmpty()){
@@ -102,15 +107,15 @@ public class ConsumerThread extends Thread{
                         out.writeObject(chunk);
                         out.flush();
                     }
+                    System.out.println("(Consumer Thread)> all chunks sent");
 
-                    System.out.println("Queue size: " + chunkQueue.size());
-
-                    System.out.println("SENT");
                 }
                 else{
                     out.writeObject("Not Found");
                     out.flush();
                 }
+
+
 
             }
 
@@ -151,7 +156,7 @@ public class ConsumerThread extends Thread{
 
         try {
 
-            for (int i=0; i<3; i++){
+            for (int i=0; i<N; i++){
                 line = reader.readLine();
 
                 ip=line.trim().substring(line.indexOf(":")+1,line.indexOf(",")).trim();
