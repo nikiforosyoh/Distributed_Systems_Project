@@ -26,8 +26,8 @@ public class Broker extends Node {
 
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        Broker broker=new Broker("127.0.0.1",5008
-                                                      ,5009 ); //des to txt prin baleis tis port!!!!!!! <-----
+        Broker broker=new Broker("127.0.0.1",5000
+                                                      ,4090 ); //des to txt prin baleis tis port!!!!!!! <-----
                                                                             //orizoyme ton arithmo ton broker sthn metavliti N tis klasis Node
         broker.calculateKeys();
         System.out.println("broker key: " + broker.key);
