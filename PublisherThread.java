@@ -134,7 +134,6 @@ public class PublisherThread extends Thread{
         Thread workingThread = new Thread(() -> {
 
             System.out.println("THREAD CREATED");
-            LinkedBlockingQueue<MusicFile> chunkQueue = new LinkedBlockingQueue<MusicFile>();
             Socket pubSocket;
             ObjectInputStream in;
             ObjectOutputStream out;
@@ -156,14 +155,20 @@ public class PublisherThread extends Thread{
                 if (found.equalsIgnoreCase("Found")) {
                     MusicFile chunk = (MusicFile) in.readObject();
                     System.out.println("Num of chunks: " + chunk.getTotalChunks());
-                    chunkQueue.add(chunk);
+                    //pass chunks to consumer thread
+                    request.getThread().addChunks(chunk);
                     System.out.println("Received: " + chunk.getChunkNumber() + " chunk");
 
                     for (int ch = 0; ch < chunk.getTotalChunks() - 1; ch++) {
                         chunk = (MusicFile) in.readObject();
-                        chunkQueue.add(chunk);
+                        //pass chunks to consumer thread
+                        request.getThread().addChunks(chunk);
                         System.out.println("Received: " + chunk.getChunkNumber() + " chunk");
                     }
+
+                    //fake chunk to check the end of chunks
+                    request.getThread().addChunks(new MusicFile(-1));
+
                     //Disconnect Publisher
                     in.close();
                     out.close();
@@ -171,14 +176,13 @@ public class PublisherThread extends Thread{
 
                 } else if (found.equalsIgnoreCase("Not Found")) {
                     System.out.println("SONG DOESN'T EXIST!");
-                    chunkQueue.add(new MusicFile(-1));
+                    request.getThread().addChunks(new MusicFile(-1));
 
                 }else{
                     System.out.println("PROBLEM");
                 }
 
-                //pass chunks to consumer thread
-                request.getThread().addChunks(chunkQueue);
+
                 System.out.println("(Publisher Thread)> chunks passed to ConsumerThread");
 
 

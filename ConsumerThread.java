@@ -82,7 +82,6 @@ public class ConsumerThread extends Thread{
                 System.out.println("Consumer connected! --> " + connection.getInetAddress().getHostAddress());
 
                 Info publisher = art_to_pub.get(new ArtistName(requestArtist));
-                request.setPublisher(publisher);
                 PublisherThread thread = pub_to_pubThread.get(publisher);
 
                 //pass request to publisher thread
@@ -91,10 +90,13 @@ public class ConsumerThread extends Thread{
                 //sos
                 System.out.println(connection.getInetAddress().getHostAddress() + " (Consumer Thread)> " + request.getRequestArtist() + " - " + request.getRequestSong());
 
+
                 //waits for chunks
                 MusicFile chunk = chunkQueue.take();
+
                 System.out.println("(Consumer Thread)> chunks received from publisher thread");
 
+                //if chunk is not fake
                 if(chunk.getTotalChunks()>0){
                     out.writeObject("Found");
                     out.flush();
@@ -102,9 +104,11 @@ public class ConsumerThread extends Thread{
                     //send chunks
                     out.writeObject(chunk);
                     out.flush();
-                    while(!chunkQueue.isEmpty()){
+
+                    while(chunk.getTotalChunks()>0){
                         chunk=chunkQueue.take();
                         out.writeObject(chunk);
+                        System.out.println("SENT: " + chunk.getChunkNumber());
                         out.flush();
                     }
                     System.out.println("(Consumer Thread)> all chunks sent");
@@ -130,8 +134,8 @@ public class ConsumerThread extends Thread{
         }
     }
 
-    public void addChunks(LinkedBlockingQueue<MusicFile> chunkQueue){
-        chunkQueue.drainTo(this.chunkQueue);
+    public void addChunks(MusicFile chunk){
+        this.chunkQueue.add(chunk);
     }
 
     //load file

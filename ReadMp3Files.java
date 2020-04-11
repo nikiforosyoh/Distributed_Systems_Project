@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -68,35 +69,31 @@ public class ReadMp3Files {
     }
 
     //returns songs of each artists
-    public ArrayList<ArrayList<String>> getListSongs(String path, ArrayList <String> listOfArtists) throws IOException, InvalidDataException, UnsupportedTagException {
-        ArrayList <ArrayList <String>> listOfArtistSongs = new ArrayList<>();
+    public HashMap<String,String> getHashSongs(String path, ArrayList<ArtistName> listOfArtists) throws IOException, InvalidDataException, UnsupportedTagException {
 
         ArrayList <String> listOfPaths = getListOfPaths(path);
+        HashMap<String,String> song_to_art = new HashMap<String,String>();
 
-        int i = 0;
-
-        for(String artist : listOfArtists)
+        for(ArtistName artist : listOfArtists)
         {
-            ArrayList<String> thisArtistSongList = new ArrayList<>();
 
             for(String songPath : listOfPaths)
             {
                 File file = new File(songPath);
                 Mp3File thisSong = new Mp3File(file);
                 ID3v2 thisSongTags = thisSong.getId3v2Tag();
+                String songTitle=file.getName().substring(0, file.getName().length()-4);
 
-
-                if(artist.equalsIgnoreCase((String)thisSongTags.getArtist()))
+                if(artist.getArtistName().equalsIgnoreCase((String)thisSongTags.getArtist()))
                 {
-                    thisArtistSongList.add(file.getName().substring(0, file.getName().length()-4));
+                    song_to_art.put(songTitle.toLowerCase(), artist.getArtistName().toLowerCase());
                 }
-                i++;
+
             }
 
-            listOfArtistSongs.add(thisArtistSongList);
         }
 
-        return listOfArtistSongs;
+        return song_to_art;
     }
 
     //splits song into chunks

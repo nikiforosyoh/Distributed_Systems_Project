@@ -5,7 +5,6 @@ public class Request implements Serializable {
     private String requestArtist;
     private String requestSong;
     private ConsumerThread thread;
-    private Info publisher;
 
     public Request(String requestArtist, String requestSong, ConsumerThread thread){
         this.requestArtist = requestArtist;
@@ -23,10 +22,6 @@ public class Request implements Serializable {
 
     public ConsumerThread getThread(){
         return thread;
-    }
-
-    public void setPublisher(Info publisher){
-        this.publisher=publisher;
     }
 
     @Override

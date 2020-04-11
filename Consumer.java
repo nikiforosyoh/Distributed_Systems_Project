@@ -37,13 +37,17 @@ public class Consumer extends Node {
                 out.writeObject("artist names");
                 out.flush();
 
+                //
                 ArrayList<String> a = new ArrayList<>();
                 artists.add(a);
+                //
                 String name = (String) in.readObject();
                 Info broker = new Info(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
                 while (!(name.equalsIgnoreCase("end"))) {
 
+                    //hashmap artist->broker
                     brokerArtists.put(name.toLowerCase(), broker);
+
 
                     artists.get(i).add(name);
                     name = (String) in.readObject();
@@ -85,7 +89,7 @@ public class Consumer extends Node {
             ArrayList<byte[]> chunkList = new ArrayList<>();//queue for chunks
             input = new DataInputStream(System.in);
             System.out.print("Artist name: ");
-            requestArtist = input.readLine();
+            requestArtist = input.readLine().trim();
 
             if (requestArtist.equalsIgnoreCase("over")) {
                 break;
@@ -104,13 +108,15 @@ public class Consumer extends Node {
                     System.out.println("Consumer Connected: " + socket);
 
                     //sends user's request
-                    out.writeObject(requestArtist.trim());
+                    out.writeObject(requestArtist);
                     out.flush();
 
                     System.out.print("Song title: ");
-                    requestSong = input.readLine();
-                    out.writeObject(requestSong.trim());
+                    requestSong = input.readLine().trim();
+                    out.writeObject(requestSong);
                     out.flush();
+
+                    //waiting for response
                     String response = (String) in.readObject();
 
                     if (response.equalsIgnoreCase("Found")) {

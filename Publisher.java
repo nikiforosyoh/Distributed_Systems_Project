@@ -7,13 +7,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Publisher extends Node {
 
     private static final int N=getN(); //Num of brokers
     private ReadMp3Files readMp3Files = new ReadMp3Files();
     private static ArrayList<ArtistName> artists = new ArrayList<ArtistName>();
-    private static ArrayList<ArrayList<String>> songsOfArtists = new ArrayList<ArrayList<String>>(); //Songs of all songs of each artist
     private static String[][] availableBrokers = new String[N][3]; //broker1: brokerIP, brokerPort -> Integer.parseInt(); , Integer.parseInt(broker keys);
     private char start; //to split artists to publishers
     private char end;
@@ -24,10 +24,11 @@ public class Publisher extends Node {
     private int pubPort;
     //list of artists for each broker
     private static ArrayList<ArrayList<ArtistName>> distributedArtist = new ArrayList<ArrayList<ArtistName>>();
+    private HashMap<String,String> song_to_art = new HashMap<String,String>();
 
 
     public static void main(String args[]) throws NoSuchAlgorithmException, InvalidDataException, IOException, UnsupportedTagException {
-        Publisher pub=new Publisher('k', 'z', "127.0.0.1", 4090, "127.0.0.1", 2012);//kathe fora allazoyme to pub port
+        Publisher pub=new Publisher('k', 'z', "127.0.0.1", 4090, "127.0.0.1", 2011);//kathe fora allazoyme to pub port
         System.out.println(Character.toUpperCase(pub.start) + "-" + Character.toUpperCase(pub.end) );
         pub.initialization();
         pub.exchangeInfo();
@@ -52,8 +53,7 @@ public class Publisher extends Node {
             ArtistName newArtist = new ArtistName(a);
             artists.add(newArtist);
         }
-
-        songsOfArtists = readMp3Files.getListSongs("Songs",readMp3Files.getPublisherArtistList(start, end));
+        song_to_art = readMp3Files.getHashSongs("Songs",artists);
 
         init(BrokerIp,BrokerPort,availableBrokers);
 
@@ -157,27 +157,19 @@ public class Publisher extends Node {
 
                         System.out.println("Consumer's Artist request: " + requestArtist);
                         System.out.println("Consumer's Song request: " + requestSong);
-                        boolean songExists = false;
-                        for (int x = 0; x < artists.size(); x++) {
-                            if (artists.get(x).getArtistName().equalsIgnoreCase(requestArtist)) {
-                                for (String a : songsOfArtists.get(x)) {
-                                    if (requestSong.equalsIgnoreCase(a)) {
-                                        System.out.println("Song found!!!");
-                                        songExists = true;
-                                        out.writeObject("Found");
-                                        out.flush();
-                                        //sends chunks to broker
-                                        push(requestSong, out);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        if (!songExists) {
+
+                        if(song_to_art.containsKey(requestSong.toLowerCase())){
+                            System.out.println("Song found!!!");
+                            out.writeObject("Found");
+                            out.flush();
+                            //sends chunks to broker
+                            push(requestSong, out);
+                        }else{
                             System.out.println("Song doesn't exist!!!");
                             out.writeObject("Not Found");
                             out.flush();
                         }
+
                         in.close();
                         out.close();
 
