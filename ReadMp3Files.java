@@ -149,7 +149,7 @@ public class ReadMp3Files {
 
         MusicFileAttributes[1] = fileTag.getArtist();
 
-        if(!fileTag.getAlbum().equals("")) {
+        if(fileTag.getAlbum()!=null) {
             MusicFileAttributes[2] = fileTag.getAlbum();
         } else {
             MusicFileAttributes[2] = "no album info";
