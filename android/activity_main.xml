@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+<ProgressBar
+   android:id="@+id/simpleProgressBar"
+   android:layout_width="wrap_content"
+   android:layout_height="wrap_content"
+   android:visibility="invisible"
+    android:layout_marginTop="300dp"
+    android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="240dp"
+        android:layout_marginEnd="30dp"
+        android:background="@android:color/holo_purple"
+        android:padding="10dp"
+        android:text="Start"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/ArtistName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:ems="10"
+        android:hint="please enter the artist"
+        android:inputType="textPersonName" />
+    <EditText
+        android:id="@+id/SongTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dp"
+        android:ems="10"
+        android:hint="please enter the song"
+        android:inputType="textPersonName" />
+    <Button
+        android:id="@+id/searchButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="400dp"
+        android:layout_marginEnd="30dp"
+        android:background="@android:color/holo_purple"
+        android:padding="10dp"
+        android:text="Search"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+    <Button
+        android:id="@+id/btnPlayer"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="650dp"
+        android:text="||"
+        android:visibility="invisible"
+        android:textSize="10dp"></Button>
+
+    <Button
+        android:id="@+id/btnForward"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="650dp"
+        android:layout_toRightOf="@id/btnPlayer"
+        android:text="&gt;&gt;"
+        android:visibility="invisible"
+        android:textSize="10dp"></Button>
+
+    <Button
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:text="&gt;&gt;"
+        android:id="@+id/btnBack"
+        android:layout_marginTop="650dp"
+        android:layout_toLeftOf="@id/btnPlayer"
+        android:layout_marginRight="20dp"
+        android:visibility="invisible"
+        android:textSize="10dp"></Button>
+
+    <SeekBar
+        android:id="@+id/seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="600dp"
+        android:visibility="invisible"
+        android:layout_marginRight="20dp"></SeekBar>
+
+</RelativeLayout>
