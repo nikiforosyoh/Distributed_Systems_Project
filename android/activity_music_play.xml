@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context=".MusicPlay">
+   <Button
+    android:id="@+id/btnPlayer"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="650dp"
+    android:text="||"
+    android:visibility="invisible"
+    android:textSize="10dp"></Button>
+
+<Button
+android:id="@+id/btnForward"
+android:layout_width="50dp"
+android:layout_height="50dp"
+android:layout_marginLeft="20dp"
+android:layout_marginTop="650dp"
+android:layout_toRightOf="@id/btnPlayer"
+android:text="&gt;&gt;"
+android:visibility="invisible"
+android:textSize="10dp"></Button>
+
+<Button
+android:layout_width="50dp"
+android:layout_height="50dp"
+android:text="&gt;&gt;"
+android:id="@+id/btnBack"
+android:layout_marginTop="650dp"
+android:layout_toLeftOf="@id/btnPlayer"
+android:layout_marginRight="20dp"
+android:visibility="invisible"
+android:textSize="10dp"></Button>
+
+<SeekBar
+android:id="@+id/seekbar"
+android:layout_width="match_parent"
+android:layout_height="40dp"
+android:layout_marginLeft="20dp"
+android:layout_marginTop="600dp"
+android:visibility="invisible"
+android:layout_marginRight="20dp"></SeekBar>
+
+</RelativeLayout>

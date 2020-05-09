@@ -5,35 +5,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
-<ProgressBar
-   android:id="@+id/simpleProgressBar"
-   android:layout_width="wrap_content"
-   android:layout_height="wrap_content"
-   android:visibility="invisible"
-    android:layout_marginTop="300dp"
-    android:layout_centerHorizontal="true"/>
-
-    <Button
-        android:id="@+id/startButton"
+    <TextView
+        android:id="@+id/welcome"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="240dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="30dp"
-        android:background="@android:color/holo_purple"
+        android:text="Welcome to the music world"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold|italic" />
+
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="140dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="30dp"
+        android:background="@color/colorPrimaryDark"
         android:padding="10dp"
-        android:text="Start"
+        android:text="Connect"
         android:textColor="@color/colorPrimary"
         android:textSize="20sp"
         android:textStyle="bold" />
+    <ProgressBar
+        android:id="@+id/simpleProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_marginTop="180dp"
+        android:outlineAmbientShadowColor="@color/colorPrimaryDark"
+        android:layout_centerHorizontal="true"/>
+    <TextView
+        android:id="@+id/insert"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="250dp"
+        android:layout_marginEnd="30dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold|italic"
+        android:text="And now...." />
 
     <EditText
         android:id="@+id/ArtistName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="300dp"
         android:ems="10"
         android:hint="please enter the artist"
         android:inputType="textPersonName" />
@@ -42,62 +63,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="350dp"
         android:ems="10"
         android:hint="please enter the song"
         android:inputType="textPersonName" />
-    <Button
-        android:id="@+id/searchButton"
-        android:layout_width="200dp"
+
+
+
+    <ImageButton
+        android:id="@+id/searchImage"
+        android:layout_width="84dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="400dp"
-        android:layout_marginEnd="30dp"
-        android:background="@android:color/holo_purple"
-        android:padding="10dp"
-        android:text="Search"
-        android:textColor="@color/colorPrimary"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-    <Button
-        android:id="@+id/btnPlayer"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_marginTop="450dp"
+        android:src="@drawable/search">
+
+    </ImageButton>
+
+
+    <TextView
+        android:id="@+id/searching"
+        android:layout_width="84dp"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="650dp"
-        android:text="||"
+        android:layout_marginTop="550dp"
         android:visibility="invisible"
-        android:textSize="10dp"></Button>
+        android:text="Searching...." />
 
-    <Button
-        android:id="@+id/btnForward"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="650dp"
-        android:layout_toRightOf="@id/btnPlayer"
-        android:text="&gt;&gt;"
-        android:visibility="invisible"
-        android:textSize="10dp"></Button>
 
-    <Button
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:text="&gt;&gt;"
-        android:id="@+id/btnBack"
-        android:layout_marginTop="650dp"
-        android:layout_toLeftOf="@id/btnPlayer"
-        android:layout_marginRight="20dp"
-        android:visibility="invisible"
-        android:textSize="10dp"></Button>
-
-    <SeekBar
-        android:id="@+id/seekbar"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="600dp"
-        android:visibility="invisible"
-        android:layout_marginRight="20dp"></SeekBar>
 
 </RelativeLayout>
