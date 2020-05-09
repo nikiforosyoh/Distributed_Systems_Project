@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+                <!-- something's wrong with color -->
     android:background="@color/colorBackground"
     tools:context=".MusicPlay">
    <Button
