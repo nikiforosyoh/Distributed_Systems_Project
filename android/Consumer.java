@@ -93,7 +93,7 @@ public class Consumer extends Node {
         return availableBrokers;
     }
 
-    /*public void openConsumer(String requestArtist,String requestSong) throws IOException {
+    public void openConsumer(String requestArtist,String requestSong) throws IOException {
 
                 ObjectInputStream in;
                 //DataInputStream input; //takes input from terminal
@@ -139,8 +139,8 @@ public class Consumer extends Node {
                                 System.out.println("-----------------");
                                 System.out.println("Song found");
 
-                                //takes the song from broker
-                                MusicFile chunk = (MusicFile) in.readObject();
+                                //takes the song from broker ->to another method ?
+                                /*MusicFile chunk = (MusicFile) in.readObject();
                                 chunkList.add(chunk.getMusicFileExtract());
                                 //System.out.println("received: " + chunk.getChunkNumber() + " chunk");
                                 for (int ch = 0; ch < chunk.getTotalChunks() - 1; ch++) {
@@ -157,7 +157,7 @@ public class Consumer extends Node {
                                 stream.write(mp3File);
 
                                 //System.out.println("Song received successfully! ");
-                                //System.out.println("-----------------");
+                                //System.out.println("-----------------");*/
 
                             } else if (response.equalsIgnoreCase("Not Found")) {
                                 System.out.println("The song doesn't exist!");
@@ -185,14 +185,14 @@ public class Consumer extends Node {
 
                 }while(true);
 
-            }*/
+            }
     //response
    //an spasw to response?
     public Consumer(String BrokerIp, int BrokerPort){
         this.BrokerIp=BrokerIp;
         this.BrokerPort=BrokerPort;
     }
-     /*
+
     //recreate mp3 file
     public byte[] recreateFile(ArrayList<byte[]> ChunkList) {
         int chunkSize = 524288;
@@ -219,7 +219,7 @@ public class Consumer extends Node {
         }
 
         return Mp3ByteArray;
-    }*/
+    }
 
 }
 
