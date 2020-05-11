@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Connect">
+
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="139dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="30dp"
+        android:background="@color/colorPrimaryDark"
+        android:fontFamily="casual"
+        android:padding="10dp"
+        android:text="Connect"
+        android:textColor="@color/colorBackground"
+        android:textSize="18sp"
+        android:textStyle="bold|italic" />
+    <ProgressBar
+        android:id="@+id/simpleProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_marginTop="180dp"
+        android:outlineAmbientShadowColor="@color/colorPrimaryDark"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/insert"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="250dp"
+        android:layout_marginEnd="30dp"
+        android:fontFamily="casual"
+        android:text="And now...."
+        android:textAlignment="center"
+        android:textColor="@color/colorBackground"
+        android:textSize="18sp"
+        android:textStyle="bold|italic" />
+
+    <EditText
+        android:id="@+id/ArtistName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="300dp"
+        android:ems="10"
+        android:fontFamily="casual"
+        android:hint="please enter the artist"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/SongTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="350dp"
+        android:ems="10"
+        android:fontFamily="casual"
+        android:hint="please enter the song"
+        android:inputType="textPersonName" />
+
+
+
+    <ImageButton
+        android:id="@+id/searchImage"
+        android:layout_width="84dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="450dp"
+        android:background="@color/colorPrimaryDark"
+        android:src="@drawable/search">
+
+    </ImageButton>
+
+
+    <TextView
+        android:id="@+id/searching"
+        android:layout_width="84dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="550dp"
+        android:visibility="invisible"
+        android:text="Searching...." />
+
+</RelativeLayout>

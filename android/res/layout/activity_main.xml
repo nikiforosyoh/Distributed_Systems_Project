@@ -4,92 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context=".MainActivity">
-    <TextView
+
+    <ImageView
         android:id="@+id/welcome"
-        android:layout_width="240dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:layout_marginEnd="30dp"
-        android:text="Welcome to the music world"
-        android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold|italic" />
-
-
-    <Button
-        android:id="@+id/startButton"
-        android:layout_width="140dp"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="100dp"
-        android:layout_marginEnd="30dp"
-        android:background="@color/colorPrimaryDark"
-        android:padding="10dp"
-        android:text="Connect"
-        android:textColor="@color/colorPrimary"
-        android:textSize="20sp"
+        android:layout_marginRight="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_centerHorizontal="true"
+        app:srcCompat="@drawable/logaki2" />
+
+    <TextView
+        android:id="@+id/tvWelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="400dp"
+        android:layout_marginRight="50dp"
+        android:fontFamily="cursive"
+        android:text="Music World"
+        android:textAppearance="@style/Widget.AppCompat.AutoCompleteTextView"
+        android:textSize="40sp"
         android:textStyle="bold" />
-    <ProgressBar
-        android:id="@+id/simpleProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:layout_marginTop="180dp"
-        android:outlineAmbientShadowColor="@color/colorPrimaryDark"
-        android:layout_centerHorizontal="true"/>
-    <TextView
-        android:id="@+id/insert"
-        android:layout_width="240dp"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="250dp"
-        android:layout_marginEnd="30dp"
-        android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold|italic"
-        android:text="And now...." />
-
-    <EditText
-        android:id="@+id/ArtistName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="300dp"
-        android:ems="10"
-        android:hint="please enter the artist"
-        android:inputType="textPersonName" />
-    <EditText
-        android:id="@+id/SongTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="350dp"
-        android:ems="10"
-        android:hint="please enter the song"
-        android:inputType="textPersonName" />
-
-
-
-    <ImageButton
-        android:id="@+id/searchImage"
-        android:layout_width="84dp"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="450dp"
-        android:src="@drawable/search">
-
-    </ImageButton>
-
-
-    <TextView
-        android:id="@+id/searching"
-        android:layout_width="84dp"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="550dp"
-        android:visibility="invisible"
-        android:text="Searching...." />
-
-
-
 </RelativeLayout>

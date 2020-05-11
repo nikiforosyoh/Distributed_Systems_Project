@@ -4,47 +4,68 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
     tools:context=".MusicPlay">
-   <Button
+   <ImageButton
     android:id="@+id/btnPlayer"
     android:layout_width="50dp"
     android:layout_height="50dp"
     android:layout_centerHorizontal="true"
-    android:layout_marginTop="650dp"
-    android:text="||"
-    android:visibility="invisible"
-    android:textSize="10dp"></Button>
+    android:layout_marginTop="450dp"
+       android:src="@drawable/play">
 
-<Button
+   </ImageButton>
+
+<ImageButton
 android:id="@+id/btnForward"
 android:layout_width="50dp"
 android:layout_height="50dp"
 android:layout_marginLeft="20dp"
-android:layout_marginTop="650dp"
+android:layout_marginTop="450dp"
 android:layout_toRightOf="@id/btnPlayer"
-android:text="&gt;&gt;"
-android:visibility="invisible"
-android:textSize="10dp"></Button>
+    android:src="@drawable/forward"
+    ></ImageButton>
 
-<Button
+<ImageButton
 android:layout_width="50dp"
 android:layout_height="50dp"
-android:text="&gt;&gt;"
 android:id="@+id/btnBack"
-android:layout_marginTop="650dp"
+android:layout_marginTop="450dp"
 android:layout_toLeftOf="@id/btnPlayer"
 android:layout_marginRight="20dp"
-android:visibility="invisible"
-android:textSize="10dp"></Button>
+    android:src="@drawable/rewind"
+></ImageButton>
 
-<SeekBar
-android:id="@+id/seekbar"
-android:layout_width="match_parent"
-android:layout_height="40dp"
-android:layout_marginLeft="20dp"
-android:layout_marginTop="600dp"
-android:visibility="invisible"
-android:layout_marginRight="20dp"></SeekBar>
+   <SeekBar
+       android:id="@+id/seekbar"
+       style="@style/Widget.AppCompat.SeekBar"
+       android:layout_width="match_parent"
+       android:layout_height="40dp"
+       android:layout_marginLeft="20dp"
+       android:layout_marginTop="400dp"
+       android:layout_marginRight="20dp"></SeekBar>
+
+   <TextView
+       android:id="@+id/songtitle"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_marginLeft="20dp"
+       android:layout_marginTop="300dp"
+       android:fontFamily="casual"
+       android:text="Song Title "
+       android:textAlignment="center"
+       android:textColor="@color/colorBackground"
+       android:textSize="24sp"
+       android:textStyle="bold" />
+
+   <ImageView
+       android:id="@+id/album"
+       android:layout_width="124dp"
+       android:layout_height="80dp"
+       android:layout_centerHorizontal="true"
+       android:layout_marginLeft="20dp"
+       android:layout_marginTop="200dp"
+       android:fontFamily="casual"
+       app:srcCompat="@mipmap/appicontwo_foreground" />
 
 </RelativeLayout>
