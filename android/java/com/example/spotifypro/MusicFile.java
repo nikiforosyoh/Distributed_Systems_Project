@@ -3,6 +3,8 @@ package com.example.spotifypro;
 import java.io.Serializable;
 
 public class MusicFile implements Serializable {
+    private static final long serialVersionUID =19970925L;
+
     protected String trackName;
     protected String artistName;
     protected String albumInfo;

@@ -87,16 +87,16 @@ public class Consumer extends Node {
         return availableBrokers;
     }
 
-    public void openConsumer(String requestArtist,String requestSong) throws IOException {
+    public ArrayList<byte[]> openConsumer(String requestArtist,String requestSong) throws IOException {
 
                 ObjectInputStream in;
                 //DataInputStream input; //takes input from terminal
                 ObjectOutputStream out;
                 Socket socket;
-
+                ArrayList<byte[]> chunkList = new ArrayList<>();//queue for chunks
 
                 do {
-                    ArrayList<byte[]> chunkList = new ArrayList<>();//queue for chunks
+                    //ArrayList<byte[]> chunkList = new ArrayList<>();//queue for chunks
                     //input = new DataInputStream(System.in);
                    // System.out.print("Artist name: ");
 
@@ -145,13 +145,14 @@ public class Consumer extends Node {
 
                                 }
 
-                                byte[] mp3File = recreateFile(chunkList);
+                                //byte[] mp3File = recreateFile(chunkList);
 
-                                FileOutputStream stream = new FileOutputStream(requestSong + "(new).mp3");
-                                stream.write(mp3File);
+                                //FileOutputStream stream = new FileOutputStream(requestSong + "(new).mp3");
+                                //stream.write(mp3File);
 
                                 System.out.println("Song received successfully! ");
                                 System.out.println("-----------------");
+                                return chunkList;
 
                             } else if (response.equalsIgnoreCase("Not Found")) {
                                 System.out.println("The song doesn't exist!");
@@ -162,6 +163,7 @@ public class Consumer extends Node {
                             in.close();
                             out.close();
                             socket.close();
+                            return chunkList;
 
                         }else{
                             System.out.println("Sorry.. There are no songs of this Artist..");
@@ -178,7 +180,7 @@ public class Consumer extends Node {
 
 
                 }while(true);
-
+                return chunkList;
             }
     //response
    //an spasw to response?
