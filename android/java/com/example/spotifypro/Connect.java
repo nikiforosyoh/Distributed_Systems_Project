@@ -3,8 +3,10 @@ package com.example.spotifypro;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -21,6 +26,7 @@ public class Connect extends AppCompatActivity {
     Consumer cons = new Consumer("192.168.77.1", 5000);//broker ip αλλάζει ανάλογα το pc
     private ArrayList<MusicFile> listOfSongs=new ArrayList<MusicFile>();
     private ArrayList<byte[]> listOfChunks=new ArrayList<>();
+    private MediaPlayer mediaPlayer=new MediaPlayer();
     byte[] mp3File;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +119,8 @@ public class Connect extends AppCompatActivity {
             try {
                 listOfChunks=cons.openConsumer(requestArt,requestS);
                 mp3File=cons.recreateFile(listOfChunks);
+                playMp3(mp3File,requestS);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -124,9 +132,31 @@ public class Connect extends AppCompatActivity {
         protected void onPostExecute(Consumer co) {
             super.onPostExecute(co);
             Toast.makeText(Connect.this, "Second stage done", Toast.LENGTH_SHORT).show();
+
             Intent intent=new Intent(Connect.this,MusicPlay.class);
+            //intent.putExtra("SONG",mp3File);
+            //intent.putExtra("SONG REQUEST","title");
             startActivity(intent);
         }
+        private void playMp3(byte[] mp3SoundByteArray,String title) throws IOException {
+            File tempMp3= File.createTempFile(title,"mp3",getCacheDir());
+            tempMp3.deleteOnExit();
+            FileOutputStream fos=new FileOutputStream(tempMp3);
+            fos.write(mp3SoundByteArray);
+            fos.close();
+
+            mediaPlayer.reset();
+            MediaPlayer mediaPlayer = new MediaPlayer();
+            FileInputStream fis = new FileInputStream(tempMp3);
+            mediaPlayer.setDataSource(fis.getFD());
+
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+
+
+        }
+
+
     }
 
 }
