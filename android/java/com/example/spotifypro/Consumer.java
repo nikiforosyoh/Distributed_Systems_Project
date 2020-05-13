@@ -87,18 +87,15 @@ public class Consumer extends Node {
         return availableBrokers;
     }
 
-    public ArrayList<byte[]> openConsumer(String requestArtist,String requestSong) throws IOException {
+    public ArrayList<MusicFile> openConsumer(String requestArtist,String requestSong) throws IOException {
 
                 ObjectInputStream in;
                 //DataInputStream input; //takes input from terminal
                 ObjectOutputStream out;
                 Socket socket;
-                ArrayList<byte[]> chunkList = new ArrayList<>();//queue for chunks
+                ArrayList<MusicFile> chunkList = new ArrayList<>();//queue for chunks
 
                 do {
-                    //ArrayList<byte[]> chunkList = new ArrayList<>();//queue for chunks
-                    //input = new DataInputStream(System.in);
-                   // System.out.print("Artist name: ");
 
                     if (requestArtist.equalsIgnoreCase("over")) {
                         break;
@@ -121,7 +118,6 @@ public class Consumer extends Node {
                             out.flush();
 
                             System.out.print("Song title: ");
-                            //requestSong = input.readLine().trim();
                             out.writeObject(requestSong);
                             out.flush();
 
@@ -135,20 +131,20 @@ public class Consumer extends Node {
 
                                 //takes the song from broker ->to another method ?
                                 MusicFile chunk = (MusicFile) in.readObject();
-                                chunkList.add(chunk.getMusicFileExtract());
+                                //chunkList.add(chunk.getMusicFileExtract());
+                                chunkList.add(chunk);
+
                                 //System.out.println("received: " + chunk.getChunkNumber() + " chunk");
                                 for (int ch = 0; ch < chunk.getTotalChunks() - 1; ch++) {
 
                                     chunk = (MusicFile) in.readObject();
+
                                     System.out.println("received: " + chunk.getChunkNumber() + " chunk");
-                                    chunkList.add(chunk.getMusicFileExtract());
+                                    //chunkList.add(chunk.getMusicFileExtract());
+                                    chunkList.add(chunk);
 
                                 }
-
-                                //byte[] mp3File = recreateFile(chunkList);
-
-                                //FileOutputStream stream = new FileOutputStream(requestSong + "(new).mp3");
-                                //stream.write(mp3File);
+                                System.out.println("For the list: "+chunkList.get(0));
 
                                 System.out.println("Song received successfully! ");
                                 System.out.println("-----------------");
@@ -215,6 +211,14 @@ public class Consumer extends Node {
         }
 
         return Mp3ByteArray;
+    }
+    public ArrayList<byte[]> takeMusicFileExtraction(int number,ArrayList<MusicFile> mlist){
+        ArrayList<byte[]> arraymusic=new ArrayList<>();
+        arraymusic.add(mlist.get(0).getMusicFileExtract());
+        for(int c=1; c<number; c++){
+            arraymusic.add(mlist.get(c).getMusicFileExtract());
+        }
+        return arraymusic;
     }
 
 }
