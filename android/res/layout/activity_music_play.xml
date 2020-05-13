@@ -5,12 +5,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MusicPlay">
+   <EditText
+       android:id="@+id/SongTitle"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_marginTop="50dp"
+       android:ems="10"
+       android:fontFamily="casual"
+       android:hint="please enter the song"
+       android:inputType="textPersonName" />
+   <ImageButton
+       android:id="@+id/searchImage"
+       android:layout_width="84dp"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_marginTop="120dp"
+       android:background="#FFFFFF"
+       android:src="@drawable/search">
+
+   </ImageButton>
    <ImageButton
     android:id="@+id/btnPlayer"
     android:layout_width="50dp"
     android:layout_height="50dp"
     android:layout_centerHorizontal="true"
-    android:layout_marginTop="450dp"
+    android:layout_marginTop="500dp"
+       android:visibility="invisible"
        android:src="@drawable/play">
 
    </ImageButton>
@@ -20,8 +41,9 @@ android:id="@+id/btnForward"
 android:layout_width="50dp"
 android:layout_height="50dp"
 android:layout_marginLeft="20dp"
-android:layout_marginTop="450dp"
+android:layout_marginTop="500dp"
 android:layout_toRightOf="@id/btnPlayer"
+    android:visibility="invisible"
     android:src="@drawable/forward"
     ></ImageButton>
 
@@ -29,9 +51,10 @@ android:layout_toRightOf="@id/btnPlayer"
 android:layout_width="50dp"
 android:layout_height="50dp"
 android:id="@+id/btnBack"
-android:layout_marginTop="450dp"
+android:layout_marginTop="500dp"
 android:layout_toLeftOf="@id/btnPlayer"
 android:layout_marginRight="20dp"
+    android:visibility="invisible"
     android:src="@drawable/rewind"
 ></ImageButton>
 
@@ -42,6 +65,7 @@ android:layout_marginRight="20dp"
        android:layout_height="40dp"
        android:layout_marginLeft="20dp"
        android:layout_marginTop="400dp"
+       android:visibility="invisible"
        android:layout_marginRight="20dp"></SeekBar>
 
    <TextView
@@ -55,6 +79,7 @@ android:layout_marginRight="20dp"
        android:text="Song Title "
        android:textAlignment="center"
        android:textColor="@color/colorBackground"
+       android:visibility="invisible"
        android:textSize="24sp"
        android:textStyle="bold" />
 
@@ -66,6 +91,41 @@ android:layout_marginRight="20dp"
        android:layout_marginLeft="20dp"
        android:layout_marginTop="200dp"
        android:fontFamily="casual"
+       android:visibility="invisible"
        app:srcCompat="@mipmap/appicontwo_foreground" />
+   <TextView
+       android:id="@+id/artist"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_marginLeft="20dp"
+       android:layout_marginTop="350dp"
+       android:fontFamily="casual"
+       android:text="Artist"
+       android:textAlignment="center"
+       android:textColor="@color/colorBackground"
+       android:visibility="invisible"
+       android:textSize="18sp"
+       android:textStyle="bold" />
+
+   <TextView
+       android:id="@+id/currentTimer"
+       android:layout_width="77dp"
+       android:layout_height="41dp"
+       android:layout_marginTop="450dp"
+       android:layout_marginRight="500dp"
+       android:layout_toRightOf="@id/btnForward"
+       android:fontFamily="casual"
+       android:text="00:00"
+       android:visibility="invisible"
+       android:textSize="18sp" />
+   <TextView
+       android:id="@+id/searching"
+       android:layout_width="84dp"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_marginTop="580dp"
+       android:visibility="invisible"
+       android:text="Searching...." />
 
 </RelativeLayout>
