@@ -19,8 +19,8 @@ public class Consumer extends Node {
 
 
     public void initialization(){
-
-        init(BrokerIp,BrokerPort,availableBrokers);
+        //inti is called in Connect.java
+        //init(BrokerIp,BrokerPort,availableBrokers);
         Socket socket;
         ObjectInputStream in;
         ObjectOutputStream out;
@@ -28,8 +28,6 @@ public class Consumer extends Node {
         //makes a list of each artist of a broker
         try {
             for (int i=0; i<N; i++) {
-                //δεν γινεται συνδεση ?
-
                 socket = new Socket(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
                 out = new ObjectOutputStream(socket.getOutputStream());
                 in = new ObjectInputStream(socket.getInputStream());
