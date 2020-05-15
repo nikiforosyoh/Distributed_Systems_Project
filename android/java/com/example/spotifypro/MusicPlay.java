@@ -165,7 +165,7 @@ public class MusicPlay extends AppCompatActivity {
             songtitle.setVisibility(View.VISIBLE);
             artist.setVisibility(View.VISIBLE);
             
-            album.setImageResource(R.drawable.default_album); //any default cover resourse folder
+            //album.setImageResource(R.drawable.default_album); //any default cover resourse folder
             album.setVisibility(View.VISIBLE);
             searchImage.setVisibility(View.INVISIBLE);
 
