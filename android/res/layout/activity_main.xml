@@ -30,4 +30,7 @@
         android:textAppearance="@style/Widget.AppCompat.AutoCompleteTextView"
         android:textSize="40sp"
         android:textStyle="bold" />
+
+
+
 </RelativeLayout>

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MusicPlay">
+
    <EditText
        android:id="@+id/SongTitle"
        android:layout_width="wrap_content"
@@ -15,16 +16,35 @@
        android:fontFamily="casual"
        android:hint="please enter the song"
        android:inputType="textPersonName" />
+   <Button
+       android:id="@+id/prepareSong"
+       android:layout_width="139dp"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_marginTop="120dp"
+       android:layout_marginEnd="30dp"
+       android:background="@color/colorPrimaryDark"
+       android:fontFamily="casual"
+       android:padding="10dp"
+       android:text="PLAY"
+       android:textColor="@color/colorBackground"
+       android:textSize="18sp"
+       android:visibility="invisible"
+       android:textStyle="bold|italic" />
+
    <ImageButton
        android:id="@+id/searchImage"
        android:layout_width="84dp"
        android:layout_height="wrap_content"
        android:layout_centerHorizontal="true"
-       android:layout_marginTop="120dp"
+       android:layout_marginLeft="3dp"
+       android:layout_marginTop="50dp"
+       android:layout_toRightOf="@id/SongTitle"
        android:background="#FFFFFF"
        android:src="@drawable/search">
 
    </ImageButton>
+
    <ImageButton
     android:id="@+id/btnPlayer"
     android:layout_width="50dp"
@@ -36,13 +56,24 @@
 
    </ImageButton>
 
-<ImageButton
+   <ImageButton
+       android:id="@+id/btnPause"
+       android:layout_width="50dp"
+       android:layout_height="50dp"
+       android:layout_centerHorizontal="true"
+       android:layout_marginTop="500dp"
+       android:visibility="invisible"
+       android:src="@drawable/pause">>
+
+   </ImageButton>
+
+   <ImageButton
 android:id="@+id/btnForward"
 android:layout_width="50dp"
 android:layout_height="50dp"
 android:layout_marginLeft="20dp"
 android:layout_marginTop="500dp"
-android:layout_toRightOf="@id/btnPlayer"
+android:layout_toRightOf="@id/btnPause"
     android:visibility="invisible"
     android:src="@drawable/forward"
     ></ImageButton>
@@ -110,15 +141,20 @@ android:layout_marginRight="20dp"
 
    <TextView
        android:id="@+id/currentTimer"
-       android:layout_width="77dp"
+       android:layout_width="70dp"
        android:layout_height="41dp"
+       android:layout_marginLeft="42dp"
        android:layout_marginTop="450dp"
        android:layout_marginRight="500dp"
        android:layout_toRightOf="@id/btnForward"
        android:fontFamily="casual"
        android:text="00:00"
-       android:visibility="invisible"
-       android:textSize="18sp" />
+       android:layout_centerHorizontal="true"
+       android:textColor="@color/colorBackground"
+       android:textSize="18sp"
+       android:textStyle="bold"
+       android:visibility="invisible" />
+
    <TextView
        android:id="@+id/searching"
        android:layout_width="84dp"
@@ -127,5 +163,14 @@ android:layout_marginRight="20dp"
        android:layout_marginTop="580dp"
        android:visibility="invisible"
        android:text="Searching...." />
+
+   <ImageButton
+       android:id="@+id/backActivity"
+       android:layout_width="57dp"
+       android:layout_height="39dp"
+       android:layout_marginTop="540dp"
+       android:layout_marginRight="40dp"
+       android:background="#FFFFFF"
+       app:srcCompat="?attr/homeAsUpIndicator" />
 
 </RelativeLayout>
