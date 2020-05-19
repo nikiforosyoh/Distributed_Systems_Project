@@ -1,16 +1,20 @@
 package com.example.spotifypro;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,21 +32,33 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnCompletionListener {
-    Consumer cons = new Consumer("192.168.77.1", 5000);
+import static com.example.spotifypro.Glob.clickCounter;
+import static com.example.spotifypro.Node.getN;
 
+
+//the third activity->ina=structions:
+/*1.enter the song of the artist you chose previously
+  2.Click the button "Search"
+  3.Click the button PLAY and the song begins....
+  !!!!!the first time,in order to choose another artist and song,you NEED to click the button "back" for sending the arraylist of artists to Connect activity and then to ArtistList activity via the playlist button->see */
+public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnCompletionListener {
+
+    Consumer cons = new Consumer("192.168.77.1", 5000);
     private ArrayList<MusicFile> listOfSongs = new ArrayList<MusicFile>();
     private ArrayList<MusicFile> listOfChunks = new ArrayList<>();
     private ArrayList<byte[]> listOfMusicExtraction = new ArrayList<>();
     private MediaPlayer mediaPlayer = new MediaPlayer();
     private MediaMetadataRetriever metadataRetriever=new MediaMetadataRetriever();
+    private static ArrayList<String> art=new ArrayList<>();
+    private static HashMap<String,Info> brokerArt=new HashMap<String,Info>();
 
-
+    //declare the basic elements
     private TextView songtitle, artist,currentTimer;
     private ImageView album;
-    private ImageButton  searchImage,btnBack,btnForward,btnPlay,btnPause;
+    private ImageButton  searchImage,btnBack,btnForward,btnPlay,btnPause,backActivity;
     SeekBar seekBar;
     byte[] mp3fileforplay;
     byte[] albumPic;
@@ -56,7 +72,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_play);
 
-
+        //connect the element with suitable ids
         songtitle = (TextView) findViewById(R.id.songtitle);
         artist = (TextView) findViewById(R.id.artist);
         searchImage = (ImageButton) findViewById(R.id.searchImage);
@@ -68,12 +84,16 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         album=(ImageView)findViewById(R.id.album);
         btnPrepare=(Button)findViewById(R.id.prepareSong);
         currentTimer=(TextView)findViewById(R.id.currentTimer);
+        backActivity=(ImageButton)findViewById(R.id.backActivity);
         final EditText SongTitle = (EditText) findViewById(R.id.SongTitle);
 
 
-        //take the value of artist name form the Connect activity
+        //take the values from the Connect activity
         artist.setText(getIntent().getStringExtra("ARTIST"));
-        //what search image button does
+
+
+
+
         searchImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,10 +102,21 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 } else {
                     Log.d("Check the control", "Done");
                 }
-                MySecondTask second = new MySecondTask();
-                String requestArtist = artist.getText().toString().trim();
-                String requestSong = SongTitle.getText().toString().trim();
-                second.execute(requestArtist, requestSong);
+
+                clickCounter++;
+                if(clickCounter==1){
+                    artist.setText(getIntent().getStringExtra("ARTIST"));
+                    String requestArtist = artist.getText().toString().trim();
+                    String requestSong = SongTitle.getText().toString().trim();
+                    MyFirstTask first=new MyFirstTask();
+                    first.execute(requestArtist, requestSong);
+                }else {
+                    artist.setText(getIntent().getStringExtra("ArtistName"));
+                    String requestArtist = artist.getText().toString().trim();
+                    String requestSong = SongTitle.getText().toString().trim();
+                    MySecondTask second = new MySecondTask();
+                    second.execute(requestArtist, requestSong);
+                }
 
             }
         });
@@ -98,7 +129,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 MyThirdTask third=new MyThirdTask();
                 third.execute(mp3fileforplay);
 
-                //αν καταργήσω το async task στο play?
 
             }
         });
@@ -160,6 +190,14 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             }
 
         });
+        backActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent artistlistintent=new Intent(MusicPlay.this,Connect.class);
+                artistlistintent.putExtra("ListOfArtists",art);
+                startActivity(artistlistintent);
+            }
+        });
 
 
     }
@@ -175,9 +213,63 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         btnPlay.setImageResource(R.drawable.play);
     }
 
+    private class MyFirstTask extends AsyncTask<String, Consumer, byte[]> {
+        TextView searching=(TextView)findViewById(R.id.searching);
+
+        @Override
+        protected void onPreExecute() {
+
+            Log.d("....", "Initialization");
+
+        }
+
+        @Override
+        protected byte[] doInBackground(String... arg0) {
+            Log.d("Insert", "First stage");
+            cons.init(cons.getBrokerIp(),cons.getBrokerPort(),cons.getAvailableBrokers());
+            Log.d("myTag3", "Problem2");
+            brokerArt=cons.initialization();
+            art=createArtList(brokerArt);
+            Log.d("myTag4", "Problem3");
+            String requestArt = arg0[0];
+            String requestS = arg0[1];
+
+            //brokerArt=cons.createHash(art2,avbrokers);
+            //brokerArt.forEach((k,v) -> Log.d(k, String.valueOf(v)));
+
+            try {
+                listOfChunks=cons.openConsumer(requestArt,requestS,brokerArt);
+                listOfMusicExtraction=cons.takeMusicFileExtraction(listOfChunks.get(0).totalChunks,listOfChunks);
+                mp3fileforplay=cons.recreateFile(listOfMusicExtraction);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.d("myTag6", "Second-3");
+            return mp3fileforplay;
+
+        }
+
+        @Override
+        protected void onPostExecute(byte[] b) {
+            super.onPostExecute(b);
+            btnPrepare.setVisibility(View.VISIBLE);
+            searching.setVisibility(View.INVISIBLE);
+        }
+
+    }
+
+    private ArrayList<String> createArtList(HashMap<String, Info> brokerArt) {
+          for(String artist:brokerArt.keySet()){
+              art.add(artist);
+              Log.d("papapa: ",artist);
+          }
+          return art;
+
+
+    }
 
     private class MySecondTask extends AsyncTask<String, Consumer, byte[]> {
-
         TextView searching=(TextView)findViewById(R.id.searching);
 
         @Override
@@ -185,23 +277,18 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
 
             Log.d("....", "Searching for a song ");
             searching.setVisibility(View.VISIBLE);
+            searching.setText("Please Wait....");
 
         }
 
+        //@RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         protected byte[] doInBackground(String... arg0) {
-            Log.d("Insert", "Second stage");
             String requestArt = arg0[0];
             String requestS = arg0[1];
-            Log.d("Artist", requestArt);
-            Log.d("Song", requestS);
-            cons.init(cons.getBrokerIp(),cons.getBrokerPort(),cons.getAvailableBrokers());
-            Log.d("myTag3", "Problem2");
-            cons.initialization();
-            Log.d("myTag4", "Problem3");
 
             try {
-                listOfChunks=cons.openConsumer(requestArt,requestS);
+                listOfChunks=cons.openConsumer(requestArt,requestS,brokerArt);
                 listOfMusicExtraction=cons.takeMusicFileExtraction(listOfChunks.get(0).totalChunks,listOfChunks);
                 mp3fileforplay=cons.recreateFile(listOfMusicExtraction);
 
@@ -283,12 +370,13 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 public void run() {
                     updateSeekBar();
                     realtime-=1000;//1 sec before
-                    currentTimer.setText(String.format("%d:%d",TimeUnit.MILLISECONDS.toMinutes(songTime),TimeUnit.MILLISECONDS.toSeconds(songTime)));
+                    currentTimer.setText(String.format("%d:%d",(songTime/1000)/60,(songTime/1000)%60));
                 }
             };
             handler.postDelayed(up,1000);
         }
     }
+
 
 
     //play the song
@@ -320,4 +408,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
 
     }
 
+
 }
+
