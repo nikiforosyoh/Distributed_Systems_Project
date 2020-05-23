@@ -121,13 +121,7 @@ public class Consumer extends Node implements Parcelable {
         Socket socket;
         ArrayList<MusicFile> chunkList = new ArrayList<>();//queue for chunks
 
-        do {
-
-            if (requestArtist.equalsIgnoreCase("over")) {
-                break;
-            }
-
-            try {
+        try {
                 //search for this artist name
                 if (brokerArtists.containsKey(requestArtist.toLowerCase())) {
 
@@ -173,7 +167,7 @@ public class Consumer extends Node implements Parcelable {
 
                         System.out.println("Song received successfully! ");
                         System.out.println("-----------------");
-                        return chunkList;
+//                        return chunkList;
 
                     } else if (response.equalsIgnoreCase("Not Found")) {
                         System.out.println("The song doesn't exist!");
@@ -184,7 +178,6 @@ public class Consumer extends Node implements Parcelable {
                     in.close();
                     out.close();
                     socket.close();
-                    return chunkList;
 
                 } else {
                     System.out.println("Sorry.. There are no songs of this Artist..");
@@ -199,8 +192,6 @@ public class Consumer extends Node implements Parcelable {
                 e.printStackTrace();
             }
 
-
-        } while (true);
         return chunkList;
     }
 

@@ -3,6 +3,8 @@ package com.example.spotifypro;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
@@ -35,7 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.spotifypro.Glob.clickCounter;
+import static com.example.spotifypro.Glob.firstTime;
 import static com.example.spotifypro.Node.getN;
 
 
@@ -46,7 +48,7 @@ import static com.example.spotifypro.Node.getN;
   !!!!!the first time,in order to choose another artist and song,you NEED to click the button "back" for sending the arraylist of artists to Connect activity and then to ArtistList activity via the playlist button->see */
 public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnCompletionListener {
 
-    Consumer cons = new Consumer("192.168.77.1", 5000);
+    Consumer cons = new Consumer("192.168.1.8", 5000);
     private ArrayList<MusicFile> listOfSongs = new ArrayList<MusicFile>();
     private ArrayList<MusicFile> listOfChunks = new ArrayList<>();
     private ArrayList<byte[]> listOfMusicExtraction = new ArrayList<>();
@@ -58,15 +60,20 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
     //declare the basic elements
     private TextView songtitle, artist,currentTimer;
     private ImageView album;
-    private ImageButton  searchImage,btnBack,btnForward,btnPlay,btnPause,backActivity;
+    private ImageButton  searchImage,btnBack,btnForward,btnPlay,btnPause,artistListbtn;
     SeekBar seekBar;
+    String timer;
     byte[] mp3fileforplay;
     byte[] albumPic;
     private int songTime,realtime;
     private Button btnPrepare;
     final Handler handler=new Handler();
+    int minutes;
+    int seconds;
+    int time;
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,15 +91,16 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         album=(ImageView)findViewById(R.id.album);
         btnPrepare=(Button)findViewById(R.id.prepareSong);
         currentTimer=(TextView)findViewById(R.id.currentTimer);
-        backActivity=(ImageButton)findViewById(R.id.backActivity);
+        artistListbtn=(ImageButton)findViewById(R.id.backActivity);
         final EditText SongTitle = (EditText) findViewById(R.id.SongTitle);
 
 
         //take the values from the Connect activity
         artist.setText(getIntent().getStringExtra("ARTIST"));
 
-
-
+        if(!art.isEmpty()){
+            artistListbtn.setVisibility(View.VISIBLE);
+        }
 
         searchImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,8 +111,8 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                     Log.d("Check the control", "Done");
                 }
 
-                clickCounter++;
-                if(clickCounter==1){
+
+                if(firstTime){
                     artist.setText(getIntent().getStringExtra("ARTIST"));
                     String requestArtist = artist.getText().toString().trim();
                     String requestSong = SongTitle.getText().toString().trim();
@@ -117,6 +125,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                     MySecondTask second = new MySecondTask();
                     second.execute(requestArtist, requestSong);
                 }
+                firstTime=false;
 
             }
         });
@@ -128,8 +137,8 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             public void onClick(View v) {
                 MyThirdTask third=new MyThirdTask();
                 third.execute(mp3fileforplay);
-
-
+                btnPrepare.setVisibility(View.INVISIBLE);
+                artistListbtn.setVisibility(View.VISIBLE);
             }
         });
 
@@ -156,7 +165,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                     mediaPlayer.pause();
                 }
                 updateSeekBar();
-                btnPrepare.setVisibility(View.INVISIBLE);
+
                 btnPause.setVisibility(View.INVISIBLE);
                 btnPlay.setVisibility(View.VISIBLE);
             }
@@ -190,16 +199,42 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             }
 
         });
-        backActivity.setOnClickListener(new View.OnClickListener() {
+        artistListbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent artistlistintent=new Intent(MusicPlay.this,Connect.class);
+
+                Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
                 artistlistintent.putExtra("ListOfArtists",art);
                 startActivity(artistlistintent);
+                if (mediaPlayer.isPlaying()){
+                    mediaPlayer.stop();
+                }
             }
         });
 
+        /*
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent connectIntent = new Intent(MusicPlay.this, Connect.class);
+                startActivity(connectIntent);
+                finish();
+            }
+        }, 1000);
+        */
 
+
+    }
+
+    @Override
+    public void onBackPressed(){
+
+            Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
+            artistlistintent.putExtra("ListOfArtists",art);
+            startActivity(artistlistintent);
+            if (mediaPlayer.isPlaying()){
+                mediaPlayer.stop();
+            }
     }
 
     @Override
@@ -239,6 +274,15 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
 
             try {
                 listOfChunks=cons.openConsumer(requestArt,requestS,brokerArt);
+
+                //in case a song that doesn't exist
+                if (listOfChunks.isEmpty()){
+                     Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
+                     artistlistintent.putExtra("ListOfArtists",art);
+                     startActivity(artistlistintent);
+                     return null;
+                }
+
                 listOfMusicExtraction=cons.takeMusicFileExtraction(listOfChunks.get(0).totalChunks,listOfChunks);
                 mp3fileforplay=cons.recreateFile(listOfMusicExtraction);
 
@@ -289,6 +333,27 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
 
             try {
                 listOfChunks=cons.openConsumer(requestArt,requestS,brokerArt);
+
+                //in case a song that doesn't exist
+                if (listOfChunks.isEmpty()){
+                    //pop up
+                    /*
+                    Context context = getApplicationContext();
+                    CharSequence text = "The song doesn't exist";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+
+                     */
+                    //Toast.makeText(MusicPlay.this, "the song doesn't exist! sorry!", Toast.LENGTH_LONG).show();
+
+                    Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
+                    artistlistintent.putExtra("ListOfArtists",art);
+                    startActivity(artistlistintent);
+                    return null;
+                }
+
                 listOfMusicExtraction=cons.takeMusicFileExtraction(listOfChunks.get(0).totalChunks,listOfChunks);
                 mp3fileforplay=cons.recreateFile(listOfMusicExtraction);
 
@@ -363,6 +428,9 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
 
     private void updateSeekBar() {
         seekBar.setProgress((int)(((float)mediaPlayer.getCurrentPosition()/songTime)*100));
+        int value = seekBar.getProgress();
+
+
         if(mediaPlayer.isPlaying()){
             Runnable up=new Runnable(){
 
@@ -370,7 +438,31 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 public void run() {
                     updateSeekBar();
                     realtime-=1000;//1 sec before
-                    currentTimer.setText(String.format("%d:%d",(songTime/1000)/60,(songTime/1000)%60));
+                    //currentTimer.setText(String.format("%d:%d",(songTime/1000)/60,(songTime/1000)%60);
+
+
+                     if (value%60 <= 9){
+                         timer = (value / 60) + ":0" + (value % 60);
+                     }else {
+                         timer = (value / 60) + ":" + (value % 60);
+                     }
+
+                    /*
+                    time = songTime/1000 - value;
+                    Log.d("time", String.valueOf(time));
+                    minutes = time / 60;
+                    seconds = time % 60;
+
+                    if (seconds <= 9){
+                        timer = minutes + ":0" + seconds;
+                    }else {
+                        timer = minutes + ":" + seconds;
+                    }
+
+                     */
+
+
+                    currentTimer.setText(timer);
                 }
             };
             handler.postDelayed(up,1000);

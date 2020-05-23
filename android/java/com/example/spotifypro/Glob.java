@@ -1,6 +1,7 @@
 package com.example.spotifypro;
 
 public class Glob {
-        public static int clickCounter;
+        public static boolean firstTime=true;
+        //consumer global?
 
 }

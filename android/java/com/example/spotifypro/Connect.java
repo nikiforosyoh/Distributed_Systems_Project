@@ -42,7 +42,6 @@ public class Connect extends AppCompatActivity {
 
         //connect the element with suitable ids
         NextButton = (Button) findViewById(R.id.NextButton);
-        playlist=(ImageButton)findViewById(R.id.playlist) ;
         final EditText ArtistName = (EditText) findViewById(R.id.ArtistName);
 
 
@@ -59,6 +58,7 @@ public class Connect extends AppCompatActivity {
         });
 
         //when i click this button ,i transfer the arraylist of artists to the ArtistList activity !!!!!!!!!! ATTENTION:This button muste be used after the first time,otherwise it's empty ->error?
+        /*
         playlist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,6 +68,7 @@ public class Connect extends AppCompatActivity {
                 startActivity(playintent);
             }
         });
+        */
 
 
     }
