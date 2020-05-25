@@ -12,5 +12,5 @@
 
 ## Android Studio
 
-* Αλλαγή της IP στο *MusicPlay.java* -> ο καθένας βάζει την IP του PC του.
+* Αλλαγή της IP στο *ArtistList.java* -> ο καθένας βάζει την IP του PC του. (Στην MyFirstTask)
 * Ορίζουμε το N στο Node.java.
