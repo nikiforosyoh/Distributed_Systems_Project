@@ -2,28 +2,24 @@ package com.example.spotifypro;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import java.util.ArrayList;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder> {
 
-     ArrayList<String> artist;
-     Context context;
+    ArrayList<String> artist;
+    Context context;
 
     public ArtistAdapter(Context ct,ArrayList<String> artistlist){
         context=ct;
         artist=artistlist;
     }
-
 
     @NonNull
     @Override
@@ -52,21 +48,15 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
             context.startActivity(intent);
         }
 
-
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
         holder.tvName.setText(artist.get(position));
-
-
-
     }
 
     @Override
     public int getItemCount() {
         return artist.size();
-
     }
 }

@@ -24,22 +24,6 @@ public class Consumer extends Node implements Parcelable {
     private static ArrayList<ArrayList<String>> artists = new ArrayList<ArrayList<String>>();
     private HashMap<String, Info> brokerArtists = new HashMap<String, Info>();
 
-    /*public HashMap<String, Info> createHash(ArrayList<ArrayList<String>> artists, String[][] availableBrokers) {
-        for (int i = 0; i < N; i++) {
-
-            Info broker = new Info(availableBrokers[i][0], Integer.parseInt(availableBrokers[i][1]));
-
-            for (String artist : artists.get(i)) {
-                //hashmap artist->broker
-                brokerArtists.put(artist, broker);
-            }
-
-        }
-        return brokerArtists;
-
-
-    }*/
-
     public HashMap<String, Info> initialization() {
 
         //init(BrokerIp,BrokerPort,availableBrokers);
@@ -58,7 +42,6 @@ public class Consumer extends Node implements Parcelable {
                 out.writeObject("artist names");
                 out.flush();
 
-
                 ArrayList<String> a = new ArrayList<>();
                 artists.add(a);
 
@@ -68,7 +51,6 @@ public class Consumer extends Node implements Parcelable {
 
                     //hashmap artist->broker
                     brokerArtists.put(name.toLowerCase(), broker);
-
 
                     artists.get(i).add(name);
                     name = (String) in.readObject();
@@ -83,7 +65,6 @@ public class Consumer extends Node implements Parcelable {
                 in.close();
                 out.close();
                 socket.close();
-
 
             }
             System.out.println("-----------------\n");
@@ -122,75 +103,75 @@ public class Consumer extends Node implements Parcelable {
         ArrayList<MusicFile> chunkList = new ArrayList<>();//queue for chunks
 
         try {
-                //search for this artist name
-                if (brokerArtists.containsKey(requestArtist.toLowerCase())) {
+            //search for this artist name
+            if (brokerArtists.containsKey(requestArtist.toLowerCase())) {
 
-                    Info broker = brokerArtists.get(requestArtist.toLowerCase());
-                    //connect with the responsible broker
-                    socket = new Socket(broker.getIP(), broker.getPort());
-                    out = new ObjectOutputStream(socket.getOutputStream());
-                    in = new ObjectInputStream(socket.getInputStream());
+                Info broker = brokerArtists.get(requestArtist.toLowerCase());
+                //connect with the responsible broker
+                socket = new Socket(broker.getIP(), broker.getPort());
+                out = new ObjectOutputStream(socket.getOutputStream());
+                in = new ObjectInputStream(socket.getInputStream());
 
-                    System.out.println("Consumer Connected: " + socket);
+                System.out.println("Consumer Connected: " + socket);
 
-                    //sends user's request
-                    out.writeObject(requestArtist);
-                    out.flush();
+                //sends user's request
+                out.writeObject(requestArtist);
+                out.flush();
 
-                    System.out.print("Song title: ");
-                    out.writeObject(requestSong);
-                    out.flush();
+                System.out.print("Song title: ");
+                out.writeObject(requestSong);
+                out.flush();
 
-                    //waiting for response
-                    String response = (String) in.readObject();
+                //waiting for response
+                String response = (String) in.readObject();
 
-                    if (response.equalsIgnoreCase("Found")) {
+                if (response.equalsIgnoreCase("Found")) {
 
-                        System.out.println("-----------------");
-                        System.out.println("Song found");
+                    System.out.println("-----------------");
+                    System.out.println("Song found");
 
-                        //takes the song from broker ->to another method ?
-                        MusicFile chunk = (MusicFile) in.readObject();
+                    //takes the song from broker ->to another method ?
+                    MusicFile chunk = (MusicFile) in.readObject();
+                    chunkList.add(chunk);
+
+                    //System.out.println("received: " + chunk.getChunkNumber() + " chunk");
+                    for (int ch = 0; ch < chunk.getTotalChunks() - 1; ch++) {
+
+                        chunk = (MusicFile) in.readObject();
+
+                        System.out.println("received: " + chunk.getChunkNumber() + " chunk");
+                        //chunkList.add(chunk.getMusicFileExtract());
                         chunkList.add(chunk);
 
-                        //System.out.println("received: " + chunk.getChunkNumber() + " chunk");
-                        for (int ch = 0; ch < chunk.getTotalChunks() - 1; ch++) {
+                    }
+                    System.out.println("For the list: " + chunkList.get(0));
 
-                            chunk = (MusicFile) in.readObject();
-
-                            System.out.println("received: " + chunk.getChunkNumber() + " chunk");
-                            //chunkList.add(chunk.getMusicFileExtract());
-                            chunkList.add(chunk);
-
-                        }
-                        System.out.println("For the list: " + chunkList.get(0));
-
-                        System.out.println("Song received successfully! ");
-                        System.out.println("-----------------");
+                    System.out.println("Song received successfully! ");
+                    System.out.println("-----------------");
 //                        return chunkList;
 
-                    } else if (response.equalsIgnoreCase("Not Found")) {
-                        System.out.println("The song doesn't exist!");
-                    } else {
-                        System.out.println("Oops! A problem occurred. Try again..");
-                    }
-
-                    in.close();
-                    out.close();
-                    socket.close();
-
+                } else if (response.equalsIgnoreCase("Not Found")) {
+                    System.out.println("The song doesn't exist!");
                 } else {
-                    System.out.println("Sorry.. There are no songs of this Artist..");
-                    System.out.println("Try an other one..");
+                    System.out.println("Oops! A problem occurred. Try again..");
                 }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                in.close();
+                out.close();
+                socket.close();
+
+            } else {
+                System.out.println("Sorry.. There are no songs of this Artist..");
+                System.out.println("Try an other one..");
             }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
         return chunkList;
     }

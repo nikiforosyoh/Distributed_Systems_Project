@@ -1,22 +1,15 @@
 package com.example.spotifypro;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,35 +17,29 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
-
 import static com.example.spotifypro.Node.getN;
 import static com.example.spotifypro.Glob.cons;
 
-//the third activity->ina=structions:
-/*1.enter the song of the artist you chose previously
-  2.Click the button "Search"
-  3.Click the button PLAY and the song begins....
-  !!!!!the first time,in order to choose another artist and song,you NEED to click the button "back" for sending the arraylist of artists to Connect activity and then to ArtistList activity via the playlist button->see */
+//Third activity->instructions:
+/*
+    1.enter the song of the artist you chose previously
+    2.Click the button "Search"
+    3.Click the button PLAY and the song begins....
+*/
 public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnCompletionListener {
 
-    //Consumer cons = new Consumer("192.168.1.5", 5000);
     private ArrayList<MusicFile> listOfSongs = new ArrayList<MusicFile>();
     private ArrayList<MusicFile> listOfChunks = new ArrayList<>();
     private ArrayList<byte[]> listOfMusicExtraction = new ArrayList<>();
     private MediaPlayer mediaPlayer = new MediaPlayer();
-    private MediaMetadataRetriever metadataRetriever=new MediaMetadataRetriever();
 
     //declare the basic elements
     private TextView songtitle, artist,currentTimer;
@@ -62,7 +49,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
     String timer;
     byte[] mp3fileforplay;
     byte[] albumPic;
-    private int songTime,realtime;
+    private int songTime;
     private Button btnPrepare;
     final Handler handler=new Handler();
     int minutes;
@@ -91,11 +78,8 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         artistListbtn=(ImageButton)findViewById(R.id.backActivity);
         final EditText SongTitle = (EditText) findViewById(R.id.SongTitle);
 
-
         //take the values from the Connect activity
         artist.setText(getIntent().getStringExtra("ARTIST"));
-
-
 
         searchImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,17 +90,13 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                     Log.d("Check the control", "Done");
                 }
 
-
                 artist.setText(getIntent().getStringExtra("ArtistName"));
                 String requestArtist = artist.getText().toString().trim();
                 String requestSong = SongTitle.getText().toString().trim();
                 MySecondTask second = new MySecondTask();
                 second.execute(requestArtist, requestSong);
-
             }
         });
-
-
 
         btnPrepare.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,9 +120,9 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 btnPause.setVisibility(View.VISIBLE);
             }
         });
+
         mediaPlayer.setOnBufferingUpdateListener(this);
         mediaPlayer.setOnCompletionListener(this);
-
 
         btnPause.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,7 +137,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             }
         });
 
-
         btnForward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,13 +144,13 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             }
         });
 
-
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mediaPlayer.seekTo(mediaPlayer.getCurrentPosition()-7000);//duration of a chunk?
             }
         });
+
         seekBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -185,6 +164,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             }
 
         });
+
         artistListbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,17 +176,15 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 }
             }
         });
-
     }
 
     @Override
     public void onBackPressed(){
-
-            Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
-            startActivity(artistlistintent);
-            if (mediaPlayer.isPlaying()){
-                mediaPlayer.stop();
-            }
+        Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
+        startActivity(artistlistintent);
+        if (mediaPlayer.isPlaying()){
+            mediaPlayer.stop();
+        }
     }
 
     @Override
@@ -220,17 +198,14 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         btnPlay.setImageResource(R.drawable.play);
     }
 
-
     private class MySecondTask extends AsyncTask<String, Consumer, byte[]> {
         TextView searching=(TextView)findViewById(R.id.searching);
 
         @Override
         protected void onPreExecute() {
-
             Log.d("....", "Searching for a song ");
             searching.setVisibility(View.VISIBLE);
             searching.setText("Please Wait....");
-
         }
 
         //@RequiresApi(api = Build.VERSION_CODES.N)
@@ -244,8 +219,8 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
 
                 //in case a song that doesn't exist
                 if (listOfChunks.isEmpty()){
-                    
-                  Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
+
+                    Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
                     startActivity(artistlistintent);
                     return null;
                 }
@@ -265,14 +240,11 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             super.onPostExecute(b);
             btnPrepare.setVisibility(View.VISIBLE);
             searching.setVisibility(View.INVISIBLE);
-
         }
-
     }
 
     private class MyThirdTask extends AsyncTask<byte[],String,String>{
 
-;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -301,7 +273,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 e.printStackTrace();
             }
             return r;
-
         }
 
         @Override
@@ -309,7 +280,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             //super.onPostExecute(s);
             Log.d("ola kala:","paizeiii");
             songTime=mediaPlayer.getDuration();
-            realtime=songTime;
             //boolean isButtonPressed=false;
             if(!mediaPlayer.isPlaying()){
                 mediaPlayer.start();
@@ -317,7 +287,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 mediaPlayer.pause();
             }
             updateSeekBar();
-
         }
     }
 
@@ -333,15 +302,14 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 @Override
                 public void run() {
                     updateSeekBar();
-                    //realtime-=1000;//1 sec before
                     //currentTimer.setText(String.format("%d:%d",(songTime/1000)/60,(songTime/1000)%60);
 
                     //Timer
-                     if (value%60 <= 9){
-                         timer = (value / 60) + ":0" + (value % 60);
-                     }else {
-                         timer = (value / 60) + ":" + (value % 60);
-                     }
+                    if (value%60 <= 9){
+                        timer = (value / 60) + ":0" + (value % 60);
+                    }else {
+                        timer = (value / 60) + ":" + (value % 60);
+                    }
 
                     //Countdown
                     /*
@@ -355,18 +323,13 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                     }else {
                         timer = minutes + ":" + seconds;
                     }
-
-                     */
-
-
+                    */
                     currentTimer.setText(timer);
                 }
             };
             handler.postDelayed(up,1000);
         }
     }
-
-
 
     //play the song
     private MediaPlayer playMp3(byte[] mp3SoundByteArray,String title) throws IOException {
@@ -383,16 +346,15 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         mediaPlayer.setDataSource(fis.getFD());
 
         try{
-                metadataRetriever.setDataSource(fis.getFD());
-                albumPic=metadataRetriever.getEmbeddedPicture();
-                Bitmap songImage = BitmapFactory.decodeByteArray(albumPic, 0, albumPic.length);
-                album.setImageBitmap(songImage);
+            metadataRetriever.setDataSource(fis.getFD());
+            albumPic=metadataRetriever.getEmbeddedPicture();
+            Bitmap songImage = BitmapFactory.decodeByteArray(albumPic, 0, albumPic.length);
+            album.setImageBitmap(songImage);
         }catch(Exception e) {
-               e.printStackTrace();
+            e.printStackTrace();
         }
         mediaPlayer.prepare();
 
         return mediaPlayer;
     }
-
 }

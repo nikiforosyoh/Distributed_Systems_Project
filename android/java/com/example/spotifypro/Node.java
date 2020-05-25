@@ -9,7 +9,7 @@ import java.net.UnknownHostException;
 
 public class Node {
     //WE MUST CHANGE IT EVERY TIME!!!!
-    private static final int N=2; //Num of brokers
+    private static final int N=1; //Num of brokers
 
     public static final int getN(){
         return N;
@@ -66,6 +66,5 @@ public class Node {
         }
         return availableBrokers;
     }
-
 
 }
