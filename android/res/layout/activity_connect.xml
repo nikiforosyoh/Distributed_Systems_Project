@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".Connect">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".Connect">
 
 
     <TextView
-        android:id="@+id/insert"
-        android:layout_width="240dp"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="250dp"
-        android:layout_marginEnd="30dp"
-        android:fontFamily="casual"
-        android:text="Hello User "
-        android:textAlignment="center"
-        android:textColor="@color/colorBackground"
-        android:textSize="18sp"
-        android:textStyle="bold|italic" />
+            android:id="@+id/insert"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="250dp"
+            android:layout_marginEnd="30dp"
+            android:fontFamily="casual"
+            android:text="Hello User "
+            android:textAlignment="center"
+            android:textColor="@color/colorBackground"
+            android:textSize="18sp"
+            android:textStyle="bold|italic" />
     <Button
-        android:id="@+id/NextButton"
-        android:layout_width="139dp"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="400dp"
-        android:layout_marginEnd="30dp"
-        android:background="@color/colorPrimaryDark"
-        android:fontFamily="casual"
-        android:padding="10dp"
-        android:text="next"
-        android:textColor="@color/colorBackground"
-        android:textSize="18sp"
-        android:textStyle="bold|italic" />
+            android:id="@+id/NextButton"
+            android:layout_width="139dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="400dp"
+            android:layout_marginEnd="30dp"
+            android:background="@color/colorPrimaryDark"
+            android:fontFamily="casual"
+            android:padding="10dp"
+            android:text="next"
+            android:textColor="@color/colorBackground"
+            android:textSize="18sp"
+            android:textStyle="bold|italic" />
     <EditText
-        android:id="@+id/ArtistName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="300dp"
-        android:ems="10"
-        android:fontFamily="casual"
-        android:hint="please enter the artist"
-        android:inputType="textPersonName" />
+            android:id="@+id/ArtistName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="300dp"
+            android:ems="10"
+            android:fontFamily="casual"
+            android:hint="please enter the artist"
+            android:inputType="textPersonName" />
 
 
     <TextView
-        android:id="@+id/searching"
-        android:layout_width="84dp"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="550dp"
-        android:visibility="invisible"
-        android:text="Searching...." />
+            android:id="@+id/searching"
+            android:layout_width="84dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="550dp"
+            android:visibility="invisible"
+            android:text="Searching...." />
 
 </RelativeLayout>
