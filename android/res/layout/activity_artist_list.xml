@@ -9,9 +9,14 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/myList"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical"
+        android:layout_width="333dp"
+        android:layout_height="611dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="39dp"
+        android:layout_marginBottom="8dp"
+        android:background="#FFFFFF"
         android:padding="4dp"
-        android:background="#FFFFFF"/>
+        android:scrollbars="vertical" />
+
 </RelativeLayout>
