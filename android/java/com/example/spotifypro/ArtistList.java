@@ -4,38 +4,93 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import static com.example.spotifypro.Glob.cons;
+import static com.example.spotifypro.Glob.firstTime;
 
 public class ArtistList extends AppCompatActivity {
     RecyclerView recyclerview;
     RecyclerView.Adapter myAdapter;
     RecyclerView.LayoutManager layoutManager;
-    private static ArrayList<String> ListOfArtists=new ArrayList<>();
 
+    private static ArrayList<String> art=new ArrayList<>();
+    private static HashMap<String,Info> brokerArt=new HashMap<String,Info>();
+    boolean listFull=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist_list);
-        ListOfArtists=(ArrayList<String>)getIntent().getSerializableExtra("ListOfArtists");
-        recyclerview=(RecyclerView)findViewById(R.id.myList);
-        recyclerview.setHasFixedSize(true);
+        //ListOfArtists=(ArrayList<String>)getIntent().getSerializableExtra("ListOfArtists");
 
 
-        layoutManager=new LinearLayoutManager(this);
-        recyclerview.setLayoutManager((layoutManager));
+        if(firstTime) {
+            ArtistList.MyFirstTask first = new ArtistList.MyFirstTask();
+            first.execute();
+            while (!listFull) ;
+            firstTime = false;
+        }
+            //registerbtn.setVisibility(View.INVISIBLE);
+            recyclerview=(RecyclerView)findViewById(R.id.myList);
+            recyclerview.setHasFixedSize(true);
+
+
+            layoutManager=new LinearLayoutManager(this);
+            recyclerview.setLayoutManager((layoutManager));
 
 
 
-        myAdapter=new ArtistAdapter(this,ListOfArtists);
-        recyclerview.setAdapter(myAdapter);
+            myAdapter=new ArtistAdapter(this,art);
+            recyclerview.setAdapter(myAdapter);
 
 
 
 
 
+
+
+    }
+
+    private class MyFirstTask extends AsyncTask<String, Consumer, ArrayList<String>> {
+
+        @Override
+        protected void onPreExecute() {
+
+            Log.d("....", "Initialization");
+
+        }
+
+        @Override
+        protected ArrayList<String> doInBackground(String... arg0) {
+            cons = new Consumer("192.168.1.7", 5000);
+            Log.d("Insert", "First stage");
+            cons.init(cons.getBrokerIp(), cons.getBrokerPort(), cons.getAvailableBrokers());
+            Log.d("myTag3", "Problem2");
+            brokerArt = cons.initialization();
+            art = createArtList(brokerArt);
+            listFull=true;
+            Log.d("myTag4", "Problem3");
+
+            return art;
+        }
+
+    }
+
+    private ArrayList<String> createArtList(HashMap<String, Info> brokerArt) {
+        for (String artist : brokerArt.keySet()) {
+            art.add(artist);
+            Log.d("papapa: ", artist);
+        }
+        return art;
 
     }
 }

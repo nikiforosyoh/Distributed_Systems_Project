@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent connectIntent = new Intent(MainActivity.this, Connect.class);
+                Intent connectIntent = new Intent(MainActivity.this, ArtistList.class);
                 startActivity(connectIntent);
                 finish();
             }

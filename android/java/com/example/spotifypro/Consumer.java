@@ -103,7 +103,7 @@ public class Consumer extends Node implements Parcelable {
         return BrokerIp;
     }
 
-
+    public  HashMap<String,Info> getBrokerArtist(){return brokerArtists;}
 
     public static int getBrokerPort() {
         return BrokerPort;

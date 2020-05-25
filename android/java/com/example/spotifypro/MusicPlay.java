@@ -37,9 +37,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.spotifypro.Glob.firstTime;
 import static com.example.spotifypro.Node.getN;
-
+import static com.example.spotifypro.Glob.cons;
 
 //the third activity->ina=structions:
 /*1.enter the song of the artist you chose previously
@@ -48,14 +47,12 @@ import static com.example.spotifypro.Node.getN;
   !!!!!the first time,in order to choose another artist and song,you NEED to click the button "back" for sending the arraylist of artists to Connect activity and then to ArtistList activity via the playlist button->see */
 public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnCompletionListener {
 
-    Consumer cons = new Consumer("192.168.1.8", 5000);
+    //Consumer cons = new Consumer("192.168.1.5", 5000);
     private ArrayList<MusicFile> listOfSongs = new ArrayList<MusicFile>();
     private ArrayList<MusicFile> listOfChunks = new ArrayList<>();
     private ArrayList<byte[]> listOfMusicExtraction = new ArrayList<>();
     private MediaPlayer mediaPlayer = new MediaPlayer();
     private MediaMetadataRetriever metadataRetriever=new MediaMetadataRetriever();
-    private static ArrayList<String> art=new ArrayList<>();
-    private static HashMap<String,Info> brokerArt=new HashMap<String,Info>();
 
     //declare the basic elements
     private TextView songtitle, artist,currentTimer;
@@ -98,9 +95,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         //take the values from the Connect activity
         artist.setText(getIntent().getStringExtra("ARTIST"));
 
-        if(!art.isEmpty()){
-            artistListbtn.setVisibility(View.VISIBLE);
-        }
+
 
         searchImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,20 +107,11 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 }
 
 
-                if(firstTime){
-                    artist.setText(getIntent().getStringExtra("ARTIST"));
-                    String requestArtist = artist.getText().toString().trim();
-                    String requestSong = SongTitle.getText().toString().trim();
-                    MyFirstTask first=new MyFirstTask();
-                    first.execute(requestArtist, requestSong);
-                }else {
-                    artist.setText(getIntent().getStringExtra("ArtistName"));
-                    String requestArtist = artist.getText().toString().trim();
-                    String requestSong = SongTitle.getText().toString().trim();
-                    MySecondTask second = new MySecondTask();
-                    second.execute(requestArtist, requestSong);
-                }
-                firstTime=false;
+                artist.setText(getIntent().getStringExtra("ArtistName"));
+                String requestArtist = artist.getText().toString().trim();
+                String requestSong = SongTitle.getText().toString().trim();
+                MySecondTask second = new MySecondTask();
+                second.execute(requestArtist, requestSong);
 
             }
         });
@@ -204,7 +190,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             public void onClick(View v) {
 
                 Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
-                artistlistintent.putExtra("ListOfArtists",art);
                 startActivity(artistlistintent);
                 if (mediaPlayer.isPlaying()){
                     mediaPlayer.stop();
@@ -230,7 +215,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
     public void onBackPressed(){
 
             Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
-            artistlistintent.putExtra("ListOfArtists",art);
             startActivity(artistlistintent);
             if (mediaPlayer.isPlaying()){
                 mediaPlayer.stop();
@@ -248,70 +232,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         btnPlay.setImageResource(R.drawable.play);
     }
 
-    private class MyFirstTask extends AsyncTask<String, Consumer, byte[]> {
-        TextView searching=(TextView)findViewById(R.id.searching);
-
-        @Override
-        protected void onPreExecute() {
-
-            Log.d("....", "Initialization");
-
-        }
-
-        @Override
-        protected byte[] doInBackground(String... arg0) {
-            Log.d("Insert", "First stage");
-            cons.init(cons.getBrokerIp(),cons.getBrokerPort(),cons.getAvailableBrokers());
-            Log.d("myTag3", "Problem2");
-            brokerArt=cons.initialization();
-            art=createArtList(brokerArt);
-            Log.d("myTag4", "Problem3");
-            String requestArt = arg0[0];
-            String requestS = arg0[1];
-
-            //brokerArt=cons.createHash(art2,avbrokers);
-            //brokerArt.forEach((k,v) -> Log.d(k, String.valueOf(v)));
-
-            try {
-                listOfChunks=cons.openConsumer(requestArt,requestS,brokerArt);
-
-                //in case a song that doesn't exist
-                if (listOfChunks.isEmpty()){
-                     Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
-                     artistlistintent.putExtra("ListOfArtists",art);
-                     startActivity(artistlistintent);
-                     return null;
-                }
-
-                listOfMusicExtraction=cons.takeMusicFileExtraction(listOfChunks.get(0).totalChunks,listOfChunks);
-                mp3fileforplay=cons.recreateFile(listOfMusicExtraction);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.d("myTag6", "Second-3");
-            return mp3fileforplay;
-
-        }
-
-        @Override
-        protected void onPostExecute(byte[] b) {
-            super.onPostExecute(b);
-            btnPrepare.setVisibility(View.VISIBLE);
-            searching.setVisibility(View.INVISIBLE);
-        }
-
-    }
-
-    private ArrayList<String> createArtList(HashMap<String, Info> brokerArt) {
-          for(String artist:brokerArt.keySet()){
-              art.add(artist);
-              Log.d("papapa: ",artist);
-          }
-          return art;
-
-
-    }
 
     private class MySecondTask extends AsyncTask<String, Consumer, byte[]> {
         TextView searching=(TextView)findViewById(R.id.searching);
@@ -332,7 +252,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             String requestS = arg0[1];
 
             try {
-                listOfChunks=cons.openConsumer(requestArt,requestS,brokerArt);
+                listOfChunks=cons.openConsumer(requestArt,requestS,cons.getBrokerArtist());
 
                 //in case a song that doesn't exist
                 if (listOfChunks.isEmpty()){
@@ -349,7 +269,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                     //Toast.makeText(MusicPlay.this, "the song doesn't exist! sorry!", Toast.LENGTH_LONG).show();
 
                     Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
-                    artistlistintent.putExtra("ListOfArtists",art);
                     startActivity(artistlistintent);
                     return null;
                 }
