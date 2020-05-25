@@ -197,18 +197,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             }
         });
 
-        /*
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent connectIntent = new Intent(MusicPlay.this, Connect.class);
-                startActivity(connectIntent);
-                finish();
-            }
-        }, 1000);
-        */
-
-
     }
 
     @Override
@@ -256,19 +244,8 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
 
                 //in case a song that doesn't exist
                 if (listOfChunks.isEmpty()){
-                    //pop up
-                    /*
-                    Context context = getApplicationContext();
-                    CharSequence text = "The song doesn't exist";
-                    int duration = Toast.LENGTH_SHORT;
-
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
-
-                     */
-                    //Toast.makeText(MusicPlay.this, "the song doesn't exist! sorry!", Toast.LENGTH_LONG).show();
-
-                    Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
+                    
+                  Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
                     startActivity(artistlistintent);
                     return null;
                 }
@@ -309,7 +286,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             album.setVisibility(View.VISIBLE);
             searchImage.setVisibility(View.INVISIBLE);
             btnPause.setVisibility(View.VISIBLE);
-            songtitle.setText(listOfChunks.get(0).trackName);
+            songtitle.setText(listOfChunks.get(0).trackName.substring(0,1).toUpperCase()+listOfChunks.get(0).trackName.substring(1));
 
         }
 
@@ -356,16 +333,17 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 @Override
                 public void run() {
                     updateSeekBar();
-                    realtime-=1000;//1 sec before
+                    //realtime-=1000;//1 sec before
                     //currentTimer.setText(String.format("%d:%d",(songTime/1000)/60,(songTime/1000)%60);
 
-
+                    //Timer
                      if (value%60 <= 9){
                          timer = (value / 60) + ":0" + (value % 60);
                      }else {
                          timer = (value / 60) + ":" + (value % 60);
                      }
 
+                    //Countdown
                     /*
                     time = songTime/1000 - value;
                     Log.d("time", String.valueOf(time));
@@ -404,21 +382,17 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         FileInputStream fis = new FileInputStream(tempMp3file);
         mediaPlayer.setDataSource(fis.getFD());
 
-        //ο κωδικας για δοκιμη του αλμπουμ
-        /*try{
+        try{
                 metadataRetriever.setDataSource(fis.getFD());
                 albumPic=metadataRetriever.getEmbeddedPicture();
                 Bitmap songImage = BitmapFactory.decodeByteArray(albumPic, 0, albumPic.length);
                 album.setImageBitmap(songImage);
         }catch(Exception e) {
-                album.setImageResource(R.mipmap.appicontwo_background);
-        }*/
+               e.printStackTrace();
+        }
         mediaPlayer.prepare();
 
         return mediaPlayer;
-
     }
 
-
 }
-
