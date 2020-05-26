@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.example.spotifypro.Glob.mediaPlayer;
+
 public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder> {
 
     ArrayList<String> artist;
@@ -42,6 +44,9 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
 
         @Override
         public void onClick(View v) {
+             if (mediaPlayer.isPlaying()){
+                mediaPlayer.stop();
+             }
             int pos=getAdapterPosition();
             Intent intent=new Intent(context,MusicPlay.class);
             intent.putExtra("ArtistName",tvName.getText().toString());

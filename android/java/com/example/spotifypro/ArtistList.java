@@ -6,10 +6,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import static com.example.spotifypro.Glob.cons;
 import static com.example.spotifypro.Glob.firstTime;
+import static com.example.spotifypro.Glob.songFound;
 
 public class ArtistList extends AppCompatActivity {
     RecyclerView recyclerview;
@@ -25,7 +30,10 @@ public class ArtistList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist_list);
         //ListOfArtists=(ArrayList<String>)getIntent().getSerializableExtra("ListOfArtists");
-
+        if(!songFound){
+            displayPopup(findViewById(R.id.rootLayout));
+            songFound=true;
+        }
         if(firstTime) {
             ArtistList.MyFirstTask first = new ArtistList.MyFirstTask();
             first.execute();
@@ -41,6 +49,10 @@ public class ArtistList extends AppCompatActivity {
 
         myAdapter=new ArtistAdapter(this,art);
         recyclerview.setAdapter(myAdapter);
+    }
+    public void displayPopup(View v){
+        Snackbar snackbar = Snackbar.make(findViewById(R.id.rootLayout),R.string.No_such_song,Snackbar.LENGTH_LONG);
+        snackbar.show();
     }
 
     private class MyFirstTask extends AsyncTask<String, Consumer, ArrayList<String>> {
