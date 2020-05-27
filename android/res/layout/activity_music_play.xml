@@ -34,60 +34,60 @@
 
    <ImageButton
            android:id="@+id/searchImage"
-           android:layout_width="84dp"
+           android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:layout_centerHorizontal="true"
            android:layout_marginLeft="3dp"
            android:layout_marginTop="50dp"
            android:layout_toRightOf="@id/SongTitle"
-           android:background="#FFFFFF"
+           android:background="@null"
            android:src="@drawable/search">
 
    </ImageButton>
 
    <ImageButton
            android:id="@+id/btnPlayer"
-           android:layout_width="50dp"
-           android:layout_height="50dp"
+           android:layout_width="67dp"
+           android:layout_height="wrap_content"
            android:layout_centerHorizontal="true"
-           android:layout_marginTop="500dp"
-           android:visibility="invisible"
-           android:src="@drawable/play">
+           android:layout_marginTop="495dp"
+           android:background="@null"
+           android:src="@drawable/play"
+           android:visibility="invisible">
 
    </ImageButton>
 
    <ImageButton
            android:id="@+id/btnPause"
-           android:layout_width="50dp"
-           android:layout_height="50dp"
+           android:layout_width="67dp"
+           android:layout_height="wrap_content"
            android:layout_centerHorizontal="true"
-           android:layout_marginTop="500dp"
-           android:visibility="invisible"
-           android:src="@drawable/pause">>
-
-   </ImageButton>
+           android:layout_marginTop="495dp"
+           android:background="@null"
+           android:src="@drawable/pause"
+           android:visibility="invisible" />
 
    <ImageButton
            android:id="@+id/btnForward"
-           android:layout_width="50dp"
-           android:layout_height="50dp"
-           android:layout_marginLeft="20dp"
+           android:layout_width="52dp"
+           android:layout_height="40dp"
+           android:layout_marginLeft="17dp"
            android:layout_marginTop="500dp"
            android:layout_toRightOf="@id/btnPause"
-           android:visibility="invisible"
            android:src="@drawable/forward"
-           ></ImageButton>
+           android:background="@null"
+           android:visibility="invisible" />
 
    <ImageButton
-           android:layout_width="50dp"
-           android:layout_height="50dp"
            android:id="@+id/btnBack"
+           android:layout_width="48dp"
+           android:layout_height="42dp"
            android:layout_marginTop="500dp"
+           android:layout_marginRight="17dp"
            android:layout_toLeftOf="@id/btnPlayer"
-           android:layout_marginRight="20dp"
-           android:visibility="invisible"
            android:src="@drawable/rewind"
-           ></ImageButton>
+           android:background="@null"
+           android:visibility="invisible" />
 
    <SeekBar
            android:id="@+id/seekbar"
@@ -97,7 +97,7 @@
            android:layout_marginLeft="20dp"
            android:layout_marginTop="400dp"
            android:visibility="invisible"
-           android:layout_marginRight="20dp"></SeekBar>
+           android:layout_marginRight="20dp" />
 
    <TextView
            android:id="@+id/songtitle"
@@ -145,7 +145,7 @@
            android:layout_width="70dp"
            android:layout_height="41dp"
            android:layout_marginLeft="42dp"
-           android:layout_marginTop="450dp"
+           android:layout_marginTop="447dp"
            android:layout_marginRight="500dp"
            android:layout_toRightOf="@id/btnForward"
            android:fontFamily="casual"
@@ -166,25 +166,28 @@
            android:visibility="invisible" />
 
    <ImageButton
-           android:id="@+id/backActivity"
-           android:layout_width="57dp"
-           android:layout_height="39dp"
+           android:id="@+id/playlist"
+           android:layout_width="37dp"
+           android:layout_height="32dp"
            android:layout_alignParentTop="true"
-           android:layout_marginTop="8dp"
-           android:layout_marginRight="40dp"
-           android:background="#FFFFFF"
+           android:layout_alignParentEnd="true"
+           android:layout_marginTop="10dp"
+           android:layout_marginEnd="364dp"
+           android:layout_marginRight="60dp"
+           android:background="@null"
            app:srcCompat="@drawable/playlist" />
 
    <ImageButton
-       android:id="@+id/downloading"
-       android:layout_width="70dp"
-       android:layout_height="41dp"
-       android:layout_alignParentStart="true"
-       android:layout_marginStart="42dp"
-       android:layout_marginLeft="42dp"
-       android:layout_marginTop="450dp"
-       android:layout_marginRight="100dp"
-       android:visibility="invisible"
-       app:srcCompat="@drawable/downloading" />
+           android:id="@+id/downloading"
+           android:layout_width="38dp"
+           android:layout_height="35dp"
+           android:layout_alignParentStart="true"
+           android:layout_marginStart="25dp"
+           android:layout_marginLeft="42dp"
+           android:layout_marginTop="445dp"
+           android:layout_marginRight="100dp"
+           android:background="@null"
+           android:visibility="invisible"
+           app:srcCompat="@drawable/downloading" />
 
 </RelativeLayout>
