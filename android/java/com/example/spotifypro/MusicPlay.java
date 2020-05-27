@@ -1,21 +1,15 @@
 package com.example.spotifypro;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,10 +24,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
-import static android.provider.MediaStore.*;
 import static com.example.spotifypro.Glob.songFound;
 import static com.example.spotifypro.Node.getN;
 import static com.example.spotifypro.Glob.cons;
@@ -58,7 +50,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
     private ImageButton  searchImage,btnBack,btnForward,btnPlay,btnPause,artistListbtn,downloading;
     SeekBar seekBar;
     String timer;
-    byte[] mp3fileforplay,mp3fordownload;
+    byte[] mp3fileforplay;
     byte[] albumPic;
     private int songTime;
     private Button btnPrepare;
@@ -88,7 +80,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         album=(ImageView)findViewById(R.id.album);
         btnPrepare=(Button)findViewById(R.id.prepareSong);
         currentTimer=(TextView)findViewById(R.id.currentTimer);
-        artistListbtn=(ImageButton)findViewById(R.id.backActivity);
+        artistListbtn=(ImageButton)findViewById(R.id.playlist);
         final EditText SongTitle = (EditText) findViewById(R.id.SongTitle);
 
         //take the values from the ArtistList activity
@@ -108,6 +100,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                     second.execute(requestArtist, requestSong);
                 }
 
+
             }
         });
 
@@ -117,6 +110,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 MyThirdTask third=new MyThirdTask();
                 third.execute(mp3fileforplay);
                 btnPrepare.setVisibility(View.INVISIBLE);
+                artistListbtn.setVisibility(View.VISIBLE);
             }
         });
 
@@ -166,12 +160,11 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         seekBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(mediaPlayer.isPlaying()){
-                    SeekBar seekbar=(SeekBar) v;
-                    int playYou=(songTime/100)*seekbar.getProgress();
-                    mediaPlayer.seekTo(playYou);
-
-                }
+               // if(mediaPlayer.isPlaying()){
+                SeekBar seekbar=(SeekBar) v;
+                int playYou=seekbar.getProgress();
+                mediaPlayer.seekTo(playYou);
+               // }
                 return false;
             }
 
@@ -185,12 +178,13 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
                 startActivity(artistlistintent);
             }
         });
+
         //download the song
         downloading.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MyFourthTask fourth=new MyFourthTask();
-                fourth.execute(mp3fordownload);
+                fourth.execute(mp3fileforplay);
             }
         });
     }
@@ -212,7 +206,9 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        btnPlay.setImageResource(R.drawable.play);
+        //btnPlay.setImageResource(R.drawable.play);
+        btnPlay.setVisibility(View.INVISIBLE);
+        btnPause.setVisibility(View.VISIBLE);
     }
 
     private class MySecondTask extends AsyncTask<String, Consumer, byte[]> {
@@ -298,6 +294,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             //super.onPostExecute(s);
             Log.d("ola kala:","paizeiii");
             songTime=mediaPlayer.getDuration();
+            seekBar.setMax(songTime);
             //boolean isButtonPressed=false;
             if(!mediaPlayer.isPlaying()){
                 mediaPlayer.start();
@@ -310,39 +307,30 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
 
 
     private void updateSeekBar() {
-        seekBar.setProgress((int)(((float)mediaPlayer.getCurrentPosition()/songTime)*100));
-        int value = seekBar.getProgress();
-
+        //seekBar.setProgress((int)(((float)mediaPlayer.getCurrentPosition()/songTime)*100));
+        seekBar.setProgress(mediaPlayer.getCurrentPosition());
+        int value = songTime-seekBar.getProgress();
 
         if(mediaPlayer.isPlaying()){
             Runnable up=new Runnable(){
 
                 @Override
                 public void run() {
-                    updateSeekBar();
-                    //currentTimer.setText(String.format("%d:%d",(songTime/1000)/60,(songTime/1000)%60);
 
-                    //Timer
-                    if (value%60 <= 9){
-                        timer = (value / 60) + ":0" + (value % 60);
+                    //countdown
+                    if ((value/1000)%60 <= 9){
+                        timer = (value /1000)/ 60 + ":0" + (value/1000) % 60;
                     }else {
-                        timer = (value / 60) + ":" + (value % 60);
+                        timer = (value/1000) / 60 + ":" + (value/1000) % 60;
                     }
 
-                    //Countdown
-                    /*
-                    time = songTime/1000 - value;
-                    Log.d("time", String.valueOf(time));
-                    minutes = time / 60;
-                    seconds = time % 60;
-
-                    if (seconds <= 9){
-                        timer = minutes + ":0" + seconds;
-                    }else {
-                        timer = minutes + ":" + seconds;
-                    }
-                    */
                     currentTimer.setText(timer);
+                    updateSeekBar();
+
+                    if (value==0){
+                        btnPause.setVisibility(View.INVISIBLE);
+                        btnPlay.setVisibility(View.VISIBLE);
+                    }
                 }
             };
             handler.postDelayed(up,1000);
@@ -375,6 +363,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
 
         return mediaPlayer;
     }
+
     private class MyFourthTask extends AsyncTask<byte[],String,String>{
         boolean isdownloaded=false;
         @Override
@@ -402,56 +391,14 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         }
     }
     private boolean downloadMp3(byte[] mp3SoundByteArray,String title)throws IOException {
-
-
-        //checks storage state
-        boolean mExternalStorageAvailable = false;
-        boolean mExternalStorageWriteable = false;
-        String state = Environment.getExternalStorageState();
-
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            // We can read and write the media
-            mExternalStorageAvailable = mExternalStorageWriteable = true;
-        } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            // We can only read the media
-            mExternalStorageAvailable = true;
-            mExternalStorageWriteable = false;
-        } else {
-            // Something else is wrong. It may be one of many other states, but all we need
-            //  to know is we can neither read nor write
-            mExternalStorageAvailable = mExternalStorageWriteable = false;
-        }
-
-        //create folder
-        File folder = new File(Environment.getExternalStorageDirectory() +
-                File.separator + "SpotifyProDownloads");
-        boolean success = true;
-
-        if (!folder.exists()) {
-            success = folder.mkdirs();
-        }else{
-            System.out.println("folder exists = " + folder.exists());
-        }
-
-        if (success) {
-            //save mp3 file in folder
-            File file = new File(folder, title + ".mp3");
-            OutputStream stream = new FileOutputStream(file);
-            stream.write(mp3SoundByteArray);
-            stream.close();
-            System.out.println("Temporary file created at : " + file.getAbsolutePath());
-        } else {
-            // Do something else on failure
-            System.out.println("ERROR CREATING FOLDER");
-        }
-
-        System.out.println("Folder path: " + folder.getAbsolutePath());
-        //String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + title + ".mp3";
-        //String path = dir.getAbsolutePath()+ "/" + title + ".mp3";
-
-       // System.out.println("PATH: " + Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
-
+        //File songfile= File.createTempFile(title,"mp3",);
+        //FileOutputStream f=new FileOutputStream(songfile);
+        FileOutputStream stream = new FileOutputStream(title + "(new).mp3");
+        stream.write(mp3SoundByteArray);
+        //f.write(mp3SoundByteArray);
+        stream.close();
         return true;
 
     }
+
 }
