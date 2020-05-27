@@ -50,8 +50,11 @@ public class ArtistList extends AppCompatActivity {
         myAdapter=new ArtistAdapter(this,art);
         recyclerview.setAdapter(myAdapter);
     }
+    
     public void displayPopup(View v){
         Snackbar snackbar = Snackbar.make(findViewById(R.id.rootLayout),R.string.No_such_song,Snackbar.LENGTH_LONG);
+        View sbView = snackbar.getView();
+        sbView.setBackgroundColor(getColor(R.color.colorPrimaryDark));
         snackbar.show();
     }
 
