@@ -44,9 +44,9 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
 
         @Override
         public void onClick(View v) {
-             if (mediaPlayer.isPlaying()){
+            /* if (mediaPlayer.isPlaying()){
                 mediaPlayer.stop();
-             }
+             }*/
             int pos=getAdapterPosition();
             Intent intent=new Intent(context,MusicPlay.class);
             intent.putExtra("ArtistName",tvName.getText().toString());

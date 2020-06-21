@@ -2,6 +2,9 @@ package com.example.spotifypro;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -9,8 +12,10 @@ import android.os.Bundle;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +30,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+//MusicPlay
+
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.example.spotifypro.Glob.songFound;
 import static com.example.spotifypro.Node.getN;
@@ -55,10 +71,6 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
     private int songTime;
     private Button btnPrepare;
     final Handler handler=new Handler();
-    int minutes;
-    int seconds;
-    int time;
-
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -160,11 +172,17 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         seekBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-               // if(mediaPlayer.isPlaying()){
+                // if(mediaPlayer.isPlaying()){
+                if(!mediaPlayer.isPlaying() ){
+                    mediaPlayer.pause();
+                    btnPause.setVisibility(View.INVISIBLE);
+                    btnPlay.setVisibility(View.VISIBLE);
+
+                }
                 SeekBar seekbar=(SeekBar) v;
                 int playYou=seekbar.getProgress();
                 mediaPlayer.seekTo(playYou);
-               // }
+                // }
                 return false;
             }
 
@@ -185,17 +203,31 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
             public void onClick(View v) {
                 MyFourthTask fourth=new MyFourthTask();
                 fourth.execute(mp3fileforplay);
+                Toast.makeText(MusicPlay.this, "Song Downloaded", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(mediaPlayer.isPlaying()){
+            mediaPlayer.pause();
+        }
+        updateSeekBar();
+
+        btnPause.setVisibility(View.INVISIBLE);
+        btnPlay.setVisibility(View.VISIBLE);
+
     }
 
     @Override
     public void onBackPressed(){
         Intent artistlistintent=new Intent(MusicPlay.this,ArtistList.class);
         startActivity(artistlistintent);
-        if (mediaPlayer.isPlaying()){
+       /* if (mediaPlayer.isPlaying()){
             mediaPlayer.stop();
-        }
+        }*/
     }
 
     @Override
@@ -369,7 +401,7 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            songtitle.setText(listOfChunks.get(0).trackName.substring(0,1).toUpperCase()+listOfChunks.get(0).trackName.substring(1));
+            //songtitle.setText(listOfChunks.get(0).trackName.substring(0,1).toUpperCase()+listOfChunks.get(0).trackName.substring(1));
 
         }
 
@@ -387,18 +419,20 @@ public class MusicPlay extends AppCompatActivity implements MediaPlayer.OnBuffer
 
         @Override
         protected void onPostExecute(String s) {
+
             //super.onPostExecute(s);
         }
     }
     private boolean downloadMp3(byte[] mp3SoundByteArray,String title)throws IOException {
-        //File songfile= File.createTempFile(title,"mp3",);
-        //FileOutputStream f=new FileOutputStream(songfile);
-        FileOutputStream stream = new FileOutputStream(title + "(new).mp3");
+        File songfile= new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/"+title + "(new).mp3");
+
+        FileOutputStream stream = new FileOutputStream(songfile);
         stream.write(mp3SoundByteArray);
-        //f.write(mp3SoundByteArray);
+
         stream.close();
         return true;
 
     }
 
 }
+

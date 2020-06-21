@@ -1,12 +1,19 @@
+//ArrayList
+
 package com.example.spotifypro;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -30,6 +37,11 @@ public class ArtistList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist_list);
         //ListOfArtists=(ArrayList<String>)getIntent().getSerializableExtra("ListOfArtists");
+        if(!isOnline()) {
+            Toast.makeText(ArtistList.this, "No Internet Connection.Go to Downloads file!", Toast.LENGTH_SHORT).show();
+            Intent connectIntent = new Intent(ArtistList.this, NoInternetCon.class);
+            startActivity(connectIntent);
+        }
         if(!songFound){
             displayPopup(findViewById(R.id.rootLayout));
             songFound=true;
@@ -50,7 +62,6 @@ public class ArtistList extends AppCompatActivity {
         myAdapter=new ArtistAdapter(this,art);
         recyclerview.setAdapter(myAdapter);
     }
-    
     public void displayPopup(View v){
         Snackbar snackbar = Snackbar.make(findViewById(R.id.rootLayout),R.string.No_such_song,Snackbar.LENGTH_LONG);
         View sbView = snackbar.getView();
@@ -67,7 +78,7 @@ public class ArtistList extends AppCompatActivity {
 
         @Override
         protected ArrayList<String> doInBackground(String... arg0) {
-            cons = new Consumer("192.168.1.8", 5000);
+            cons = new Consumer("192.168.1.9", 5000);
             Log.d("Insert", "First stage");
             cons.init(cons.getBrokerIp(), cons.getBrokerPort(), cons.getAvailableBrokers());
             Log.d("myTag3", "Problem2");
@@ -85,5 +96,10 @@ public class ArtistList extends AppCompatActivity {
             Log.d("papapa: ", artist);
         }
         return art;
+    }
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 }
